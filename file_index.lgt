@@ -59,7 +59,6 @@
 	% Create the file if it doesn't allready exist
 	:- initialization(init).
 	
-	
 	:- private(init/0).
 	init :-
 		parameter(1,P1),
@@ -77,8 +76,8 @@
 	result_files_allocate(Module,Task,InputFiles,Options,ResultFiles) :-
 		get_index_file(IndexFile),
  		current_timestamp(AllocatedTimestamp),
- 		term_manipulation::term_to_atom(AllocatedTimestamp,AllocatedTimestampAtom),
  		IndexFile::dirname(IndexDir),
+		IndexFile::read_terms(Terms),
  		next_available_index(Terms, Index),
  		term_manipulation::term_to_atom(Index,IndexAtom),
  		findall(Filename, (
@@ -86,7 +85,7 @@
 			term_manipulation::term_to_atom(FileNo,FileNoAtom),
 			meta::foldl(atom_concat,'',[IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Filename)
 		),ResultFiles),
-		IndexFile::append([files(IndexAtom,AllocatedTimestampAtom,null,ResultFiles,Module,Task,InputFiles,Options)]).
+		IndexFile::append([files(IndexAtom,AllocatedTimestamp,null,ResultFiles,Module,Task,InputFiles,Options)]).
 
 	result_files_commit(Module,Task,InputFiles,Options) :-
 		get_index_file(IndexFile),
@@ -98,7 +97,20 @@
 		get_index_file(IndexFile),
 		IndexFile::select(files(_,_,null,_,Module,Task,InputFiles,Options),RestEntries),
 		IndexFile::write_terms(RestEntries).
+		
+	result_files(Module,Task,InputFiles,Options,ResultFiles) :-
+		get_index_file(IndexFile),
+		IndexFile::member(files(_id,_alloc_ts,time(_,_,_,_,_,_),ResultFiles,Module,Task,InputFiles,Options)).
 
+
+	result_files_allocate_time(Module,Task,InputFiles,Options,AllocTs) :-
+		get_index_file(IndexFile),
+		IndexFile::member(files(_id,AllocTs,_,_ResultFiles,Module,Task,InputFiles,Options)).
+	
+	result_files_commit_time(Module,Task,InputFiles,Options,time(Year,Day,Mon,Hour,Min,Sec)) :-
+		get_index_file(IndexFile),
+		IndexFile::member(files(_id,_AllocTs,time(Year,Day,Mon,Hour,Min,Sec),_ResultFiles,Module,Task,InputFiles,Options)).
+		
 	:- private(next_available_index/2).
 	:- info(next_available_index/2, [
 		comment is 'Given Terms, unify NextAvailableIndex with a unique index not occuring as index in terms.',

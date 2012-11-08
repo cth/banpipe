@@ -107,36 +107,72 @@
 	succeeds(allocate_commit0) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
 		
 	succeeds(allocate_rollback) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
-		
+
 	fails(allocate_commit_rollback) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		!,
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		!,
 		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
 
 	fails(allocate_rollback_commit) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		!,
 		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		!,
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
 		
 	succeeds(allocate_commmit_results) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
 		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		!,
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
-		term_file_index(FI)::resuls_files('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],ResultFiles),
-		writeln(result_files(ResultFiles)),
+		!,
+		term_file_index(FI)::result_files('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],ResultFiles),
 		ResultFiles == [Out1,Out2].
 		
+	succeeds(allocate_allocate_time) :-
+		index_file(FI),
+		file(FI)::delete, % make sure the file does not exists
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		!,
+		term_file_index(FI)::result_files_allocate_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
+		date::valid(AYear,AMon,ADay),
+		time::valid(AHour,AMin,ASec).
+		
+	fails(allocate_commit_time) :-
+		index_file(FI),
+		file(FI)::delete, % make sure the file does not exists
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		!,
+		term_file_index(FI)::result_files_commit_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],_).
+				
+	succeeds(allocate_commit_alloctime) :-
+		index_file(FI),
+		file(FI)::delete, % make sure the file does not exists
+		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		!,
+		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		!,
+		term_file_index(FI)::result_files_allocate_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
+		!,
+		writeln(adter_allocate_time),
+		term_file_index(FI)::result_files_commit_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(CYear,CMon,CDay,CHour,CMin,CSec)),
+		date::valid(AYear,AMon,ADay),
+		time::valid(AHour,AMin,ASec),
+		date::valid(CYear,CMon,CDay),
+		time::valid(CHour,CMin,CSec).
 :- end_object.
