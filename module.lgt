@@ -1,0 +1,125 @@
+:- object(banpipe_module_path).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/09,
+		comment is 'Manages the module directory search paths. These are obtained from the BANPIPE_MODULE_PATH and directories which have subsequently programmatically been added through the include_directory predictate.']).
+		
+	:- private(path_dir/1).
+	:- dynamic(path_dir/1).
+
+	:- public(get_paths/1).
+	:- info(get_paths/1,
+		[ comment is 'Extract module directories from the BANPIPE_MODULE_PATH environment variable.',
+		  argnames is ['Paths']]).
+	get_paths(Paths) :-
+		(shell::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
+			[Separator] = ":",
+			atom_codes(PathAtom,PathCodes),	
+			list_extras::sublist_split(Separator,PathCodes,PathsCodes),
+			meta::map([X,Y]>>atom_codes(Y,X),PathsCodes,EnvPaths)
+			;
+			EnvPaths = []),
+		findall(Dir,::path_dir(Dir),AdditionalDirs),
+		list::append(AdditionalDirs,EnvPaths,Paths).
+		
+	:- public(include_directory/1).
+	:- info(include_directory/1,
+		[ comment is 'Programmatically appends a directory to the module search path',
+		  argnames is ['Directory']]).
+	include_directory(Directory) :-
+		(::path_dir(Directory) -> 
+			true
+			;
+			::assertz(path_dir(Directory))).
+:- end_object.
+
+:- object(module(_Name)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/09,
+		comment is 'A proxy object which represent a particular banpipe module.']).
+
+	:- public(interface_file/1).
+	
+	interface_file(File) :-
+		parameter(1,ModuleName),
+		banpipe_module_path::get_paths(Paths),
+		list::member(Path,Paths),
+		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.pl'],File),
+		file(File)::exists.
+:- end_object.
+
+:- object(module_task(_Module,_Task)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/09,
+		comment is 'Represents a task in a module']).
+
+	:- public(valid/1).
+	:- info(valid/1,
+		[ comment is 'Checks if a call with option parameters Options to the task represented by the object is valid. The module+task must exist, have a declaration and a implementation in the interface file and the options must match (be a subset of) declared options of the task.',
+		  argnames is ['Options']]).
+	valid(Options) :-
+		parameter(1,Module),
+		parameter(2,Task),
+		% Check that the task is declared
+		(::has_declaration -> true ; reporting::error(no_task_declaration(Module,Task))),
+		(::has_implementation -> true ; reporting::error(no_task_implementation(Module,Task))),
+		::options(DeclaredOptions),
+		(forall(list::member(Opt,Options), (Opt =.. [F,_], MatchOpt =.. [F,_],list::member(MatchOpt,DeclaredOptions))) ->
+			true
+			;
+			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
+			
+	:- private(has_declaration/0).
+	has_declaration :-
+		::declaration(_).
+
+	:- private(has_implementation/0).
+	:- info(has_implementation/0, [comment is 'True if the there is an implementition of the task. This merely verifies that a predicate of the correct name and arity exists, but not whether it works.']).
+	has_implementation :-
+		parameter(1,Module),
+		parameter(2,Task),
+		module(Module)::interface_file(File),
+		prolog_file(File)::read_terms(Terms),
+		term_manipulation::has_rule_with_head(Terms,Task,3).
+
+	:- private(declaration/1).
+	:- info(declaration/1,
+		[ comment is 'Declaration is the task declation, e.g, taskname(input_types,options,output_types).',
+		argnames is ['Declaration']]).
+	declaration(Declaration) :-
+		parameter(1,Module),
+		parameter(2,Task),
+		module(Module)::interface_file(InterfaceFile),
+		prolog_file(InterfaceFile)::member(TaskMatcher),
+		TaskMatcher =.. [ ':-', task(Declaration) ],
+		Declaration =.. [ Task | _ ].
+		
+	:- public(options/1).
+	:- info(options/1, 
+		[ comment is 'Options is the list of declared options for task.',
+		  argnames is ['Options']]).
+	options(Options) :-
+		declaration(Decl),
+		Decl =.. [ _ , _, Options, _ ].
+	
+	:- public(input_types/1).
+	:- info(input_types/1,
+		[ comment is 'InputTypes is a sequence of file types accepted as input to the task.',
+		  argnames is ['InputTypes']]).
+	input_types(InputTypes) :-
+		declaration(Decl),
+		Decl =.. [ _ , InputTypes, _, _ ].
+
+	:- public(output_types/1).
+	:- info(output_types/1,
+		[ comment is 'OutputTypes is a sequence of file types produced by the task.',
+		  argnames is ['OutputTypes']]).
+	output_types(OutputTypes) :-
+		declaration(Decl),
+		Decl =.. [ _ , _, _, OutputTypes ].
+:- end_object.

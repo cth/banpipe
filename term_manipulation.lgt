@@ -6,15 +6,14 @@
 		comment is 'Utility predicates for term manipulation']).
 
 
-	:- public(terms_has_rule_with_head/3).
-	:- info(terms_has_rule_with_head/3, [ 
+	:- public(has_rule_with_head/3).
+	:- info(has_rule_with_head/3, [ 
 		comment is 'True if the list Terms has a rule with a given Functor and Arity',
 		argnames is ['Terms','Functor','Arity']	]).
-	terms_has_rule_with_head(Terms,Functor,Arity) :-
-		member(Rule, Terms),
+	has_rule_with_head(Terms,Functor,Arity) :-
+		list::member(Rule, Terms),
 		Rule =.. [ (:-), Head, _ ],
 		functor(Head, Functor, Arity).
-			
 
 	:- public(atom_integer/2).
 	:- info(atom_integer/2, [

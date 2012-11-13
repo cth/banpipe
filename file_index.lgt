@@ -56,15 +56,6 @@
 	% InputFiles: Fully qualified list of input files
 	% Options: List of option terms on the form key(value)
 	
-	% Create the file if it doesn't allready exist
-	:- initialization(init).
-	
-	:- private(init/0).
-	init :-
-		parameter(1,P1),
-		writeln(init(P1)),
-		(file(P1)::exists -> consistency_check ; file(P1)::create).
-		
 	:- private(get_index_file/1).
 	get_index_file(IndexFile) :-
 		parameter(1,Param1),

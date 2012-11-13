@@ -6,9 +6,12 @@
 	logtalk_load(library(time)),
 	logtalk_load(library(datep)),
 	logtalk_load(library(date)),
+	logtalk_load(shell),
 	logtalk_load(file),
 	logtalk_load(list_extras),
 	logtalk_load(term_manipulation),
 	logtalk_load(file_index),
+	logtalk_load(reporting),
+	logtalk_load(module),
 	logtalk_load(tests,[hook(lgtunit)])
 )).
