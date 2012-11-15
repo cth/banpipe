@@ -1,28 +1,37 @@
 :- object(reporting).
 	:- public(error/1).
 	:- public(warning/1).
+	:- public(info/1).
 	
-	error(Error) :-
+	error(Msg) :-
 		check_condition,
 		!,
-		writeln(throwing),
-		throw(Error).
+		write('ERROR: '),
+		writeln(Msg),
+		throw(Msg).
 
-	warning(Warning) :-
+	warning(Msg) :-
 		check_condition,
 		!,
-		writeln(Warning).
+		write('WARNING: '),
+		writeln(Msg).
+	
+	info(Msg) :-
+		check_condition,
+		!,
+		write('INFO: '),
+		writeln(Msg).
 
 	check_condition.
 :- end_object.
 
-:- object(throw_if(_Cond), extends(reporting)).
+:- object(report_if(_Cond), extends(reporting)).
 	check_condition :-
 		parameter(1,Goal),
 		call(Goal).
 :- end_object.
 
-:- object(throw_unless(_Cond), extends(reporting)).
+:- object(report_unless(_Cond), extends(reporting)).
 	check_condition :-
 		parameter(1,Goal),
 		\+ call(Goal).

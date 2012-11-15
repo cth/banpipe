@@ -108,7 +108,7 @@
 		parameter(2,Task),
 		module(Module)::interface_file(File),
 		prolog_file(File)::read_terms(Terms),
-		term_manipulation::has_rule_with_head(Terms,Task,3).
+		term_extras::has_rule_with_head(Terms,Task,3).
 
 	:- private(declaration/1).
 	:- info(declaration/1,
@@ -151,29 +151,31 @@
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
 	:- public(run/1).
+	:- info(run/1,[
+		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). In either case, OutputFiles as a list of names of resulting files.',
+		argnames is ['OutputFiles']]).
+		
+	% FIXME: hook into logging
 	run(OutputFiles) :-
-		writeln(run_called),
 		::output_types(OutputTypes),
-		writeln(got_output_types(OutputTypes)),
 		list::length(OutputTypes,N),
 		list::length(OutputFiles,N),
 		parameter(1,Module),
 		parameter(2,Task),
 		parameter(3,InputFiles),
 		parameter(4,Options),
-		writeln(got_params),
-		config::get(filemanager,FileManager),
-		writeln(file_manager(FileManager)),
+		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
-		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions) ->
+		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions,OutputFiles) ->
+
 			true % The task has allready been run 
 			;
-			FileManager::result_files_allocate(Module,Task,InputFiles,ExpandedOptions)),
-		::invoker(Invoker),
-		module(Module)::interface_file(InterfaceFile),
-		Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
-		Invoker::run(InterfaceFile,Goal),
-		FileManager::result_files_commit(Module,Task,InputFiles,ExpandedOptions).
+			FileManager::result_files_allocate(Module,Task,InputFiles,ExpandedOptions,OutputFiles),
+			::invoker(Invoker),
+			module(Module)::interface_file(InterfaceFile),
+			Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
+			Invoker::run(InterfaceFile,Goal),!,
+			FileManager::result_files_commit(Module,Task,InputFiles,ExpandedOptions)).
 		
 	:- public(invoker/1).
 	:- info(invoker/1,

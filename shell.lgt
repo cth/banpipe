@@ -15,7 +15,12 @@
 	:- info(working_directory/1,
 		[ comment is 'Bind Dir to the current working directory',
 		  argnames is ['Dir']]).
-	
+		
+	:- public(change_directory/1).
+	:- info(change_directory/1,
+		[ comment is 'Change the current working directory to NewDir',
+		  argnames is ['NewDir']]).
+		
 	:- public(exec/1).
 	:- info(exec/1, [comment is 'Send Command to the OS shell', argnames is ['Command']]).
 	
@@ -33,7 +38,10 @@
 			{shell(ShellCmd,Status)}.
 			
 		working_directory(Dir) :-
-			{working_directory(Dir)}.
+			{working_directory(Dir,Dir)}.
+			
+		change_directory(NewDir) :-
+			{working_directory(_,NewDir)}.
 	:- elif((current_logtalk_flag(prolog_dialect, b))).
 		environment_variable(Key,Var) :-
 			{environ(Key,Var)}.
@@ -46,6 +54,9 @@
 			
 		working_directory(Dir) :-
 			{get_cwd(Dir)}.
+			
+		change_directory(NewDir) :-
+			{chdir(NewDir)}.
 	:- endif.
 	
 	:- public(make_directory/1).

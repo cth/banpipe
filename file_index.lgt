@@ -70,10 +70,10 @@
  		IndexFile::dirname(IndexDir),
 		IndexFile::read_terms(Terms),
  		next_available_index(Terms, Index),
- 		term_manipulation::term_to_atom(Index,IndexAtom),
+ 		term_extras::term_to_atom(Index,IndexAtom),
  		findall(Filename, (
 			list::nth1(FileNo,ResultFiles,Filename),
-			term_manipulation::term_to_atom(FileNo,FileNoAtom),
+			term_extras::term_to_atom(FileNo,FileNoAtom),
 			meta::foldl(atom_concat,'',[IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Filename)
 		),ResultFiles),
 		IndexFile::append([files(IndexAtom,AllocatedTimestamp,null,ResultFiles,Module,Task,InputFiles,Options)]).
@@ -92,7 +92,6 @@
 	result_files(Module,Task,InputFiles,Options,ResultFiles) :-
 		get_index_file(IndexFile),
 		IndexFile::member(files(_id,_alloc_ts,time(_,_,_,_,_,_),ResultFiles,Module,Task,InputFiles,Options)).
-
 
 	result_files_allocate_time(Module,Task,InputFiles,Options,AllocTs) :-
 		get_index_file(IndexFile),
@@ -117,7 +116,7 @@
 	largest_index([], 0).
 	largest_index([Term|Rest], LargestIndex) :-
 		Term =.. [ files, TermIndexAtom | _ ],
-		term_manipulation::atom_integer(TermIndexAtom,Index),
+		term_extras::atom_integer(TermIndexAtom,Index),
 		largest_index(Rest,MaxRestIndex),
 		max(Index,MaxRestIndex,LargestIndex).
 		

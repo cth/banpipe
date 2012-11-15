@@ -220,24 +220,24 @@
 :- object(test_reporting, extends(lgtunit)).
 	:- initialization(::run).
 
-	succeeds(test_throw_if) :- 
-		catch(throw_if(true)::error(blah), blah,true).
+	succeeds(test_report_if) :- 
+		catch(report_if(true)::error(blah), blah,true).
 		
-	succeeds(test_throw_unless) :-
-		catch(throw_unless(false)::error(blah),blah,true).
+	succeeds(test_report_unles) :-
+		catch(report_unless(false)::error(blah),blah,true).
 		
-	succeeds(test_throw_if_warning) :- 
+	succeeds(test_report_if_warning) :- 
 		tell('/tmp/warning'),
-		throw_if(true)::warning(blah),
+		report_if(true)::warning(blah),
 		told,
 		file('/tmp/warning')::read(Warning),
 		list::member(NewLine,[[10],[10,13]]),
 		atom_codes(blah,Blah),
 		list::append(Blah,NewLine,Warning).
 
-	succeeds(test_throw_unless_warning) :- 
+	succeeds(test_report_unles_warning) :- 
 		tell('/tmp/warning'),
-		throw_if(false)::warning(blah),
+		report_if(false)::warning(blah),
 		told,
 		file('/tmp/warning')::read(Warning),
 		list::member(NewLine,[[10],[10,13]]),
@@ -341,7 +341,7 @@
 		% Task declaration
 		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
 		% (dummy) Task implementation
-		"test(In,Opt,[Out1,Out2]) :- writeln(hello_from_prism), tell(Out1), writeln(file1), told, tell(Out2), writeln(file2), told.\n"
+		"test(In,Opt,[Out1,Out2]) :- writeln(hello_from_prism), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		shell::exec('rm -rf /tmp/testmodule'),
@@ -354,10 +354,12 @@
 	
 	succeeds(invoke_task1) :-
 		task(testmodule,test,[],[])::run([F1,F2]),
-		writeln(ran_task),
 		file(F1)::read("file1"),
-		file(F2)::read("file2").
+		file(F2)::read("file2"),
+		file(F1)::delete,
+		file(F2)::delete.
 		
 	cleanup :-
-		config::setup_defaults.
+		config::setup_defaults,
+		file('/tmp/index-file')::delete.
 :- end_object.

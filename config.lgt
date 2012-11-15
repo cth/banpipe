@@ -1,6 +1,4 @@
-
 :- object(config).
-
 	:- info([
 		version is 1.0,
 		author is 'Christian Theil Have',
@@ -17,7 +15,7 @@
 		comment is 'Add configuration with Key/Value - overrides previous entries for Key.',
 		argnames is ['Key','Value']]).
 	push(Key,Value) :-
-		::assertz(directive(Key,Value)).
+		::asserta(directive(Key,Value)).
 		
 	:- public(pop/2).
 	:- info(pop/2, [
@@ -34,13 +32,14 @@
 		::directive(Key,Value),
 		!.
 		
-	:- private(setup_defaults/0).
+	:- public(setup_defaults/0).
 	:- mode(setup_defaults, one).
 	:- info(setup_defaults/0, [
 		comment is 'Sets up default values for necessary configuration directives']).
 	setup_defaults :-
 		::push(execution_mode,sequential),
-		::push(default_invoker,prism),
+		::push(default_invoker,prism_invoker),
+		::push(invoke_command(prism),prism),
 		shell::working_directory(WorkingDir),
 		atom_concat(WorkingDir,'/result_files',ResultFileDir),
 		::push(result_file_directory,ResultFileDir),

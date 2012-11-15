@@ -10,7 +10,7 @@
 	logtalk_load(config),
 	logtalk_load(file),
 	logtalk_load(list_extras),
-	logtalk_load(term_manipulation),
+	logtalk_load(term_extras),
 	logtalk_load(file_index),
 	logtalk_load(reporting),
 	logtalk_load(module),
