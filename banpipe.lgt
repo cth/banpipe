@@ -189,6 +189,6 @@
 	load(Script) :- {[Script]}.
 	
 	run(Goal) :-
-		banpipe_config::execution_mode(Mode),
+		config::execution_mode(Mode),
 		banpipe_interpreter(Mode)::run(Goal).
 :- end_object.

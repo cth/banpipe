@@ -1,12 +1,12 @@
-:- object(test_banpipe_config, extends(lgtunit)).
+:- object(test_config, extends(lgtunit)).
 	:- initialization(::run).
 
 	succeeds(get_defaults) :-
-		banpipe_config::get(execution_mode,sequential),
-		banpipe_config::get(default_invoker,prism),
-		banpipe_config::get(result_file_directory,_),
-		banpipe_config::get(index_file,_),
-		banpipe_config::get(file_mananger,_).
+		config::get(execution_mode,sequential),
+		config::get(default_invoker,prism),
+		config::get(result_file_directory,_),
+		config::get(index_file,_),
+		config::get(file_manager,_).
 :- end_object.
 
 :- object(test_file, extends(lgtunit)).	

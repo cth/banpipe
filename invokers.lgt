@@ -39,7 +39,7 @@
 		file(InterfaceFile)::dirname(ModuleDir),
 		shell::change_directory(ModuleDir),
 		::key_invoke_command(InvokeCmdKey),
-		banpipe_config::get(InvokeCmdKey,Exec),
+		config::get(InvokeCmdKey,Exec),
 		meta::foldl(atom_concat,'',[Exec,' -g ', '"consult(\', InterfaceFile, '\'),', Goal,',halt."'],Command),
 		shell::exec(Command),
 		shell::change_directory(CurrentDir).

@@ -162,7 +162,7 @@
 		parameter(3,InputFiles),
 		parameter(4,Options),
 		writeln(got_params),
-		banpipe_config::get(filemanager,FileManager),
+		config::get(filemanager,FileManager),
 		writeln(file_manager(FileManager)),
 		::expand_options(Options,ExpandedOptions),
 		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions) ->
@@ -180,7 +180,7 @@
 		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
 		  argnames is ['InvokerObject']]).
 	invoker(InvokerName) :-
-		banpipe_config::get(override_invoker,InvokerName),
+		config::get(override_invoker,InvokerName),
 		!.
 	invoker(InvokerName) :-
 		parameter(1,Module),
@@ -189,7 +189,7 @@
 		TaskMatcher =.. [ ':-', invoke_with(InvokerName) ],
 		!.
 	invoker(Invoker) :-
-		banpipe_config::get(default_invoker,Invoker).
+		config::get(default_invoker,Invoker).
 		
 	% TODO: Eventually, I might move guard invokation to run/1 (rather than in script interpreter)
 	% to allow unifying variables from the default option settings
