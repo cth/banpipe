@@ -74,12 +74,35 @@
 			;
 			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
 			
+	:- public(expand_options/2).
+	:- info(expand_options/2,
+		[ comment is 'Given "call options" Options are expanded to SortedExpandedOptions - A sorted list which include all Options and all declared default options, except if an option in Options use same functor. ',
+		  argnams is [ 'Options', 'SortedExpandedOptions' ]]).
+	expand_options(Options,SortedExpandedOptions) :-
+		::valid(Options),
+		::options(DefaultOptions),
+		meta::map([OptIn,OptOut]>>(OptIn=..[F,_],OptOut=..[F,_],(list::member(OptOut,Options) -> true ; OptOut=OptIn)), DefaultOptions, ExpandedOptions),
+		list::sort(ExpandedOptions,SortedExpandedOptions).
+		
+/*
+	:- public(invoke/2).
+	invoke(Invoker,InputFiles,Options,OutputFiles) :-
+		parameter(1,Module),
+		parameter(2,Task),
+		module(Module)::interface_file(InterfaceFile),
+		::expand_options(Options,ExpandedOptions),
+		list::length()
+		Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
+		Invoker::run(InterfaceFile,),
+*/		
+	
 	:- private(has_declaration/0).
+	:- info(has_declaration/0, [comment is 'True if the task has a declaration.']).
 	has_declaration :-
 		::declaration(_).
 
 	:- private(has_implementation/0).
-	:- info(has_implementation/0, [comment is 'True if the there is an implementition of the task. This merely verifies that a predicate of the correct name and arity exists, but not whether it works.']).
+	:- info(has_implementation/0, [comment is 'True if the there is an implementation of the task. This merely verifies that a predicate of the correct name and arity exists, but not whether it works.']).
 	has_implementation :-
 		parameter(1,Module),
 		parameter(2,Task),
@@ -122,4 +145,52 @@
 	output_types(OutputTypes) :-
 		declaration(Decl),
 		Decl =.. [ _ , _, _, OutputTypes ].
+		
+
+:- end_object.
+
+:- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
+	:- public(run/1).
+	run(OutputFiles) :-
+		writeln(run_called),
+		::output_types(OutputTypes),
+		writeln(got_output_types(OutputTypes)),
+		list::length(OutputTypes,N),
+		list::length(OutputFiles,N),
+		parameter(1,Module),
+		parameter(2,Task),
+		parameter(3,InputFiles),
+		parameter(4,Options),
+		writeln(got_params),
+		banpipe_config::get(filemanager,FileManager),
+		writeln(file_manager(FileManager)),
+		::expand_options(Options,ExpandedOptions),
+		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions) ->
+			true % The task has allready been run 
+			;
+			FileManager::result_files_allocate(Module,Task,InputFiles,ExpandedOptions)),
+		::invoker(Invoker),
+		module(Module)::interface_file(InterfaceFile),
+		Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
+		Invoker::run(InterfaceFile,Goal),
+		FileManager::result_files_commit(Module,Task,InputFiles,ExpandedOptions).
+		
+	:- public(invoker/1).
+	:- info(invoker/1,
+		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
+		  argnames is ['InvokerObject']]).
+	invoker(InvokerName) :-
+		banpipe_config::get(override_invoker,InvokerName),
+		!.
+	invoker(InvokerName) :-
+		parameter(1,Module),
+		module(Module)::interface_file(InterfaceFile),
+		prolog_file(InterfaceFile)::member(TaskMatcher),
+		TaskMatcher =.. [ ':-', invoke_with(InvokerName) ],
+		!.
+	invoker(Invoker) :-
+		banpipe_config::get(default_invoker,Invoker).
+		
+	% TODO: Eventually, I might move guard invokation to run/1 (rather than in script interpreter)
+	% to allow unifying variables from the default option settings
 :- end_object.

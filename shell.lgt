@@ -10,6 +10,11 @@
 	:- info(environment_variable/2,
 		[ comment is 'If there is an environment variable with name Key, then Value is the value of the environment variable (atom)',
 		argnames is ['Key','Value']]).
+		
+	:- public(working_directory/1).
+	:- info(working_directory/1,
+		[ comment is 'Bind Dir to the current working directory',
+		  argnames is ['Dir']]).
 	
 	:- public(exec/1).
 	:- info(exec/1, [comment is 'Send Command to the OS shell', argnames is ['Command']]).
@@ -27,6 +32,8 @@
 		exec(ShellCmd,Status) :-
 			{shell(ShellCmd,Status)}.
 			
+		working_directory(Dir) :-
+			{working_directory(Dir)}.
 	:- elif((current_logtalk_flag(prolog_dialect, b))).
 		environment_variable(Key,Var) :-
 			{environ(Key,Var)}.
@@ -36,6 +43,9 @@
 			
 		exec(ShellCmd,Status) :-
 			{system(ShellCmd,Status)}.
+			
+		working_directory(Dir) :-
+			{get_cwd(Dir)}.
 	:- endif.
 	
 	:- public(make_directory/1).
@@ -45,5 +55,8 @@
 	:- public(delete_directory/1).
 	delete_directory(Directory) :-
 		{delete_directory(Directory)}.
+		
+	
+	
 	
 :- end_object.

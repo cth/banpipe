@@ -1,3 +1,14 @@
+:- object(test_banpipe_config, extends(lgtunit)).
+	:- initialization(::run).
+
+	succeeds(get_defaults) :-
+		banpipe_config::get(execution_mode,sequential),
+		banpipe_config::get(default_invoker,prism),
+		banpipe_config::get(result_file_directory,_),
+		banpipe_config::get(index_file,_),
+		banpipe_config::get(file_mananger,_).
+:- end_object.
+
 :- object(test_file, extends(lgtunit)).	
 	:- initialization(::run).
 
@@ -240,9 +251,6 @@
 		forall(list::member(TD,TestDirs),list::member(TD,SearchDirectories)).
 :- end_object.
 
-
-
-
 :- object(test_module, extends(lgtunit)).
 	:- initialization(::run).
 	
@@ -259,6 +267,7 @@
 :- end_object.
 
 :- object(test_module_task, extends(lgtunit)).
+	:- initialization(::run).
 
 	setup :-
 		InterfaceFileContentsLines = [
@@ -289,6 +298,34 @@
 	
 	succeeds(valid_task_call) :-
 		module_task(testmodule,test)::valid([version(1.0),debug(true)]).
-	
+
+	succeeds(expand_options1) :-
+		module_task(testmodule,test)::expand_options([], [debug(true),version(1.0)]).
+
+	succeeds(expand_options2) :-
+		module_task(testmodule,test)::expand_options([version(2.0)], [debug(true),version(2.0)]).
 :- end_object.
 
+:- object(test_invoke_task,extends(lgtunit)).
+	:- initialization(::run).
+
+	setup :-
+		InterfaceFileContentsLines = [
+		% Task declaration
+		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
+		% (dummy) Task implementation
+		"test(In,Opt,[Out1,Out2]) :- tell(Out1), writeln(file1), told, tell(Out2), writeln(file2), told.\n"
+		],
+		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		shell::exec('rm -rf /tmp/testmodule'),
+		shell::make_directory('/tmp/testmodule'),
+		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
+		banpipe_module_path::include_directory('/tmp'),
+		writeln('setup finished').
+	
+	succeeds(invoke_task1) :-
+		task(testmodule,test,[],[])::run([F1,F2]),
+		writeln(ran_task),
+		file(F1)::read("file1"),
+		file(F2)::read("file2").
+:- end_object.

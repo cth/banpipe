@@ -1,11 +1,6 @@
 % Dependency rule operator, note that it has same precendece as :-
 :- op(1200,xfx,'<-').
 
-:- object(banpipe_config).
-	:- public(execution_mode/1).
-	execution_mode(sequential).
-:- end_object.
-
 :- object(conjunction).
 	:- public(nth1/3).
 	:- private(conjunction_nth/4).
@@ -93,7 +88,7 @@
 	:- public(run_task/3).
 	
 	run_task(Module,RealTaskSpec,RunTaskOptions) :-
-	writeln(run_task(Module,RealTaskSpec,RunTaskOptions)).
+		writeln(run_task(Module,RealTaskSpec,RunTaskOptions)).
 :- end_object.
 
 
@@ -141,11 +136,14 @@
 		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),
 		run_options(RunOpts,RunTaskOptions,NewRunOpts),
 		run_multiple(NewRunOpts,Inputs,InputFiles),
-		RealTaskSpec =.. [ Task, InputFiles, Options, Files ],
+		/*
+		RealTaskSpec =.. [ Task, InputFiles, Options, OutputFiles ],
 		banpipe_invoker::run_task(Module,RealTaskSpec,RunTaskOptions),
 		%run_model(Model,RealTaskSpec,RunModelOptions),
-		list::nth1(TargetIndex,Files,File).
-
+		*/
+		task(Module,Task,InputFiles,Options)::run(OutputFiles),
+		list::nth1(TargetIndex,OutputFiles,File).
+		
 	run(Target,_RunOpts,_File) :-
 		write('BANpipe error. Could not run target: '),
 		writeln(Target),
@@ -160,14 +158,18 @@
 :- end_object.
 
 
-
 :- object(banpipe).
 	:- public(listing/0).
 	:- public(listing/1).
 	:- public(run/1).
 	:- public(load/1).
 	
-	:- info([author is 'Christian Theil Have']).
+	
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/13,
+		comment is 'The main object for interaction with banpipe scripts.']).
 	
 	:- dynamic('<-'/2).
 	
@@ -190,6 +192,3 @@
 		banpipe_config::execution_mode(Mode),
 		banpipe_interpreter(Mode)::run(Goal).
 :- end_object.
-
-
-
