@@ -46,7 +46,7 @@
 
 	:- public(term_to_atom/2).
 	:- info(term_to_atom/2, [
-		comment is 'Converts ground Prolog terms to atoms.',
+		comment is 'Converts Prolog terms to atoms.',
 		argnames is ['Term','Atom']]).
 		
 	term_to_atom(Term,Atom) :-
@@ -58,7 +58,8 @@
 		var(X),
 		!,
 		list::nth1(N,Vars,X),
-		atom_concat('V',N,Atom).
+		term_to_atom(N,AtomN),
+		atom_concat('V',AtomN,Atom).
 
 		
 	term_to_atom(AtomTerm,Atom,_) :-

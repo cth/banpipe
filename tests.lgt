@@ -109,6 +109,12 @@
 		term_extras::atom_integer(X,123),
 		X == '123'.
 		
+	succeeds(vars) :-
+		term_extras::vars([A,B,C],[A,B,C]),
+		term_extras::vars(a([A,B],C),[A,B,C]),
+		term_extras::vars(a(b(c)),[]),
+		term_extras::vars([A,A,A],A).
+		
 	succeeds(term_to_atom1) :-
 		term_extras::term_to_atom(a(b(c,d(1,f))), 'a(b(c,d(1,f)))').
 		
