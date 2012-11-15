@@ -7,6 +7,14 @@
 		config::get(result_file_directory,_),
 		config::get(index_file,_),
 		config::get(file_manager,_).
+		
+	succeeds(push_and_pop) :-
+		config::push(test,1),
+		config::get(test,1),
+		config::push(test,2),
+		config::get(test,2),
+		config::pop(test),
+		config::get(test,1).
 :- end_object.
 
 :- object(test_file, extends(lgtunit)).	
@@ -90,19 +98,32 @@
 		list_extras::sublist_split(':',[a,':',b,c,':',d], [[a],[b,c],[d]]).
 :- end_object.
 
-:- object(test_term_manipulation, extends(lgtunit)).
+:- object(test_term_extras, extends(lgtunit)).
 	:- initialization(::run).
 	
 	succeeds(atom_integer1) :-
-		term_manipulation::atom_integer('123',X),
+		term_extras::atom_integer('123',X),
 		X == 123.
 		
 	succeeds(atom_integer2) :-
-		term_manipulation::atom_integer(X,123),
+		term_extras::atom_integer(X,123),
 		X == '123'.
 		
 	succeeds(term_to_atom1) :-
-		term_manipulation::term_to_atom(a(b(c,d(1,f))), 'a(b(c,d(1,f)))').
+		term_extras::term_to_atom(a(b(c,d(1,f))), 'a(b(c,d(1,f)))').
+		
+	succeeds(term_to_atom2) :-
+		term_extras::term_to_atom([a,b,c],'[a,b,c]').
+		
+	succeeds(term_to_atom3) :-
+		term_extras::term_to_atom('_a','\'_a\'').
+
+	succeeds(term_to_atom4) :-
+		term_extras::term_to_atom(a(b(c(d(_,_)))),'a(b(c(d(V1,V2))))').
+		
+	succeeds(term_to_atom5) :-
+		term_extras::term_to_atom(a(b(c(d(X,X)))),'a(b(c(d(V1,V1))))').
+	
 :- end_object.
 
 :- object(test_term_file_index, extends(lgtunit)).
@@ -298,7 +319,7 @@
 	
 	succeeds(valid_task_call) :-
 		module_task(testmodule,test)::valid([version(1.0),debug(true)]).
-
+		
 	succeeds(expand_options1) :-
 		module_task(testmodule,test)::expand_options([], [debug(true),version(1.0)]).
 
@@ -314,18 +335,23 @@
 		% Task declaration
 		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
 		% (dummy) Task implementation
-		"test(In,Opt,[Out1,Out2]) :- tell(Out1), writeln(file1), told, tell(Out2), writeln(file2), told.\n"
+		"test(In,Opt,[Out1,Out2]) :- writeln(hello_from_prism), tell(Out1), writeln(file1), told, tell(Out2), writeln(file2), told.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		shell::exec('rm -rf /tmp/testmodule'),
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		banpipe_module_path::include_directory('/tmp'),
-		writeln('setup finished').
+		config::push(result_file_directory,'/tmp/'),
+		config::push(index_file,'/tmp/index-file'),
+		config::push(file_manager,term_file_index('/tmp/index-file')).
 	
 	succeeds(invoke_task1) :-
 		task(testmodule,test,[],[])::run([F1,F2]),
 		writeln(ran_task),
 		file(F1)::read("file1"),
 		file(F2)::read("file2").
+		
+	cleanup :-
+		config::setup_defaults.
 :- end_object.
