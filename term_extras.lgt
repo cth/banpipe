@@ -105,3 +105,19 @@
 		set::insert_all(AtomCodes,[],AtomSet),
 		set::subset(AtomSet,WhitelistCodes).
 :- end_object.
+
+:- object(conjunction).
+	:- public(nth1/3).
+	:- private(conjunction_nth/4).
+	
+	nth1(N,Conjunction,Element) :-
+		conjunction_nth(Element,Conjunction,1,N).
+
+	conjunction_nth(Member,(Member,_),Idx,Idx).
+	conjunction_nth(Member,(ConjA,ConjB),IdxIn,IdxOut) :-
+		Member \= ConjA,
+		!,
+		IdxNext is IdxIn + 1,
+		conjunction_nth(Member,ConjB,IdxNext,IdxOut).
+		conjunction_nth(Member,Member,Idx,Idx).
+:- end_object.
