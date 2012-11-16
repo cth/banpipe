@@ -62,13 +62,6 @@
 		atom_concat('V',AtomN,Atom).
 
 		
-	term_to_atom(AtomTerm,Atom,_) :-
-		atom(AtomTerm),
-		(::atom_verbatim(AtomTerm) ->
-			Atom=AtomTerm
-			;
-			meta::foldl(atom_concat,'',['\'',AtomTerm,'\''],Atom)).
-
 	term_to_atom(Number, Atom, _) :-
 		number(Number),
 		!,
@@ -83,6 +76,13 @@
 		meta::foldl(atom_concat,'[',CommaSepAtoms,Atom1),
 		atom_concat(Atom1,']',Atom).
 		
+	term_to_atom(AtomTerm,Atom,_) :-
+		atom(AtomTerm),
+		(::atom_verbatim(AtomTerm) ->
+			Atom=AtomTerm
+			;
+			meta::foldl(atom_concat,'',['\'',AtomTerm,'\''],Atom)).
+
 	term_to_atom(Term,Atom,Vars) :-
 		Term =.. [ Functor | Arguments ],
 		atom(Functor),
