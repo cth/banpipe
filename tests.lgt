@@ -129,6 +129,9 @@
 		
 	succeeds(term_to_atom5) :-
 		term_extras::term_to_atom(a(b(c(d(X,X)))),'a(b(c(d(V1,V1))))').
+		
+	succeeds(term_to_atom6) :-
+		term_extras::term_to_atom([],'[]').
 	
 :- end_object.
 
@@ -335,13 +338,19 @@
 
 :- object(test_invoke_task,extends(lgtunit)).
 	:- initialization(::run).
-
+	
 	setup :-
+		(file('/tmp/index-file')::exists ->
+			file('/tmp/index-file')::delete
+			;
+			true).
+
+	task_setup :-
 		InterfaceFileContentsLines = [
 		% Task declaration
 		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
 		% (dummy) Task implementation
-		"test(In,Opt,[Out1,Out2]) :- writeln(hello_from_prism), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
+		"test(In,Opt,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		shell::exec('rm -rf /tmp/testmodule'),
@@ -352,14 +361,126 @@
 		config::push(index_file,'/tmp/index-file'),
 		config::push(file_manager,term_file_index('/tmp/index-file')).
 	
-	succeeds(invoke_task1) :-
+	succeeds(invoke_task_default) :-
+		task_setup,
+		invoke_task,
+		task_cleanup.
+		
+	succeeds(invoke_task_prism) :-
+		task_setup,		
+		config::push(default_invoker,prism_invoker),
+		invoke_task,
+		task_cleanup.
+		
+	succeeds(invoke_task_bp) :-
+		task_setup,
+		config::push(default_invoker,bp_invoker),
+		invoke_task,
+		task_cleanup.
+		
+	succeeds(invoke_task_swipl) :-
+		task_setup,
+		config::push(default_invoker,swipl_invoker),
+		invoke_task,
+		task_cleanup.
+		
+	succeeds(invoke_task_yap) :-
+		task_setup,
+		config::push(default_invoker,yap_invoker),
+		invoke_task,
+		task_cleanup.
+
+	/* FIXME: invocation on gprolog needs attention
+	succeeds(invoke_task_gprolog) :-
+		task_setup,
+		config::push(default_invoker,gprolog_invoker),
+		invoke_task,
+		task_cleanup.
+	*/
+	
+	
+				
+	:- private(invoke_task/0).
+	invoke_task :-
+		writeln(task(testmodule,test,[],[])::run([F1,F2])),
 		task(testmodule,test,[],[])::run([F1,F2]),
 		file(F1)::read("file1"),
 		file(F2)::read("file2"),
 		file(F1)::delete,
 		file(F2)::delete.
+				
+	task_cleanup :-
+		config::setup_defaults,
+		file('/tmp/index-file')::delete.
+:- end_object.
+
+
+:- object(test_invoke_task_custom,extends(lgtunit)).
+	:- initialization(::run).
+	
+	% Just in case the previous test didn't finish well and forgot cleanup of file
+	setup :-
+		(file('/tmp/index-file')::exists ->
+			file('/tmp/index-file')::delete
+			;
+			true).
+
+	task_setup(PrologName) :-
+		InterfaceFileContentsLines = [
+		% Task declaration
+		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
+		":- invoke_with(", PrologName, ").\n",
+		% (dummy) Task implementation
+		"test(_,_,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
+		],
+		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		shell::exec('rm -rf /tmp/testmodule'),
+		shell::make_directory('/tmp/testmodule'),
+		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
+		%shell::exec('cat /tmp/testmodule/interface.pl'),
+		banpipe_module_path::include_directory('/tmp'),
+		config::push(result_file_directory,'/tmp/'),
+		config::push(index_file,'/tmp/index-file'),
+		config::push(file_manager,term_file_index('/tmp/index-file')).
+	
+	succeeds(invoke_task_prism) :-
+		task_setup("prism"),
+		invoke_task,
+		task_cleanup.
 		
-	cleanup :-
+	succeeds(invoke_task_bp) :-
+		task_setup("bp"),
+		invoke_task,
+		task_cleanup.
+		
+	succeeds(invoke_task_swipl) :-
+		task_setup("swipl"),
+		invoke_task,
+		task_cleanup.
+		
+	succeeds(invoke_task_yap) :-
+		task_setup("yap"),
+		invoke_task,
+		task_cleanup.
+
+	/* FIXME: invocation on gprolog needs attention
+	succeeds(invoke_task_gprolog) :-
+		task_setup(gprolog),
+		config::push(default_invoker,gprolog_invoker),
+		invoke_task,
+		task_cleanup.
+	*/
+				
+	:- private(invoke_task/0).
+	invoke_task :-
+		writeln(task(testmodule,test,[],[])::run([F1,F2])),
+		task(testmodule,test,[],[])::run([F1,F2]),
+		file(F1)::read("file1"),
+		file(F2)::read("file2"),
+		file(F1)::delete,
+		file(F2)::delete.
+				
+	task_cleanup :-
 		config::setup_defaults,
 		file('/tmp/index-file')::delete.
 :- end_object.

@@ -19,8 +19,15 @@
 		
 	:- public(pop/2).
 	:- info(pop/2, [
-		comment is 'Remove configuration directive with Key/Value, resorting to previous definition for Key.',
+		comment is 'Remove configuration directive with Key/Value, resorting to previous definition for Key (if there is one).',
 		argnames is ['Key','Value']]).
+	pop(Key,Value) :-
+		::retract(directive(Key,Value)).
+		
+	:- public(pop/1).
+	:- info(pop/1, [
+		comment is 'alias for as pop(Key,_)',
+		argnames is ['Key']]).
 	pop(Key,Value) :-
 		::retract(directive(Key,Value)).
 	

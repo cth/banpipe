@@ -167,7 +167,6 @@
 		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
 		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions,OutputFiles) ->
-
 			true % The task has allready been run 
 			;
 			FileManager::result_files_allocate(Module,Task,InputFiles,ExpandedOptions,OutputFiles),
@@ -181,14 +180,16 @@
 	:- info(invoker/1,
 		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
 		  argnames is ['InvokerObject']]).
-	invoker(InvokerName) :-
-		config::get(override_invoker,InvokerName),
-		!.
+% Should not be necessary
+%	invoker(InvokerName) :-
+%		config::get(override_invoker,InvokerName),
+%		!.
 	invoker(InvokerName) :-
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
-		TaskMatcher =.. [ ':-', invoke_with(InvokerName) ],
+		TaskMatcher =.. [ ':-', invoke_with(PrologName) ],
+		atom_concat(PrologName,'_invoker',InvokerName),
 		!.
 	invoker(Invoker) :-
 		config::get(default_invoker,Invoker).
