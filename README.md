@@ -1,5 +1,5 @@
-This is an experimental reimplementation of banpipe in Logtalk. 
-Banpipe is a declarative pipeline with emphasis on large time consuming analyses, e.g., for big data files.  
+This is an experimental reimplementation of the banpipe language in Logtalk. 
+Banpipe is a declarative pipeline language with emphasis on large time consuming analyses, e.g., for big data files.  
 
 This implementation is meant to be smaller, portable and more usable in more general contexts.
 For now, it serves as a "development branch" for the banpipe language. It will be compatible with
