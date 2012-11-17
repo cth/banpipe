@@ -1,4 +1,40 @@
-:- object(sequential_interpreter, extends(banpipe_interpreter)).
+:- protocol(task_semantics).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/16,
+		comment is 'Protocol for applying a particular semantics to a task.']).
+	
+	:- public(apply/2).
+	:- info(apply/2, [
+		comment is 'Apply semantics for Task to obtain Result',
+		argnames is ['Task','Result']]).
+:- end_protocol.
+
+
+:- object(execution_semantics(_Task), implements(task_semantics)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/16,
+		comment is 'A semantics for tasks, which computes output files.']).
+		
+	apply(Task,Result) :-
+		Task::run(Result).
+:- end_object.
+
+:- object(typecheck_semantics(_Task), implements(task_semantics)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/16,
+		comment is 'A semantics for tasks, which computes output files.']).
+		
+	apply(Task,Result) :-
+		Task::typecheck(Result).
+:- end_object.
+
+:- object(sequential_interpreter(Semantics), extends(banpipe_interpreter)).
 	:- uses(banpipe_parser, [match_target_rule/3]).
 	
 	:- public(run/1).
@@ -31,7 +67,7 @@
 		list::append(MatchSyms,_,TargetSyms).
 
 	% run with model call body
-	run(Target,RunOpts,File) :-
+	run(Target,RunOpts,Output) :-
 		match_target_rule(Target,Rule,TargetIndex),
 		banpipe_parser::parse_guard_and_body(Rule,Guard,Body),
 		call(Guard),
@@ -39,8 +75,9 @@
 		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),
 		::run_options(RunOpts,RunTaskOptions,NewRunOpts),
 		::run_multiple(NewRunOpts,Inputs,InputFiles),
-		task(Module,Task,InputFiles,Options)::run(OutputFiles),
-		list::nth1(TargetIndex,OutputFiles,File).
+		TaskObject = task(Module,Task,InputFiles,Options),
+		Semantics::apply(TaskObject,Outputs), % TODO: Fix 
+		list::nth1(TargetIndex,Outputs,Output).
 		
 	run(Target,_RunOpts,_File) :-
 		write('BANpipe error. Could not run target: '),

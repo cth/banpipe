@@ -110,7 +110,7 @@
 		prolog_file(File)::read_terms(Terms),
 		term_extras::has_rule_with_head(Terms,Task,3).
 
-	:- private(declaration/1).
+	:- protected(declaration/1).
 	:- info(declaration/1,
 		[ comment is 'Declaration is the task declation, e.g, taskname(input_types,options,output_types).',
 		argnames is ['Declaration']]).
@@ -175,15 +175,27 @@
 			Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
 			Invoker::run(InterfaceFile,Goal),!,
 			FileManager::result_files_commit(Module,Task,InputFiles,ExpandedOptions)).
+	
+	:- public(typecheck/1).
+	:- info(typecheck/1,[
+		comments is 'Check that supplied types of the input types are valid and unify OutputTypes to the resulting output types.',
+		argnames is ['OutputTypes']]).
+
+	typecheck(OutputTypes) :-
+		parameter(1,Module),
+		parameter(2,Task),
+		parameter(3,SuppliedInputTypes),
+		parameter(4,Options),
+		::declaration(TaskDeclaration),
+		TaskDeclaration =.. [ Task, InputTypes, Options, OutputTypes ],
+		::expand_options(Options,ExpandedOptions),
+		term::subsumes(InputTypes,SuppliedInputTypes).
 		
 	:- public(invoker/1).
 	:- info(invoker/1,
 		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
 		  argnames is ['InvokerObject']]).
-% Should not be necessary
-%	invoker(InvokerName) :-
-%		config::get(override_invoker,InvokerName),
-%		!.
+
 	invoker(InvokerName) :-
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile),

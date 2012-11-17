@@ -47,6 +47,16 @@
 		file('/tmp/touchme')::touch,
 		file('/tmp/touchme')::delete,
 		file('/tmp/touchme')::exists.
+		
+	succeeds(copy_to) :-
+		From = file('/tmp/somefile'),
+		To = '/tmp/otherfile',
+		From::write("test"),
+		From::copy_to(To),
+		file(To)::read("test"),
+		From::delete,
+		file(To)::delete.
+
 :- end_object.
 
 :- object(test_prolog_file, extends(lgtunit)).
@@ -462,7 +472,7 @@
 		task_setup("yap"),
 		invoke_task,
 		task_cleanup.
-
+		
 	/* FIXME: invocation on gprolog needs attention
 	succeeds(invoke_task_gprolog) :-
 		task_setup(gprolog),
@@ -481,6 +491,32 @@
 		file(F2)::delete.
 				
 	task_cleanup :-
+		config::setup_defaults,
+		file('/tmp/index-file')::delete.
+:- end_object.
+
+:- object(test_task_typecheck1,extends(lgtunit)).
+	:- initialization(::run).
+	
+	setup :-
+		InterfaceFileContentsLines = [
+		":- task(test([_], [filetype(X)], [X])).\n",
+		"test([InFile],_Options,[OutFile]) :- atom_concat('cp ',InFile,T1),atom_concat(T1,' ',T2),atom_concat(T2,OutFile,Cmd),system(Cmd).\n"
+		],
+		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		shell::exec('rm -rf /tmp/testmodule'),
+		shell::make_directory('/tmp/testmodule'),
+		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
+		banpipe_module_path::include_directory('/tmp'),
+		config::push(result_file_directory,'/tmp/'),
+		config::push(index_file,'/tmp/index-file'),
+		config::push(file_manager,term_file_index('/tmp/index-file')).
+
+	succeeds(type_check1) :-
+		task(testmodule,test,['/tmp/blah'],[filetype(test(type))])::typecheck([OutputType]),
+		OutputType == test(type).
+
+	cleanup :-
 		config::setup_defaults,
 		file('/tmp/index-file')::delete.
 :- end_object.
