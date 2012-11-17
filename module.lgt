@@ -84,18 +84,6 @@
 		meta::map([OptIn,OptOut]>>(OptIn=..[F,_],OptOut=..[F,_],(list::member(OptOut,Options) -> true ; OptOut=OptIn)), DefaultOptions, ExpandedOptions),
 		list::sort(ExpandedOptions,SortedExpandedOptions).
 		
-/*
-	:- public(invoke/2).
-	invoke(Invoker,InputFiles,Options,OutputFiles) :-
-		parameter(1,Module),
-		parameter(2,Task),
-		module(Module)::interface_file(InterfaceFile),
-		::expand_options(Options,ExpandedOptions),
-		list::length()
-		Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
-		Invoker::run(InterfaceFile,),
-*/		
-	
 	:- private(has_declaration/0).
 	:- info(has_declaration/0, [comment is 'True if the task has a declaration.']).
 	has_declaration :-
@@ -103,6 +91,17 @@
 
 	:- private(has_implementation/0).
 	:- info(has_implementation/0, [comment is 'True if the there is an implementation of the task. This merely verifies that a predicate of the correct name and arity exists, but not whether it works.']).
+
+	% has_implementation/0 for built-in modules
+	has_implementation :-
+		parameter(1,Module),
+		implements_protocol(Module,banpipe_builtin_module),
+		!,
+		parameter(2,Task),
+		TaskGoal =.. [ Task, _, _, _ ],
+		Module::predicate_property(TaskGoal,(public)).
+	
+	% has_implementation/0 for external prolog-based banpipe modules
 	has_implementation :-
 		parameter(1,Module),
 		parameter(2,Task),
@@ -110,10 +109,18 @@
 		prolog_file(File)::read_terms(Terms),
 		term_extras::has_rule_with_head(Terms,Task,3).
 
-	:- protected(declaration/1).
+	:- public(declaration/1).
 	:- info(declaration/1,
 		[ comment is 'Declaration is the task declation, e.g, taskname(input_types,options,output_types).',
 		argnames is ['Declaration']]).
+	declaration(Declaration) :-
+		parameter(1,Module),
+		implements_protocol(Module,banpipe_builtin_module),
+		!,
+		parameter(2,Task),
+		Module::task(Declaration),
+		Declaration =.. [ Task | _ ].
+		
 	declaration(Declaration) :-
 		parameter(1,Module),
 		parameter(2,Task),
@@ -127,7 +134,7 @@
 		[ comment is 'Options is the list of declared options for task.',
 		  argnames is ['Options']]).
 	options(Options) :-
-		declaration(Decl),
+		::declaration(Decl),
 		Decl =.. [ _ , _, Options, _ ].
 	
 	:- public(input_types/1).
@@ -135,7 +142,7 @@
 		[ comment is 'InputTypes is a sequence of file types accepted as input to the task.',
 		  argnames is ['InputTypes']]).
 	input_types(InputTypes) :-
-		declaration(Decl),
+		::declaration(Decl),
 		Decl =.. [ _ , InputTypes, _, _ ].
 
 	:- public(output_types/1).
@@ -143,10 +150,8 @@
 		[ comment is 'OutputTypes is a sequence of file types produced by the task.',
 		  argnames is ['OutputTypes']]).
 	output_types(OutputTypes) :-
-		declaration(Decl),
+		::declaration(Decl),
 		Decl =.. [ _ , _, _, OutputTypes ].
-		
-
 :- end_object.
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).

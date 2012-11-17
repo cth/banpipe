@@ -507,16 +507,25 @@
 		shell::exec('rm -rf /tmp/testmodule'),
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
-		banpipe_module_path::include_directory('/tmp'),
-		config::push(result_file_directory,'/tmp/'),
-		config::push(index_file,'/tmp/index-file'),
-		config::push(file_manager,term_file_index('/tmp/index-file')).
+		banpipe_module_path::include_directory('/tmp').
 
 	succeeds(type_check1) :-
-		task(testmodule,test,['/tmp/blah'],[filetype(test(type))])::typecheck([OutputType]),
+		task(testmodule,test,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
+		OutputType == test(type).
+		
+	fails(type_check2) :-
+		task(testmodule,test,[wrong,number,of,inputs],[filetype(test(type))])::typecheck([OutputType]),
 		OutputType == test(type).
 
 	cleanup :-
-		config::setup_defaults,
-		file('/tmp/index-file')::delete.
+		config::setup_defaults.
+:- end_object.
+
+:- object(test_typecheck_builtin_file,extends(lgtunit)).
+	:- initialization(::run).
+	
+	succeeds(type_check1) :-
+		task(file,get,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
+		writeln(OutputType),
+		OutputType == test(type).
 :- end_object.

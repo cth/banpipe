@@ -28,6 +28,12 @@
 		open(F,append,Stream),
 		write_characters(Stream,Contents),
 		close(Stream).
+	
+	:- public(copy_to/1).
+	copy_to(TargetFile) :-
+		parameter(1,File),
+		meta::foldl(atom_concat,'',['cp ',File,' ',TargetFile],ShellCopyCommand),
+		shell::exec(ShellCopyCommand).
 		
 	:- public(touch/0).
 	touch :-

@@ -13,6 +13,7 @@
 	logtalk_load(term_extras),
 	logtalk_load(file_index),
 	logtalk_load(reporting),
+	logtalk_load(builtin_modules),
 	logtalk_load(module),
 	logtalk_load(invokers),
 	logtalk_load(tests,[hook(lgtunit)])
