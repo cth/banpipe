@@ -91,15 +91,15 @@
 		
 	result_files(Module,Task,InputFiles,Options,ResultFiles) :-
 		get_index_file(IndexFile),
-		IndexFile::member(files(_id,_alloc_ts,time(_,_,_,_,_,_),ResultFiles,Module,Task,InputFiles,Options)).
+		IndexFile::member(files(_,_,time(_,_,_,_,_,_),ResultFiles,Module,Task,InputFiles,Options)).
 
 	result_files_allocate_time(Module,Task,InputFiles,Options,AllocTs) :-
 		get_index_file(IndexFile),
-		IndexFile::member(files(_id,AllocTs,_,_ResultFiles,Module,Task,InputFiles,Options)).
+		IndexFile::member(files(_,AllocTs,_,_ResultFiles,Module,Task,InputFiles,Options)).
 	
 	result_files_commit_time(Module,Task,InputFiles,Options,time(Year,Day,Mon,Hour,Min,Sec)) :-
 		get_index_file(IndexFile),
-		IndexFile::member(files(_id,_AllocTs,time(Year,Day,Mon,Hour,Min,Sec),_ResultFiles,Module,Task,InputFiles,Options)).
+		IndexFile::member(files(_,_AllocTs,time(Year,Day,Mon,Hour,Min,Sec),_ResultFiles,Module,Task,InputFiles,Options)).
 		
 	:- private(next_available_index/2).
 	:- info(next_available_index/2, [

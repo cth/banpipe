@@ -38,7 +38,7 @@
 		var(X), !.
 		
 	vars(Term,Vars) :-
-		Term =.. [ Functor | Arguments ],
+		Term =.. [ _ | Arguments ],
 		self(Self),
 		meta::map([X,Y]>>(Self::vars(X,Y)),Arguments,VarsLists),
 		list::flatten(VarsLists,VarsList),

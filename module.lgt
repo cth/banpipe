@@ -198,13 +198,12 @@
 		argnames is ['OutputTypes']]).
 
 	typecheck(OutputTypes) :-
-		parameter(1,Module),
 		parameter(2,Task),
 		parameter(3,SuppliedInputTypes),
 		parameter(4,Options),
 		::declaration(TaskDeclaration),
 		TaskDeclaration =.. [ Task, InputTypes, DeclOptions, OutputTypes ],
-		::expand_options(Options,DeclOptions,ExpandedOptions), % Needs to expand variables - doesn't it seems
+		::expand_options(Options,DeclOptions,_),
 		term::subsumes(InputTypes,SuppliedInputTypes).
 		
 	:- public(invoker/1).

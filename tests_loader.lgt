@@ -1,20 +1,5 @@
 :- initialization ((
-	logtalk_load(library(lgtunit_loader)),
-	logtalk_load(library(metap)),
-	logtalk_load(library(meta)),
-	logtalk_load(library(timep)),
-	logtalk_load(library(time)),
-	logtalk_load(library(datep)),
-	logtalk_load(library(date)),
-	logtalk_load(shell),
-	logtalk_load(config),
-	logtalk_load(file),
-	logtalk_load(list_extras),
-	logtalk_load(term_extras),
-	logtalk_load(file_index),
-	logtalk_load(reporting),
-	logtalk_load(builtin_modules),
-	logtalk_load(module),
-	logtalk_load(invokers),
+	logtalk_load(init),
+	logtalk_load(library(lgtunit)),
 	logtalk_load(tests,[hook(lgtunit)])
 )).
