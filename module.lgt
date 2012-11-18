@@ -79,10 +79,17 @@
 		[ comment is 'Given "call options" Options are expanded to SortedExpandedOptions - A sorted list which include all Options and all declared default options, except if an option in Options use same functor. ',
 		  argnams is [ 'Options', 'SortedExpandedOptions' ]]).
 	expand_options(Options,SortedExpandedOptions) :-
-		::valid(Options),
 		::options(DefaultOptions),
-		meta::map([OptIn,OptOut]>>(OptIn=..[F,_],OptOut=..[F,_],(list::member(OptOut,Options) -> true ; OptOut=OptIn)), DefaultOptions, ExpandedOptions),
-		list::sort(ExpandedOptions,SortedExpandedOptions).
+		::expand_options(Options,DefaultOptions,SortedExpandedOptions).
+
+	:- public(expand_options/3).		
+	expand_options(Options,DefaultOptions,SortedExpandedOptions) :-
+		::valid(Options),
+		meta::map([OptIn,OptOut]>>((OptIn=..[F,X],OptOut=..[F,X], list::member(OptOut,Options) -> true
+						; (OptIn=..[F,_],OptOut=..[F,_],list::member(OptOut,Options)) -> true
+							; OptOut=OptIn)),
+			DefaultOptions,ExpandedOptions),
+		list::sort(ExpandedOptions,SortedExpandedOptions).		
 		
 	:- private(has_declaration/0).
 	:- info(has_declaration/0, [comment is 'True if the task has a declaration.']).
@@ -135,7 +142,11 @@
 		  argnames is ['Options']]).
 	options(Options) :-
 		::declaration(Decl),
-		Decl =.. [ _ , _, Options, _ ].
+		Decl =.. [ _ , _, OptionsDecl, _ ],
+		(list::member(version(_),OptionsDecl) ->
+			Options = OptionsDecl
+			;
+			Options = [version(na)|OptionsDecl]).
 	
 	:- public(input_types/1).
 	:- info(input_types/1,
@@ -192,8 +203,8 @@
 		parameter(3,SuppliedInputTypes),
 		parameter(4,Options),
 		::declaration(TaskDeclaration),
-		TaskDeclaration =.. [ Task, InputTypes, Options, OutputTypes ],
-		::expand_options(Options,ExpandedOptions),
+		TaskDeclaration =.. [ Task, InputTypes, DeclOptions, OutputTypes ],
+		::expand_options(Options,DeclOptions,ExpandedOptions), % Needs to expand variables - doesn't it seems
 		term::subsumes(InputTypes,SuppliedInputTypes).
 		
 	:- public(invoker/1).

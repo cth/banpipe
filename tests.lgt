@@ -526,6 +526,10 @@
 	
 	succeeds(type_check1) :-
 		task(file,get,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
-		writeln(OutputType),
 		OutputType == test(type).
+	
+	% No filetype option supplied
+	succeeds(type_check2) :-
+		task(file,get,[type(blah)],[])::typecheck([OutputType]),
+		var(OutputType).
 :- end_object.
