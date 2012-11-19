@@ -21,5 +21,11 @@ logtalk_load(banpipe(file_index)),
 logtalk_load(banpipe(reporting)),
 logtalk_load(banpipe(builtin_modules)),
 logtalk_load(banpipe(module)),
-logtalk_load(banpipe(invokers))
+logtalk_load(banpipe(invokers)),
+logtalk_load(banpipe(parser)),
+logtalk_load(banpipe(interpreter)),
+logtalk_load(banpipe(sequential_interpreter)),
+logtalk_load(banpipe(task_semantics)),
+logtalk_load(banpipe(banpipe)),
+banpipe_module_path::check_set
 )).

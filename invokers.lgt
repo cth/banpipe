@@ -45,7 +45,7 @@
 		term_extras::term_to_atom(Goal,GoalAtom),
 		::goal_option(GoalOption),
 		meta::foldl(atom_concat,'',[Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', InterfaceFile, '\'),', GoalAtom,',halt."'],Command),
-		%writeln(shell_command(Command)),
+		writeln(shell_command(Command)),
 		shell::exec(Command),
 		shell::change_directory(CurrentDir).
 

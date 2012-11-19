@@ -23,6 +23,11 @@
 		findall(Dir,::path_dir(Dir),AdditionalDirs),
 		list::append(AdditionalDirs,EnvPaths,Paths).
 		
+	:- public(check_set/0).
+	:- info(check_set/0, [comment is 'Check that BANPIPE_MODULE_PATH is set.']).
+	check_set :-
+		report_unless(shell::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
+		
 	:- public(include_directory/1).
 	:- info(include_directory/1,
 		[ comment is 'Programmatically appends a directory to the module search path',
@@ -182,6 +187,7 @@
 		parameter(4,Options),
 		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
+		writeln(here),
 		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions,OutputFiles) ->
 			true % The task has allready been run 
 			;

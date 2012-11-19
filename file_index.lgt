@@ -60,6 +60,8 @@
 	get_index_file(IndexFile) :-
 		parameter(1,Param1),
 		IndexFile = prolog_file(Param1),
+		IndexFile::dirname(Dir),
+		directory(Dir)::create,
 		(IndexFile::exists -> true ; IndexFile::touch).
 	
 	consistency_check. % FIXME: do somethinh useful

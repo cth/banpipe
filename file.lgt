@@ -1,6 +1,10 @@
 % A paraterized object representing a single file.
 
-:- object(file(_)).
+:- object(path(_Path)).
+% TODO: See what can be moved here...
+:- end_object.
+
+:- object(file(Path), extends(path(Path))).
 	:- info([
 		version is 1.0,
 		author is 'Christian Theil Have',
@@ -34,7 +38,24 @@
 		parameter(1,File),
 		meta::foldl(atom_concat,'',['cp ',File,' ',TargetFile],ShellCopyCommand),
 		shell::exec(ShellCopyCommand).
-		
+
+
+	:- public(exists/0).
+	:- info(exists/0, [ comment is 'True if the file A exists.']).
+	:- if((current_logtalk_flag(prolog_dialect, swi))).
+		exists :-
+			parameter(1,F),
+			exists_file(F).
+	:- elif((current_logtalk_flag(prolog_dialect, yap))).
+		exists :-
+			parameter(1,F),
+			file_exists(F).
+	:- elif((current_logtalk_flag(prolog_dialect, b))).
+		exists :-
+			parameter(1,F),
+			exists(F).
+	:- endif.
+
 	:- public(touch/0).
 	touch :-
 		parameter(1,F),		
@@ -63,23 +84,7 @@
 		list::append(_,[47],DirPartCodes), % DirPart should end with a '/'
 		\+ list::member(47,FilePartCodes),
 		atom_codes(Directory,DirPartCodes).
-
-	:- public(exists/0).
-	:- info(exists/0, [ comment is 'True if the file A exists.']).
-	:- if((current_logtalk_flag(prolog_dialect, swi))).
-		exists :-
-			parameter(1,F),
-			exists_file(F).
-	:- elif((current_logtalk_flag(prolog_dialect, yap))).
-		exists :-
-			parameter(1,F),
-			file_exists(F).
-	:- elif((current_logtalk_flag(prolog_dialect, b))).
-		exists :-
-			parameter(1,F),
-			exists(F).
-	:- endif.
-	
+		
 	:- private(read_characters/2).
 	read_characters(Stream,Contents) :-
 		get_code(Stream,Code),
@@ -157,4 +162,18 @@
 		writeq(Stream,Term),
 		write(Stream,'.\n'),
 		stream_write_terms(Stream,Rest).
+:- end_object.
+
+:- object(directory(Path), extends(path(Path))).
+	:- public(create/0).
+	:- info(create/0, [comment is 'Creates the directory if it does not allready exist']).
+	
+	create :-
+		%self(Self),
+		parameter(1,Path),
+		%(Self::exists(Path) ->
+		%	true
+		%	;
+		meta::foldl(atom_concat,'',['mkdir -p "',Path, '"'],Cmd),
+		shell::exec(Cmd).
 :- end_object.
