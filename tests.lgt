@@ -533,3 +533,106 @@
 		task(file,get,[type(blah)],[])::typecheck([OutputType]),
 		var(OutputType).
 :- end_object.
+
+
+:- object(test_scheduler_tree,extends(lgtunit)).
+	:- initialization(::run).
+	
+	
+	/*
+	+1 ready module1::task1
+	|--+3 ready module3::task3
+	|--+2 ready module2::task2
+	*/
+	make_small_tree(Tree4) :-
+		scheduler_tree::create(Tree1),
+		scheduler_tree::add(module1,task1,nil,Tree1,Tree2,TaskId1),
+		scheduler_tree::add(module2,task2,TaskId1,Tree2,Tree3,_TaskId2),
+		scheduler_tree::add(module3,task3,TaskId1,Tree3,Tree4,_TaskId3).
+
+	/* 
+	+1 ready module1::task1
+	|--+6 ready module5::task5
+	   |--+8 ready module7::task7
+	|--+2 ready module2::task2
+	   |--+3 ready module3::task3
+	      |--+5 ready module4::task4
+	      |--+4 ready module3::task3
+	         |--+9 ready module7::task7
+	         |--+7 ready module6::task6
+	*/
+	make_large_tree(Tree10) :-
+		scheduler_tree::create(Tree1),
+		scheduler_tree::add(module1,task1,nil,Tree1,Tree2,TaskId1),
+		scheduler_tree::add(module2,task2,TaskId1,Tree2,Tree3,TaskId2),
+		scheduler_tree::add(module3,task3,TaskId2,Tree3,Tree4,TaskId3),
+		scheduler_tree::add(module3,task3,TaskId3,Tree4,Tree5,TaskId4),
+		scheduler_tree::add(module4,task4,TaskId3,Tree5,Tree6,_TaskId5),
+		scheduler_tree::add(module5,task5,TaskId1,Tree6,Tree7,TaskId6),
+		scheduler_tree::add(module6,task6,TaskId4,Tree7,Tree8,_TaskId7),
+		scheduler_tree::add(module7,task7,TaskId6,Tree8,Tree9,TaskId8),
+		scheduler_tree::add(module7,task7,TaskId4,Tree9,Tree10,_TaskId9).
+	
+	succeeds(make_small_tree) :-
+		make_small_tree(T),
+		scheduler_tree::print(T).
+		
+	succeeds(make_large_tree) :-
+		make_large_tree(T),
+		scheduler_tree::print(T).
+
+	succeeds(test_ready) :-
+		make_large_tree(T1),
+		findall(TaskId,scheduler_tree::ready_task(T1,TaskId),AllReady),
+		sort(AllReady,[5,7,8,9]).
+
+	% After removing the root element, the tree should be empty.
+	succeeds(test_remove) :-
+		make_small_tree(T),
+		scheduler_tree::remove(1,T,T2),
+		scheduler_tree::empty(T2).
+	
+	succeeds(test_replace_node) :-
+		make_small_tree(T),
+		scheduler_tree::lookup(2,T,SubTree1),
+		SubTree1 = [node(Id,State,_,_,Children)],
+		SubTree1_new = node(Id,State,replaced_module,replace_goal,Children),
+		scheduler_tree::replace(SubTree1_new,T,T2), % replace it
+		T \= T2, % It is changed
+		scheduler_tree::replace(Subtree1,T2,T). % Replace it again with original subtree
+		
+	succeeds(test_set_running1) :-
+		make_small_tree(T1),
+		scheduler_tree::set_running(2,T1,T2),
+		scheduler_tree::lookup(2,T2,[node(2,running,_,_,_)]).
+			
+	fails(test_set_running2) :-
+		make_small_tree(T1),
+		scheduler_tree::set_running(4,T1,_). % there is no task with id 4
+		
+	fails(test_set_running_twice) :-
+		make_small_tree(T1),
+		scheduler_tree::set_running(2,T1,T2),
+		scheduler_tree::set_running(2,T2,_).
+
+	succeeds(test_set_completed) :-
+		make_small_tree(T1),
+		scheduler_tree::set_running(2,T1,T2),
+		scheduler_tree::set_completed(2,T2,T3).
+		
+	fails(test_set_completed_write) :-
+		make_small_tree(T1),
+		scheduler_tree::set_running(2,T1,T2),
+		scheduler_tree::set_completed(2,T2,T3),
+		scheduler_tree::set_completed(2,T3,_).
+
+	succeeds(test_complete_all) :-
+		make_small_tree(T1),
+		scheduler_tree::set_running(3,T1,T2),
+		scheduler_tree::set_completed(3,T2,T3),
+		scheduler_tree::set_running(2,T3,T4),
+		scheduler_tree::set_completed(2,T4,T5),
+		scheduler_tree::set_running(1,T5,T6),
+		scheduler_tree::set_completed(1,T6,T7),
+		scheduler_tree::empty(T7).
+:- end_object.
