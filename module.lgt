@@ -187,7 +187,6 @@
 		parameter(4,Options),
 		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
-		writeln(here),
 		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions,OutputFiles) ->
 			true % The task has allready been run 
 			;

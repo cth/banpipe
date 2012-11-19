@@ -47,9 +47,9 @@ read_from_file(File,Contents) :-
 	close(Stream).
 
 read_from_stream(Stream,Contents) :-
-	get_code(Stream,Ch),
-	((Ch == end_of_file) ->
+	get_code(Stream,C),
+	((C == -1) ->
 		Contents = []
 		;
-		Contents = [Ch|Rest],
+		Contents = [C|Rest],
 		read_from_stream(Stream,Rest)).
