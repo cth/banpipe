@@ -104,20 +104,14 @@
 		AtomCodes \= [UnderScore|_],
 		set::insert_all(AtomCodes,[],AtomSet),
 		set::subset(AtomSet,WhitelistCodes).
-:- end_object.
+		
 
-:- object(conjunction).
-	:- public(nth1/3).
-	:- private(conjunction_nth/4).
-	
-	nth1(N,Conjunction,Element) :-
-		conjunction_nth(Element,Conjunction,1,N).
-
-	conjunction_nth(Member,(Member,_),Idx,Idx).
-	conjunction_nth(Member,(ConjA,ConjB),IdxIn,IdxOut) :-
-		Member \= ConjA,
+	:- public(conjunction_as_list/2).
+	:- info(conjunction_as_list/2,[
+		comments is 'Converversion from Conjunction to List, i.e., (A,B,C) => [A,B,C].',
+		argnames is ['Conjunction','List']]).
+	conjunction_as_list((A,ConjRest),[A|ListRest]) :-
 		!,
-		IdxNext is IdxIn + 1,
-		conjunction_nth(Member,ConjB,IdxNext,IdxOut).
-		conjunction_nth(Member,Member,Idx,Idx).
+		::conjunction_as_list(ConjRest,ListRest).
+	conjunction_as_list(X,[X]).
 :- end_object.

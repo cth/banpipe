@@ -2,15 +2,16 @@
 	:- public(match_target_rule/3).
 	:- public(parse_guard_and_body/3).
 	:- public(parse_task_specification/4).
-
+	
 	%% match_target_rule(+Target,-Type,-Rule,-Index)
 	:- info(match_target_rule/3,[
 		comment is 'Matches a dependency rule where Target is the Nth goal of the rule head',
 		argnames is ['Target','Rule','N']]).
 		
-	match_target_rule(Target,Rule,TargetIndex) :-
+	match_target_rule(Target,TargetsList+Rule,TargetIndex) :-
 		{clause('<-'(Targets,Rule),true)},
-		conjunction::nth1(TargetIndex,Targets,Target).
+		term_extras::conjunction_as_list(Targets,TargetsList),
+		list::nth1(TargetIndex,TargetsList,Target).
 
 	:- info(parse_guard_and_body/3,[
 		comment is 'parse the RHS side of a rule',

@@ -142,7 +142,9 @@
 		
 	succeeds(term_to_atom6) :-
 		term_extras::term_to_atom([],'[]').
-	
+		
+	succeeds(conjunction_as_list) :-
+		term_extras::conjunction_as_list((a,b,c,d),[a,b,c,d]).
 :- end_object.
 
 :- object(test_term_file_index, extends(lgtunit)).

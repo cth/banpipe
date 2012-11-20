@@ -1,6 +1,4 @@
-
 :- object(parallel_interpreter(Semantics), extends(banpipe_interpreter)).
-
 	:- info([
 		version is 1.0,
 		author is 'Christian Theil Have',

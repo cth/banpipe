@@ -67,7 +67,4 @@
 	delete_directory(Directory) :-
 		{delete_directory(Directory)}.
 		
-	
-	
-	
 :- end_object.

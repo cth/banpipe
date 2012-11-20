@@ -201,7 +201,7 @@
 	:- info(typecheck/1,[
 		comments is 'Check that supplied types of the input types are valid and unify OutputTypes to the resulting output types.',
 		argnames is ['OutputTypes']]).
-
+		
 	typecheck(OutputTypes) :-
 		parameter(2,Task),
 		parameter(3,SuppliedInputTypes),
@@ -210,7 +210,7 @@
 		TaskDeclaration =.. [ Task, InputTypes, DeclOptions, OutputTypes ],
 		::expand_options(Options,DeclOptions,_),
 		term::subsumes(InputTypes,SuppliedInputTypes).
-		
+
 	:- public(invoker/1).
 	:- info(invoker/1,
 		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
