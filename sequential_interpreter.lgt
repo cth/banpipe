@@ -26,7 +26,7 @@
 	%	writeln(run(A,B,C)),
 	%	fail.
 
-	run(Target,Target,(nil,nil,[Target])) :-
+	run(Target,Target,(nil,[Target])) :-
 		atom(Target),
 		atom_codes(Target,TargetSyms),
 		meta::map([Atoms,Codes]>>atom_codes(Atoms,Codes),['file://','ftp://','http://', '"ftp://', '"http://'],Matchers),
@@ -34,7 +34,7 @@
 		list::append(MatchSyms,_,TargetSyms).
 		
 	% run with model call body
-	run(Target,Output,[(Module,TaskObject,Outputs),ChildSpecs]) :-
+	run(Target,Output,[(TaskObject,Outputs),ChildSpecs]) :-
 		match_target_rule(Target,LHS+RHS,TargetIndex),
 		banpipe_parser::parse_guard_and_body(RHS,Guard,Body),
 		{call(Guard)},

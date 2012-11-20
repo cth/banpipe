@@ -6,6 +6,29 @@
 		date is 2012/11/19,
 		comment is 'The scheduler_tree is a data tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks.  A Task may be in several states: \'ready\' (in the tree, but not yet running), \'running\' (but not yet completed) and \'completed\' (in which case it is removed from the tree). The object is used by the process scheduler to infer which tasks can be run in parallel.']).
 
+
+	:- public(from_trace/2).
+	from_trace(Trace,Tree) :-
+		::create(EmptyTree),
+		::from_trace_rec(nil,Trace,EmptyTree,Tree).
+		
+	:- private(from_trace_rec/4).
+
+	from_trace_rec(_,[],Tree,Tree).
+
+	from_trace_rec(_,[(nil,_)],Tree,Tree).
+
+	from_trace_rec(Parent,[(task(Module,Task,_,Options),_),ChildCalls],InTree,OutTree) :-
+		%Goal =.. [Task,Options],
+		::add(Module,Task,Parent,InTree,OutTree1,TaskId),
+		::from_trace_rec(TaskId,ChildCalls,OutTree1,OutTree).
+
+	from_trace_rec(Parent,[[(task(Module,Task,_,Options),_),Children]|Siblings],InTree,OutTree) :-
+		%Goal =.. [Task,Options],
+		::add(Module,Task,Parent,InTree,Tree1,TaskId),
+		from_trace_rec(TaskId,Children,Tree1,Tree2),
+		from_trace_rec(Parent,Siblings,Tree2,OutTree).
+
 	:- public(create/1).
 	:- info(create/1,[
 		comment is 'Creates an empty scheduler tree (EmptyTree)',

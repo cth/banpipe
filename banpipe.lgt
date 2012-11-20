@@ -56,6 +56,16 @@
 			;
 			reporting::error(no_such_execution_mode(Mode)))),
 		!.
+		
+	:- public(trace/1).
+	trace(Goal) :-
+		::trace(Goal,_,Trace),
+		scheduler_tree::from_trace(Trace,Tree),
+		scheduler_tree::print(Tree).
+	
+	:- public(trace/3).
+	trace(Goal,Result,Trace) :-
+		sequential_interpreter(typecheck_semantics)::run(Goal,Result,Trace), !.
 			
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
