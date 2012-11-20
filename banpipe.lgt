@@ -2,7 +2,6 @@
 :- op(1200,xfx,'<-').
 
 :- object(banpipe).
-
 	:- public(load/1).
 	
 	:- info([
@@ -19,7 +18,7 @@
 		argnames is ['G']]).
 	listing(Goal) :-
 		% escaped using {}/1 operator to find clause from "global" database rather than this objects database
-		findall([Head,Body],({clause('<-'(Head,Body),true)},conjunction::nth1(_,Head,Goal)),Rules),
+		findall([Head,Body],({clause('<-'(Head,Body),true)},term_extras::conjunction_as_list(Head,HeadList),list::nth1(_,HeadList,Goal)),Rules),
 		forall(list::member([Head,Body],Rules),(write(Head), write(' <- '), writeln(Body))).
 
 	:- public(listing/0).
@@ -46,26 +45,27 @@
 		argnames is ['Goal','File']]).
 
 	run(Goal,Result) :-
-		config::get(execution_mode,Mode),
-		((Mode == sequential) ->
-			sequential_interpreter(execution_semantics)::run(Goal,Result)
-			;
-		((Mode == parallel) ->
-			%parallel_interpreter::run(Goal)
-			reporting::error('parallel_interpreter missing')
-			;
-			reporting::error(no_such_execution_mode(Mode)))),
-		!.
+		sequential_interpreter(execution_semantics)::run(Goal,Result).
 		
+:- if(current_logtalk_flag(threads,supported)).
+	run_parallel(Goal,Result) :-
+		trace(Goal,_,Trace),
+		scheduler_tree::from_trace(Trace,Tree),
+		scheduler::run,
+		% Result should now be available on file, use 'sequential' run to retrieve it
+		run(Goal,Result).
+:- endif.
+
 	:- public(trace/1).
 	trace(Goal) :-
 		::trace(Goal,_,Trace),
-		scheduler_tree::from_trace(Trace,Tree),
-		scheduler_tree::print(Tree).
+		scheduler_tree::from_trace(Trace,Tree1),
+		scheduler_tree::reduce_tree(Tree1,Tree2),
+		scheduler_tree::print(Tree2).
 	
 	:- public(trace/3).
 	trace(Goal,Result,Trace) :-
-		sequential_interpreter(typecheck_semantics)::run(Goal,Result,Trace), !.
+		sequential_interpreter(trace_semantics)::run(Goal,Result,Trace), !.
 			
 	:- public(typecheck/1).
 	:- info(typecheck/1,[

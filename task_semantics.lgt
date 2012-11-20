@@ -41,6 +41,6 @@
 		date is 2012/11/19,
 		comment is 'Semantics used for generating call trace. Only the syntactical Rule is relevant.']).
 		
-	apply(LHS+RHS,_Task,LHS).
+	apply(LHS+_RHS,_Task,LHS).
 :- end_object.
 

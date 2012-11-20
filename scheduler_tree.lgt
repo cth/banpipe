@@ -19,13 +19,13 @@
 	from_trace_rec(_,[(nil,_)],Tree,Tree).
 
 	from_trace_rec(Parent,[(task(Module,Task,_,Options),_),ChildCalls],InTree,OutTree) :-
-		%Goal =.. [Task,Options],
-		::add(Module,Task,Parent,InTree,OutTree1,TaskId),
+		Goal =.. [Task,Options],
+		::add(Module,Goal,Parent,InTree,OutTree1,TaskId),
 		::from_trace_rec(TaskId,ChildCalls,OutTree1,OutTree).
 
 	from_trace_rec(Parent,[[(task(Module,Task,_,Options),_),Children]|Siblings],InTree,OutTree) :-
-		%Goal =.. [Task,Options],
-		::add(Module,Task,Parent,InTree,Tree1,TaskId),
+		Goal =.. [Task,Options],
+		::add(Module,Goal,Parent,InTree,Tree1,TaskId),
 		from_trace_rec(TaskId,Children,Tree1,Tree2),
 		from_trace_rec(Parent,Siblings,Tree2,OutTree).
 

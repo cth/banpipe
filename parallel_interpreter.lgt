@@ -87,6 +87,4 @@
 			map(callspec_output_file,ChildSpecs,InputFiles),
 			RunGoal =.. [ Task, InputFiles, Options, OutputFiles ],
 			goal_result_files(Model,RunGoal,OutputFiles). % FIXME
-
-
 :- end_object.
