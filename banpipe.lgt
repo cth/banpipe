@@ -34,28 +34,44 @@
 	
 	:- public(run/1).
 	:- info(run/1, [
-		comment is 'Recursively compute the file associated with Goal.',
+		comment is 'RRecursively (sequentially) compute the File associated with Goal.',
 		argnames is ['Goal']]).
 	run(Goal) :-
 		::run(Goal,_).
 
 	:- public(run/2).
 	:- info(run/2, [
-		comment is 'Recursively compute the File associated with Goal.',
+		comment is 'Recursively (sequentially) compute the File associated with Goal.',
 		argnames is ['Goal','File']]).
 
 	run(Goal,Result) :-
 		sequential_interpreter(execution_semantics)::run(Goal,Result).
-		
+
+	:- public(prun/1).
+	:- info(prun/1, [
+		comment is 'Compute the File associated with Goal. Independent sub-tasks are computed in parallel.',
+		argnames is ['Goal']]).
+	prun(Goal) :-
+		prun(Goal,_).
+
+	:- public(prun/2).
+	:- info(prun/2,[
+		comment is 'Compute the File associated with Goal. Independent sub-tasks are computed in parallel.',
+		argnames is ['Goal','File']]).
+
 :- if(current_logtalk_flag(threads,supported)).
-	run_parallel(Goal,Result) :-
+	prun(Goal,Result) :-
 		trace(Goal,_,Trace),
 		scheduler_tree::from_trace(Trace,Tree),
-		scheduler::run,
+		scheduler_tree::reduce_tree(Tree,ReducedTree),
+		scheduler::run(ReducedTree,[]),
 		% Result should now be available on file, use 'sequential' run to retrieve it
 		run(Goal,Result).
+:- else.
+	prun(_Goal,_Result) :-
+		reporting::error('parallel execution is not supported.').
 :- endif.
-
+	
 	:- public(trace/1).
 	trace(Goal) :-
 		::trace(Goal,_,Trace),

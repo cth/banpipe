@@ -50,7 +50,6 @@
 		list::nth1(TargetIndex,Outputs,Output).
 		
 	run(Target,_Output,_Trace) :-
-		parameter(1,Semantics),
 		self(Self),
 		term_extras::term_to_atom(Self,SelfAtom),
 		term_extras::term_to_atom(Target,TargetAtom),
