@@ -195,5 +195,5 @@ specifies that the `interface.pl` should be loaded with SWI-prolog. The current 
 
 ### For developers
 
-[Code on github](https://github.com/cth/banpipe.lgt)
-[Generated documentation](http://banpipe.org/apidoc/)
+- [Code on github](https://github.com/cth/banpipe.lgt)
+- [Generated documentation](http://banpipe.org/apidoc/)
