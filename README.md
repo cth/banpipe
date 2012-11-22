@@ -16,11 +16,11 @@ BANpipe has been developed within the [LoSt research project](http://lost.ruc.dk
 BANpipe is based on what was previously called "The LoSt framework", which is available as [banpipe-lost on github](https://github.com/cth/the-lost-framework).
 The banpipe-lost contains a lot of libraries and modules specific to biological sequences and is developed exclusively for PRISM as host language. 
 
-If you have questions, please don't hesitate to contact me - [Christian Theil Have)](mailto:cth@ruc.dk)
+If you have questions, please don't hesitate to contact me - [Christian Theil Have](mailto:cth@ruc.dk)
 
 ## License
 
-(C) Christian Theil Have, <a href="mailto:cth@ruc.dk">, 2012.
+(C) [Christian Theil Have](mailto:cth@ruc.dk), 2012.
 
 This program is distributed under the terms of the GNU General Public License:
 [http://www.gnu.org/licenses/gpl.html](http://www.gnu.org/licenses/gpl.html)
