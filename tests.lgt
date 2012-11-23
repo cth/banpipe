@@ -280,6 +280,15 @@
 	fails(environment_variable_nonexisting) :-
 		shell::environment_variable('NO_SUCH_VARIABLE','').
 
+	succeeds(make_change_change_delete) :-
+	    D=testdir42,
+	    shell::working_directory(Current),
+	    shell::make_directory(D),
+	    shell::change_directory(D),
+	    shell::change_directory(Current),
+	    shell::delete_directory(D).
+
+
 	% FIXME: More test-cases needed for shell object
 :- end_object.
 
