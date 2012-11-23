@@ -45,15 +45,15 @@
 	:- if((current_logtalk_flag(prolog_dialect, swi))).
 		exists :-
 			parameter(1,F),
-			exists_file(F).
+			{exists_file(F)}.
 	:- elif((current_logtalk_flag(prolog_dialect, yap))).
 		exists :-
 			parameter(1,F),
-			file_exists(F).
+			{file_exists(F)}.
 	:- elif((current_logtalk_flag(prolog_dialect, b))).
 		exists :-
 			parameter(1,F),
-			exists(F).
+			{exists(F)}.
 	:- endif.
 
 	:- public(touch/0).
@@ -169,11 +169,17 @@
 	:- info(create/0, [comment is 'Creates the directory if it does not allready exist']).
 	
 	create :-
-		%self(Self),
 		parameter(1,Path),
-		%(Self::exists(Path) ->
-		%	true
-		%	;
-		meta::foldl(atom_concat,'',['mkdir -p "',Path, '"'],Cmd),
-		shell::exec(Cmd).
+		((::exists) ->
+			true
+			;
+			shell::make_directory(Path)).
+
+	:- public(exists/0).
+	:- info(exists/0,[comment is 'True if the directory exists']).
+    	% FIXME: This is not going to work for all Prologs
+	exists :- 
+	    	parameter(1,Path),
+	    	file(Path)::exists.
+
 :- end_object.
