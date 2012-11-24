@@ -1,10 +1,13 @@
 :- object(scheduler_tree).
-
+    	% The object is used by the process scheduler to infer which tasks can be run in parallel.
 	:- info([
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/19,
-		comment is 'The scheduler_tree is a data tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks.  A Task may be in several states: \'ready\' (in the tree, but not yet running), \'running\' (but not yet completed) and \'completed\' (in which case it is removed from the tree). The object is used by the process scheduler to infer which tasks can be run in parallel.']).
+		comment is 'Tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks.  Tasks one of three states.',
+		remarks is [ 	'state ready' - 'in the tree, but not yet running', 
+				'state running' - 'tasks being run, but has not yet completed',
+				'state completed' - 'completed tasks are removed from the tree']]).
 
 
 	:- public(from_trace/2).

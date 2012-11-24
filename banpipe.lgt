@@ -1,5 +1,6 @@
 % Dependency rule operator, note that it has same precendece as :-
 :- op(1200,xfx,'<-').
+:- dynamic('<-'/2).
 
 :- object(banpipe).
 	:- public(load/1).
@@ -11,6 +12,13 @@
 		comment is 'The main object for interaction with banpipe scripts.']).
 
 	:- dynamic('<-'/2).
+/*
+    	:- public(version/1).
+    	:- info(version/1, [
+		comment is 'Version is the current version of banpipe',
+		argnames is ['Version']]).
+	version('pre 1.0').
+ */
 	
 	:- public(listing/1).
 	:- info(listing/1, 

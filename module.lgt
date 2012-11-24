@@ -3,7 +3,11 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/09,
-		comment is 'Manages the module directory search paths. These are obtained from the BANPIPE_MODULE_PATH and directories which have subsequently programmatically been added through the include_directory predictate.']).
+		comment is 'Manages the module directory search paths.',
+		remarks is [ 
+			'environment_variable $BANPIPE_MODULE_PATH'  - 'Search paths are obtained from the BANPIPE_MODULE_PATH (paths separated by : (unix) or ; (windows)',
+			'explicit paths in scripts' - 'module directories can be added explicitly from scripts, see include_directory/1']
+			]).
 		
 	:- private(path_dir/1).
 	:- dynamic(path_dir/1).
@@ -65,7 +69,7 @@
 
 	:- public(valid/1).
 	:- info(valid/1,
-		[ comment is 'Checks if a call with option parameters Options to the task represented by the object is valid. The module+task must exist, have a declaration and a implementation in the interface file and the options must match (be a subset of) declared options of the task.',
+		[ comment is 'True if module+task exists, have a declaration+implementation in the interface file and Options matches (is a subset of) declared options.',
 		  argnames is ['Options']]).
 	valid(Options) :-
 		parameter(1,Module),
@@ -80,8 +84,9 @@
 			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
 			
 	:- public(expand_options/2).
+ 
 	:- info(expand_options/2,
-		[ comment is 'Given "call options" Options are expanded to SortedExpandedOptions - A sorted list which include all Options and all declared default options, except if an option in Options use same functor. ',
+		[ comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
 		  argnams is [ 'Options', 'SortedExpandedOptions' ]]).
 	expand_options(Options,SortedExpandedOptions) :-
 		::options(DefaultOptions),
@@ -102,7 +107,7 @@
 		::declaration(_).
 
 	:- private(has_implementation/0).
-	:- info(has_implementation/0, [comment is 'True if the there is an implementation of the task. This merely verifies that a predicate of the correct name and arity exists, but not whether it works.']).
+	:- info(has_implementation/0, [comment is 'True if the there is an implementation predicate for the task.']).
 
 	% has_implementation/0 for built-in modules
 	has_implementation :-
@@ -172,9 +177,11 @@
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
 	:- public(run/1).
+    /*
 	:- info(run/1,[
 		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). In either case, OutputFiles as a list of names of resulting files.',
 		argnames is ['OutputFiles']]).
+	    */
 		
 	% FIXME: hook into logging
 	run(OutputFiles) :-
@@ -212,9 +219,19 @@
 		term::subsumes(InputTypes,SuppliedInputTypes).
 
 	:- public(invoker/1).
+    /*
+	:- if((current_prolog_flag(windows,true),current_prolog_dialect(b))).
 	:- info(invoker/1,
+    		% short comment to avoid atom_too_long error
+		[ comment is 'Determines which InvokerObject to use to execute the task.',
+		  argnames is ['InvokerObject']]).
+	:- else.
+	:- info(invoker/1,
+    		% short comment to avoid atom_too_long error
 		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
 		  argnames is ['InvokerObject']]).
+    	:- endif.
+    */
 
 	invoker(InvokerName) :-
 		parameter(1,Module),
