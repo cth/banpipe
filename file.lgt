@@ -75,16 +75,53 @@
 		[comment is 'Separate out the directory part (Directory) of a filename',
 		 argnames is ['Directory']]).
 
-	% FIXME: This is unix only and somewhat fragile. Write a better and portable version.
 	dirname(Directory) :-
+	    ::dir_file(Directory,_).
+
+	:- public(basename/1).
+    	basename(Filename) :-
+	    ::dir_file(_,Filename).
+
+	:- private(dir_file/2).
+    	:- info(dir_file/2,[
+		comment is 'Separates filename into a Directory part and a Filename part',
+		argnames is ['Directory','Filename']]).
+	% FIXME: This is unix only and somewhat fragile. Write a better and portable version.
+	dir_file(Directory,Filepart) :-
 		parameter(1,Filename),
 		% everything before last '/'=47 is dirname:
 		atom_codes(Filename, CharCodes),
 		list::append(DirPartCodes, FilePartCodes, CharCodes),
 		list::append(_,[47],DirPartCodes), % DirPart should end with a '/'
 		\+ list::member(47,FilePartCodes),
-		atom_codes(Directory,DirPartCodes).
-		
+		atom_codes(Directory,DirPartCodes),
+		atom_codes(Filepart,FilePartCodes).
+
+	:- public(canonical/1).
+    	:- info(canonical/1, [
+		comment is 'CanonicalFilename is Filename with backspaces->slashes and double slashes removed',
+		argnames is ['CanonicalFilename']]).
+	canonical(CanonicalFilename) :-
+	    	parameter(1,Filename),
+		atom_codes(Filename,FileCodes),
+		% Replace backslash (code 92) with forward slash (code 47)
+		meta::map([X,Y]>>((X==92) -> Y=47 ; Y=X),FileCodes,UnixFilenameCodes),
+		remove_double_slashes(UnixFilenameCodes,Unslashed),
+		atom_codes(CanonicalFilename,Unslashed).
+	
+	:- private(remove_double_slashes/2).
+    	:- info(remove_double_slashes/2,[
+		comment is 'replace adjacent slashes with one slash',
+		argnames is ['FilenameIn','FilenameOut']]).
+	remove_double_slashes([],[]).
+	remove_double_slashes([47,47|FilenameCodesIn],[47|FilenameCodesOut]) :-
+	    	!,
+	    	remove_double_slashes(FilenameCodesIn,FilenameCodesOut).
+	remove_double_slashes([X|FilenameCodesIn],[X|FilenameCodesOut]) :-
+	    	remove_double_slashes(FilenameCodesIn,FilenameCodesOut).
+
+
+
 	:- private(read_characters/2).
 	read_characters(Stream,Contents) :-
 		get_code(Stream,Code),

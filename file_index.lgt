@@ -81,7 +81,8 @@
  		findall(Filename, (
 			list::nth1(FileNo,ResultFiles,Filename),
 			term_extras::term_to_atom(FileNo,FileNoAtom),
-			meta::foldl(atom_concat,'',[IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Filename)
+			meta::foldl(atom_concat,'',[IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Gen),
+			file(Gen)::canonical(Filename)
 		),ResultFiles),
 		IndexFile::append([files(IndexAtom,AllocatedTimestamp,null,ResultFiles,Module,Task,InputFiles,Options)]).
 

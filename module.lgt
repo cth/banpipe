@@ -194,15 +194,16 @@
 		parameter(4,Options),
 		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
-		(FileManager::result_files(Module,Task,InputFiles,ExpandedOptions,OutputFiles) ->
+		meta::map([X,Y]>>(file(X)::canonical(Y)),InputFiles,InputFilesCanonical),
+		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFiles) ->
 			true % The task has allready been run 
 			;
-			FileManager::result_files_allocate(Module,Task,InputFiles,ExpandedOptions,OutputFiles),
+			FileManager::result_files_allocate(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFiles),
 			::invoker(Invoker),
 			module(Module)::interface_file(InterfaceFile),
-			Goal =.. [ Task, InputFiles, ExpandedOptions, OutputFiles ],
+			Goal =.. [ Task, InputFilesCanonical, ExpandedOptions, OutputFiles ],
 			Invoker::run(InterfaceFile,Goal),!,
-			FileManager::result_files_commit(Module,Task,InputFiles,ExpandedOptions)).
+			FileManager::result_files_commit(Module,Task,InputFilesCanonical,ExpandedOptions)).
 	
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
@@ -219,20 +220,9 @@
 		term::subsumes(InputTypes,SuppliedInputTypes).
 
 	:- public(invoker/1).
-    /*
-	:- if((current_prolog_flag(windows,true),current_prolog_dialect(b))).
 	:- info(invoker/1,
-    		% short comment to avoid atom_too_long error
-		[ comment is 'Determines which InvokerObject to use to execute the task.',
+		[ comment is 'Determine InvokerObject to use: module may declare invoke_with/1; otherwise use banpipe_config default_invoker',
 		  argnames is ['InvokerObject']]).
-	:- else.
-	:- info(invoker/1,
-    		% short comment to avoid atom_too_long error
-		[ comment is 'Determines which InvokerObject to use to execute the task. If there is a override_invoker config directive, then that it used (e.g. a type checker), second if module itself declares a particular invoker to use, then that is used. Otherwise the invoker indicated by the config directive default_invoker is used',
-		  argnames is ['InvokerObject']]).
-    	:- endif.
-    */
-
 	invoker(InvokerName) :-
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile),

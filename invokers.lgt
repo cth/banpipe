@@ -36,6 +36,7 @@
 	run(InterfaceFile,Goal) :-
 		shell::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
+		file(InterfaceFile)::basename(BaseFileName),
 		shell::change_directory(ModuleDir),
 		::key_invoke_command(InvokeCmdKey),
 		(config::get(InvokeCmdKey,Exec) ->
@@ -44,7 +45,7 @@
 			::default_invoke_command(Exec)),
 		term_extras::term_to_atom(Goal,GoalAtom),
 		::goal_option(GoalOption),
-		meta::foldl(atom_concat,'',[Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', InterfaceFile, '\'),', GoalAtom,',halt."'],Command),
+		meta::foldl(atom_concat,'',[Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', BaseFileName, '\'),', GoalAtom,',halt."'],Command),
 		writeln(shell_command(Command)),
 		shell::exec(Command),
 		shell::change_directory(CurrentDir).
