@@ -9,7 +9,7 @@ Pipelines for machine learning, natural language processing and biological seque
 Banpipe is a general pipeline programming language, but it is designed to support a special kind of annotation pipelines which we call [Bayesian Annotation Networks](http://drops.dagstuhl.de/opus/frontdoor.php?source_opus=3164) (BANs). A Bayesian Network is a directed acyclic graph where the nodes are conditional probability distributions and the edges represent conditional dependencies. A BAN is a Bayesian Network where nodes are instead (probabilistic) annotation programs and edges are input/output dependencies between programs. Inference in BANs is performed iteratively by evaluating each program at a time and using its output annotation as input for dependent programs. This is not only similar to the way forward analysis takes place in Bayesian networks, but also a nice fit to the pipeline paradigm.
 
 Banpipe is implemented in [Logtalk](http://logtalk.org) and is portable across multiple Prolog systems.
-It has been tested using [B-Prolog](http://www.probp.com/) and [SWI-Prolog](http://www.swi-prolog.org/). 
+It has been tested on OSX using [B-Prolog](http://www.probp.com/) and [SWI-Prolog](http://www.swi-prolog.org/) and the latest stable logtalk. Windows support seems to be flaky still.  
 To run logtalk, you need Logtalk plus at least one Prolog system installed. 
 
 BANpipe has been developed within the [LoSt research project](http://lost.ruc.dk).
@@ -39,15 +39,13 @@ Alternative you can clone the git repository, i.e.,
 
 Place the source code in any directory that you see fit, e.g. /home/myaccount/banpipe. 
 
-After downloading banpipe, you will need to setup banpipe as a logtalk library,
+After downloading banpipe, you will need to setup banpipe as a logtalk library.
 
-edit `$LOGTALKUSER/libpaths/libpaths.pl`
+You can do this by editing your `$LOGTALK_HOME/settings.lgt` file. 
+You need to add a fact,  `logtalk_library_path(banpipe, '/home/myaccount/banpipe')`, 
+to this file as well as multifile/1 and dynamic/1 directives. The file 
+allready contains commented example. 
 
-Add a fact,
-
-`logtalk_library_path(banpipe, '/home/myaccount/banpipe')`.
-
-at the end of the file.
 
 You also need to add any directory which contains banpipe modules to the 
 `$BANPIPE_MODULE_PATH` variable. For instance, to add the example modules,
