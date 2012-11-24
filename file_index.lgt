@@ -90,6 +90,7 @@
 		get_index_file(IndexFile),
 		IndexFile::select(files(Id,AllocatedTimestamp,null,ResultFiles,Module,Task,InputFiles,Options),RestEntries),
 		current_timestamp(CommitTimestamp),
+		forall(list::member(F,ResultFiles), ((file(F)::exists -> true ; reporting::error(result_files_commit(no_such_file(F)))))),
 		IndexFile::write_terms([files(Id,AllocatedTimestamp,CommitTimestamp,ResultFiles,Module,Task,InputFiles,Options)|RestEntries]).
 
 	result_files_rollback(Module,Task,InputFiles,Options) :-
