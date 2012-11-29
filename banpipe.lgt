@@ -12,14 +12,19 @@
 		comment is 'The main object for interaction with banpipe scripts.']).
 
 	:- dynamic('<-'/2).
-/*
+	
+	:- public(version/0).
+	:- info(version/0,[comment is 'Writes current version of BANpipe.']).
+	version :-
+		version(V),
+		writeln(V).
+
     	:- public(version/1).
     	:- info(version/1, [
 		comment is 'Version is the current version of banpipe',
 		argnames is ['Version']]).
-	version('pre 1.0').
- */
-	
+	version('1.0 alpha release 1').
+
 	:- public(listing/1).
 	:- info(listing/1, 
 		[ comment is 'Lists all banpipe dependency rules where the goal G occurs in the head.',
@@ -53,7 +58,16 @@
 		argnames is ['Goal','File']]).
 
 	run(Goal,Result) :-
-		sequential_interpreter(execution_semantics)::run(Goal,Result).
+		run_with_semantics(execution_semantics,Goal,Result).
+		
+	:- private(run_with_semantics/3).
+	run_with_semantics(Semantics,Goal,Result) :-
+		(config::get(trace,true) ->
+			Sem=trace(Semantics)
+			;
+			Sem=Semantics),
+		sequential_interpreter(Sem)::run(Goal,Result).
+
 
 	:- public(prun/1).
 	:- info(prun/1, [
@@ -69,8 +83,8 @@
 
 :- if(current_logtalk_flag(threads,supported)).
 	prun(Goal,Result) :-
-		trace(Goal,_,Trace),
-		scheduler_tree::from_trace(Trace,Tree),
+		callgraph(Goal,_,Callgraph),
+		scheduler_tree::from_trace(Callgraph,Tree),
 		scheduler_tree::reduce_tree(Tree,ReducedTree),
 		scheduler::run(ReducedTree,[]),
 		% Result should now be available on file, use 'sequential' run to retrieve it
@@ -79,18 +93,18 @@
 	prun(_Goal,_Result) :-
 		reporting::error('parallel execution is not supported.').
 :- endif.
-	
-	:- public(trace/1).
-	trace(Goal) :-
-		::trace(Goal,_,Trace),
-		scheduler_tree::from_trace(Trace,Tree1),
+
+	:- public(callgraph/1).
+	callgraph(Goal) :-
+		::callgraph(Goal,_,Callgraph),
+		scheduler_tree::from_trace(Callgraph,Tree1),
 		scheduler_tree::reduce_tree(Tree1,Tree2),
 		scheduler_tree::print(Tree2).
 	
-	:- public(trace/3).
-	trace(Goal,Result,Trace) :-
-		sequential_interpreter(trace_semantics)::run(Goal,Result,Trace), !.
-			
+	:- public(callgraph/3).
+	callgraph(Goal,Result,Callgraph) :-
+		sequential_interpreter(callgraph_semantics)::run(Goal,Result,Callgraph), !.
+
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
 		comment is 'Typecheck Goal -- recursively check that the types of input files for Goal are compatible.',
@@ -104,5 +118,12 @@
 		comment is 'Typecheck Goal -- recursively check that the types of input files for Goal are compatible and unify resulting Type.',
 		argnames is ['Goal','Type']]).
 	typecheck(Goal,Type) :-
-		sequential_interpreter(typecheck_semantics)::run(Goal,Type), !.
+		run_with_semantics(typecheck_semantics,Goal,Type).
+			
+	:- public(trace/0).
+	trace :- config::set(trace).
+	
+	:- public(notrace/0).
+	notrace :- config::pop(trace) ; true.
+	
 :- end_object.

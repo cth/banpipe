@@ -34,13 +34,43 @@
 		Task::typecheck(Result).
 :- end_object.
 
-:- object(trace_semantics, implements(task_semantics)).
+:- object(callgraph_semantics, implements(task_semantics)).
 	:- info([
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/19,
-		comment is 'Semantics used for generating call trace. Only the syntactical Rule is relevant.']).
+		comment is 'Semantics used for generating call graph. Only the syntactical Rule is relevant.']).
 		
 	apply(LHS+_RHS,_Task,LHS).
+:- end_object.
+
+:- object(trace(_Semantics), implements(task_semantics)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/19,
+		comment is 'A Semantics which implements a very simple tracer']).
+		
+	apply(LHS+RHS,Task,Outputs) :-
+		write('call: '),
+		write(LHS),
+		write(' <- '),
+		writeln(RHS),
+		writeln('(c)reep (a)bort>'),
+		get_char(Action),
+		perform_action(Action,LHS+RHS,Task,Outputs).
+		
+	:- private(perform_action/4).
+		
+	perform_action(a,_,_,_) :-
+		!,
+		throw(tracer(abort)).	
+		
+	% creep
+	perform_action(_,Rule,Task,Outputs) :-
+		writeln(creep),
+		parameter(1,Semantics),
+		Semantics::apply(Rule,Task,Outputs),
+		write('-->'), writeln(Outputs).
 :- end_object.
 

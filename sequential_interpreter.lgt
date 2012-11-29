@@ -20,11 +20,6 @@
 	:- info(run/3, [
 		comment is 'Same as run/2, but additionally generates a trace',
 		argnames is ['Goal','Result','Trace']]).
-	
-	% uncomment for debug trace
-	%run(A,B,C) :-
-	%	writeln(run(A,B,C)),
-	%	fail.
 
 	run(Target,Target,(nil,[Target])) :-
 		atom(Target),

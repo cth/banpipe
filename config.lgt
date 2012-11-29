@@ -28,8 +28,9 @@
 	:- info(pop/1, [
 		comment is 'alias for as pop(Key,_)',
 		argnames is ['Key']]).
-	pop(Key,Value) :-
-		::retract(directive(Key,Value)).
+
+	pop(Key) :-
+		::retract(directive(Key,_)).
 	
 	:- public(get/2).
 	:- info(get/2, [
@@ -38,6 +39,24 @@
 	get(Key,Value) :-
 		::directive(Key,Value),
 		!.
+	
+	:- public(set/2).
+	:- info(set/2,[
+		comment is 'Set is current Value for Key. No effect is current value for Key is Value',
+		argnames is ['Key','Value']]).
+	set(Key,Value) :-
+		(::get(Key,Value) ->
+			true
+			;
+			::push(Key,Value)).
+			
+	:- public(set/1).
+	:- info(set/2,[
+		comment is 'Set is current value for Key to true.',
+		argnames is ['Key','Value']]).
+	set(Key) :-
+		::set(Key,true).
+	
 		
 	:- public(setup_defaults/0).
 	:- mode(setup_defaults, one).

@@ -31,11 +31,11 @@ This program is distributed under the terms of the GNU General Public License:
 
 To install banpipe you first need to download ***Logtalk***, available from [logtalk.org](http://logtalk.org).
 
-Next, you need to download the source code for banpipe. You can download the latest version as a tgz or a zip file [here](https://github.com/cth/banpipe.lgt/downloads). 
+Next, you need to download the source code for banpipe. You can download the latest version as a tgz or a zip file [here](https://github.com/cth/banpipe/downloads). 
 
 Alternative you can clone the git repository, i.e., 
 
-`git clone https://github.com/cth/banpipe.lgt.git`
+`git clone https://github.com/cth/banpipe.git`
 
 Place the source code in any directory that you see fit, e.g. /home/myaccount/banpipe. 
 
@@ -145,8 +145,8 @@ For instance, for the hello world example, the following call graph is produced:
 
 ### Tracing a script
 
-The trace semantics...
-FIXME - not yet done.
+Scripts can be run through an interactive trace. This is enabled by typing `banpipe::trace.` 
+To disable tracing, type `banpipe::notrace.`
 
 ### Change propagation 
 
