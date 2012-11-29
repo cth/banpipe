@@ -41,11 +41,11 @@
 
 
 	:- public(exists/0).
-	:- info(exists/0, [ comment is 'True if the file A exists.']).
+	:- info(exists/0, [ comment is 'True if the file (or directory) A exists.']).
 	:- if((current_logtalk_flag(prolog_dialect, swi))).
 		exists :-
 			parameter(1,F),
-			{exists_file(F)}.
+			{exists_file(F) ; exists_directory(F) }.
 	:- elif((current_logtalk_flag(prolog_dialect, yap))).
 		exists :-
 			parameter(1,F),
