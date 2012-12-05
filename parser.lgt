@@ -1,4 +1,10 @@
 :- object(banpipe_parser).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/13,
+		comment is 'Predicates for decomposing banpipe rules.']).
+
 	:- public(match_target_rule/3).
 	:- public(parse_guard_and_body/3).
 	:- public(parse_task_specification/4).
