@@ -57,6 +57,17 @@
 		From::delete,
 		file(To)::delete.
 
+
+	succeeds(canonical_normal_file) :-
+		file('/tmp//file')::canonical('/tmp/file').	
+
+	succeeds(canonical_windows_file) :-
+		file('c:\\some\\file')::canonical('c:/some/file').	
+
+	succeeds(canonical_url) :-
+		file('http://banpipe.org//index.html')::canonical('http://banpipe.org/index.html').
+
+
 :- end_object.
 
 :- object(test_prolog_file, extends(lgtunit)).
@@ -647,3 +658,37 @@
 		scheduler_tree::set_completed(1,T6,T7),
 		scheduler_tree::empty(T7).
 :- end_object.
+
+
+:- object(test_uri,extends(lgtunit)).
+	:- initialization(::run).
+	
+	succeeds(uri_elements) :-
+		uri('http://banpipe.org/index.html')::uri_elements('http://','banpipe.org/index.html').
+		
+	succeeds(uri_valid_file) :-
+		uri('file:///tmp/blah')::valid.
+	
+	succeeds(uri_valid_url) :-
+		uri('ftp://user:pass@server.org/dir/file')::valid.
+		
+	fails(uri_invalid_file) :-
+		uri('/just/a/file')::valid.
+:- end_object.
+
+
+:- object(test_builtin_module_file,extends(lgtunit)).
+	:- initialization(::run).
+
+	succeeds(test_file_get1) :-
+		file('/tmp/test.1')::touch,
+		file::get(['file:///tmp/test.1'],[],['/tmp/test.2']),
+		file('/tmp/test.1')::delete,
+		file('/tmp/test.2')::delete.
+		
+	succeeds(test_file_get2) :-
+		file::get(['http://banpipe.org/'],[],['/tmp/test.banpipe']),
+		file('/tmp/test.banpipe')::delete.
+		
+:- end_object.
+	
