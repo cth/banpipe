@@ -64,6 +64,13 @@
 	builtin :-
 		parameter(1,Module),
 		implements_protocol(Module,banpipe_builtin_module).
+		
+	:- public(available/0).
+	:- info(available/0,[comment is 'True if a module with the given name is available.']).
+	available :-
+		::builtin 
+		;
+		::interface_file(_).
 :- end_object.
 
 :- object(module_task(_Module,_Task)).
@@ -97,21 +104,21 @@
 		::options(DefaultOptions),
 		::expand_options(Options,DefaultOptions,SortedExpandedOptions).
 
-	:- public(expand_options/3).		
+	:- public(expand_options/3).
 	expand_options(Options,DefaultOptions,SortedExpandedOptions) :-
 		::valid(Options),
 		meta::map([OptIn,OptOut]>>((OptIn=..[F,X],OptOut=..[F,X], list::member(OptOut,Options) -> true
 						; (OptIn=..[F,_],OptOut=..[F,_],list::member(OptOut,Options)) -> true
 							; OptOut=OptIn)),
 			DefaultOptions,ExpandedOptions),
-		list::sort(ExpandedOptions,SortedExpandedOptions).		
-		
-	:- private(has_declaration/0).
+		list::sort(ExpandedOptions,SortedExpandedOptions).
+
+	:- public(has_declaration/0).
 	:- info(has_declaration/0, [comment is 'True if the task has a declaration.']).
 	has_declaration :-
 		::declaration(_).
 
-	:- private(has_implementation/0).
+	:- public(has_implementation/0).
 	:- info(has_implementation/0, [comment is 'True if the there is an implementation predicate for the task.']).
 
 	% has_implementation/0 for built-in modules
@@ -182,29 +189,48 @@
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
 	:- public(run/1).
-    /*
+
 	:- info(run/1,[
-		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). In either case, OutputFiles as a list of names of resulting files.',
+		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). OutputFiles is a list of names of resulting files.',
 		argnames is ['OutputFiles']]).
-	    */
 	
-	% FIXME: hook into logging
-	run(OutputFiles) :-
-		::output_types(OutputTypes),
-		list::length(OutputTypes,N),
-		list::length(OutputFiles,N),
+	run(OutputFilesList) :-
+		self(Self),
 		parameter(1,Module),
 		parameter(2,Task),
 		parameter(3,InputFiles),
 		parameter(4,Options),
+		report_unless(module(Module)::available)::error(module_not_available(Module)),
+		report_unless(Self::has_declaration)::error(no_task_declaration(Module::Task)),
+		report_unless(Self::has_implementation)::error(no_task_implementation(Module::Task)),
+		::output_types(OutputTypes),
+		% If the output-types are not declared as a list,
+		% assume task predicate takes a single file argument
+		(list::valid(OutputTypes) ->
+			OutputTypesList = OutputTypes,
+			list::length(OutputTypesList,N),
+			list::length(OutputFilesList,N),
+			OutputFiles=OutputFilesList
+			;
+			OutputTypesList = [OutputTypes],
+			OutputFilesList = [OutputFiles]),
 		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
 		meta::map([X,Y]>>(file(X)::canonical(Y)),InputFiles,InputFilesCanonical),
-		Goal =.. [ Task, InputFilesCanonical, ExpandedOptions, OutputFiles ],
-		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFiles) ->
+		% If the input-types are not declared as a list, 
+		% assume that task predicate takes a single file as argument
+		::input_types(InputTypes),
+		(list::valid(InputTypes) -> 
+			InputFilesCanonicalAdapt = InputFilesCanonical
+			;
+			% Strip the list if it is not declared in the argument
+			[InputFilesCanonicalAdapt] = InputFilesCanonical),
+		Goal =.. [ Task, InputFilesCanonicalAdapt, ExpandedOptions, OutputFiles ],
+		writeln(Goal),
+		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFilesList) ->
 			true % The task has allready been run 
 			;
-			FileManager::result_files_allocate(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFiles),
+			FileManager::result_files_allocate(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFilesList),
 			(module(Module)::builtin ->
 				Module::Goal
 				;
@@ -213,12 +239,13 @@
 				Invoker::run(InterfaceFile,Goal)),
 			!,
 			FileManager::result_files_commit(Module,Task,InputFilesCanonical,ExpandedOptions)).
-	
+
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
 		comments is 'Check that supplied types of the input types are valid and unify OutputTypes to the resulting output types.',
 		argnames is ['OutputTypes']]).
-		
+	
+	% FIXME: Typecheck needs adaptation to non-list types
 	typecheck(OutputTypes) :-
 		parameter(2,Task),
 		parameter(3,SuppliedInputTypes),

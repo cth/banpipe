@@ -21,12 +21,14 @@
 		comment is 'Same as run/2, but additionally generates a trace',
 		argnames is ['Goal','Result','Trace']]).
 	
-	%run(A,B,C) :-
-	%	writeln(run(A,B,C)),
-	%	fail.
+	run(A,B,C) :-
+		writeln(run(A,B,C)),
+		fail.
 
 	run(Target,Target,(nil,[Target])) :-
-		uri(Target)::valid.
+		atom(Target),
+		uri(Target)::valid,
+		!.
 
 	% run with model call body
 	run(Target,Output,[(TaskObject,Outputs),ChildSpecs]) :-
@@ -34,7 +36,7 @@
 		banpipe_parser::parse_guard_and_body(RHS,Guard,Body),
 		{call(Guard)},
 		Body =.. [ '::', Module, TaskSpec],
-		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),
+		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),!,
 		self(Self),
 		meta::map([I,[O,C]]>>(Self::run(I,O,C)),Inputs,OutputsAndChildSpecs),
 		meta::map([[O,_],O]>>true,OutputsAndChildSpecs,InputsResults),
