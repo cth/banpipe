@@ -14,6 +14,7 @@
 :- initialization(logtalk_load(banpipe(shell))).
 :- initialization(logtalk_load(banpipe(config))).
 :- initialization(logtalk_load(banpipe(file))).
+:- initialization(logtalk_load(banpipe(uri))).
 :- initialization(logtalk_load(banpipe(list_extras))).
 :- initialization(logtalk_load(banpipe(term_extras))).
 :- initialization(logtalk_load(banpipe(file_index))).

@@ -58,6 +58,12 @@
 		list::member(Path,Paths),
 		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.pl'],File),
 		file(File)::exists.
+		
+	:- public(builtin/0). 
+	:- info(builtin/0,[comment is 'True if module is a builtin module']).
+	builtin :-
+		parameter(1,Module),
+		implements_protocol(Module,banpipe_builtin_module).
 :- end_object.
 
 :- object(module_task(_Module,_Task)).
@@ -84,8 +90,7 @@
 			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
 			
 	:- public(expand_options/2).
- 
-	:- info(expand_options/2,
+ 	:- info(expand_options/2,
 		[ comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
 		  argnams is [ 'Options', 'SortedExpandedOptions' ]]).
 	expand_options(Options,SortedExpandedOptions) :-
@@ -112,7 +117,7 @@
 	% has_implementation/0 for built-in modules
 	has_implementation :-
 		parameter(1,Module),
-		implements_protocol(Module,banpipe_builtin_module),
+		module(Module)::builtin,
 		!,
 		parameter(2,Task),
 		TaskGoal =.. [ Task, _, _, _ ],
@@ -132,7 +137,7 @@
 		argnames is ['Declaration']]).
 	declaration(Declaration) :-
 		parameter(1,Module),
-		implements_protocol(Module,banpipe_builtin_module),
+		module(Module)::builtin,
 		!,
 		parameter(2,Task),
 		Module::task(Declaration),
@@ -182,7 +187,7 @@
 		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). In either case, OutputFiles as a list of names of resulting files.',
 		argnames is ['OutputFiles']]).
 	    */
-		
+	
 	% FIXME: hook into logging
 	run(OutputFiles) :-
 		::output_types(OutputTypes),
@@ -195,14 +200,18 @@
 		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
 		meta::map([X,Y]>>(file(X)::canonical(Y)),InputFiles,InputFilesCanonical),
+		Goal =.. [ Task, InputFilesCanonical, ExpandedOptions, OutputFiles ],
 		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFiles) ->
 			true % The task has allready been run 
 			;
 			FileManager::result_files_allocate(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFiles),
-			::invoker(Invoker),
-			module(Module)::interface_file(InterfaceFile),
-			Goal =.. [ Task, InputFilesCanonical, ExpandedOptions, OutputFiles ],
-			Invoker::run(InterfaceFile,Goal),!,
+			(module(Module)::builtin ->
+				Module::Goal
+				;
+				::invoker(Invoker),
+				module(Module)::interface_file(InterfaceFile),
+				Invoker::run(InterfaceFile,Goal)),
+			!,
 			FileManager::result_files_commit(Module,Task,InputFilesCanonical,ExpandedOptions)).
 	
 	:- public(typecheck/1).
@@ -223,6 +232,10 @@
 	:- info(invoker/1,
 		[ comment is 'Determine InvokerObject to use: module may declare invoke_with/1; otherwise use banpipe_config default_invoker',
 		  argnames is ['InvokerObject']]).
+	invoker(builtin) :-
+		parameter(1,Module),
+		module(Module)::builtin.
+		
 	invoker(InvokerName) :-
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile),

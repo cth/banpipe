@@ -66,8 +66,6 @@
 
 	succeeds(canonical_url) :-
 		file('http://banpipe.org//index.html')::canonical('http://banpipe.org/index.html').
-
-
 :- end_object.
 
 :- object(test_prolog_file, extends(lgtunit)).
@@ -663,8 +661,8 @@
 :- object(test_uri,extends(lgtunit)).
 	:- initialization(::run).
 	
-	succeeds(uri_elements) :-
-		uri('http://banpipe.org/index.html')::uri_elements('http://','banpipe.org/index.html').
+	succeeds(elements) :-
+		uri('http://banpipe.org/index.html')::elements('http://','banpipe.org/index.html').
 		
 	succeeds(uri_valid_file) :-
 		uri('file:///tmp/blah')::valid.

@@ -101,6 +101,19 @@
     	:- info(canonical/1, [
 		comment is 'CanonicalFilename is Filename with backspaces->slashes and double slashes removed',
 		argnames is ['CanonicalFilename']]).
+		
+	canonical(CanonicalFilename) :-
+	    	parameter(1,Filename),
+		uri(Filename)::valid,
+		!,
+		uri(Filename)::elements(Protocol,Filepart),
+		atom_codes(Filepart,FilePartCodes),
+		% Replace backslash (code 92) with forward slash (code 47)
+		meta::map([X,Y]>>((X==92) -> Y=47 ; Y=X),FilePartCodes,UnixFilenameCodes),
+		remove_double_slashes(UnixFilenameCodes,Unslashed),
+		atom_codes(CanonicalFilepart,Unslashed),
+		atom_concat(Protocol,CanonicalFilepart,CanonicalFilename).
+		
 	canonical(CanonicalFilename) :-
 	    	parameter(1,Filename),
 		atom_codes(Filename,FileCodes),
@@ -119,8 +132,6 @@
 	    	remove_double_slashes(FilenameCodesIn,FilenameCodesOut).
 	remove_double_slashes([X|FilenameCodesIn],[X|FilenameCodesOut]) :-
 	    	remove_double_slashes(FilenameCodesIn,FilenameCodesOut).
-
-
 
 	:- private(read_characters/2).
 	read_characters(Stream,Contents) :-

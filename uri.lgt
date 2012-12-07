@@ -21,19 +21,19 @@
 	:- public(valid/0).
 	:- info(valid/0,[comment is 'True if URI represented by object is valid.']).
 	valid :- 
-		::uri_elements(_,_).
+		::elements(_,_).
 	
 	:- public(is_url/0).
 	:- info(is_url/0,[comment is 'True if the file name begins with an URL identifier (e.g. http://...)']).
 	is_url :-
 		::internet_protocol(Protocol),
-		::uri_elements(Protocol,_).
+		::elements(Protocol,_).
 
-	:- public(uri_elements/2).
-	:- info(uri_elements/2, [
+	:- public(elements/2).
+	:- info(elements/2, [
 		comment is 'For, e.g., http://banpipe.org/index.html, Protocol is \'http://\' and Filepart is \'banpipe.org/index.html\'',
 		argnames is ['Protocol','Filepart']]).
-	uri_elements(Protocol,Filepart) :-
+	elements(Protocol,Filepart) :-
 		parameter(1,URI),
 		atom_codes(URI,URICodes),
 		::protocol(Protocol),

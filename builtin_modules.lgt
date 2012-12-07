@@ -17,7 +17,7 @@
 		author is 'Christian Theil Have',
 		date is 2012/11/17,
 		comment is 'Built-in module "file" ']).
-	
+		
 	% Task declaration: get/3.
 	task(get([_],[filetype(T)],[T])).
 	
@@ -28,26 +28,19 @@
 
 	% Getting via http or ftp
 	get([TargetURL],_Options,[OutputFile]) :-
-		atom_codes(TargetURL,TargetSyms),
-		meta::map([X,Y]>>atom_codes(X,Y), ['ftp://','http://', '"ftp://', '"http://'],Matchers),
-		list::member(MatchSyms,Matchers),
-		list::append(MatchSyms,_,TargetSyms),
+		uri(TargetURL)::is_url,
 		::wget(TargetURL,OutputFile).
 
 	% Getting a file from the local file system
-	get([FileURL],Options,[OutputFile]) :-
-		atom(File),
-		atom_codes(FileURL,FileURLSyms),
-		atom_codes('file://', MatchSyms),
-		list::append(MatchSyms,FileCodes,FileURLSyms),
-		atom_codes(File,FileCodes),
-		::get([File],Options,[OutputFile]).
-
-	get([File],_Options,[OutputFile]) :-
+	get([FileURI],Options,[OutputFile]) :-
+		uri(FileURI)::elements('file://',Filename),
+		file(Filename)::canonical(File),
 		file(File)::exists(File),
 		file(File)::copy_to(OutputFile).
-
-	% utility predicate for fetching a file via http	
+		
+		
+	:- private(wget/2).
+	:- info(wget/2,[argnames is ['URL','OutputFile'],comment is 'fetching a file via http/ftp using wget utility']).
 	wget(URL,OutputFile) :-
 		meta::foldl(atom_concat,'',[wget, ' "', URL, '" --output-document=', OutputFile],Command),
 		shell::exec(Command).
