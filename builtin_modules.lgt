@@ -32,7 +32,7 @@
 		::wget(TargetURL,OutputFile).
 
 	% Getting a file from the local file system
-	get([FileURI],Options,[OutputFile]) :-
+	get([FileURI],_Options,[OutputFile]) :-
 		uri(FileURI)::elements('file://',Filename),
 		file(Filename)::canonical(File),
 		file(File)::exists(File),
