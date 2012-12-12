@@ -8,5 +8,5 @@
 	:- public(run/1).
 	:- info(run/1, [
 		comment is 'Runs the banpipe interpreter for Goal',
-		argnames is ['Goal']]).		
+		argnames is ['Goal']]).
 :- end_protocol.
