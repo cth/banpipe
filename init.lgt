@@ -11,22 +11,22 @@
 :- initialization(logtalk_load(library(time))).
 :- initialization(logtalk_load(library(datep))).
 :- initialization(logtalk_load(library(date))).
-:- initialization(logtalk_load(banpipe(shell))).
-:- initialization(logtalk_load(banpipe(config))).
-:- initialization(logtalk_load(banpipe(file))).
-:- initialization(logtalk_load(banpipe(uri))).
-:- initialization(logtalk_load(banpipe(list_extras))).
-:- initialization(logtalk_load(banpipe(term_extras))).
-:- initialization(logtalk_load(banpipe(file_index))).
-:- initialization(logtalk_load(banpipe(reporting))).
-:- initialization(logtalk_load(banpipe(builtin_modules))).
-:- initialization(logtalk_load(banpipe(module))).
-:- initialization(logtalk_load(banpipe(invokers))).
-:- initialization(logtalk_load(banpipe(parser))).
-:- initialization(logtalk_load(banpipe(interpreter))).
-:- initialization(logtalk_load(banpipe(sequential_interpreter))).
-:- initialization(logtalk_load(banpipe(task_semantics))).
-:- initialization(logtalk_load(banpipe(scheduler_tree))).
-:- initialization(logtalk_load(banpipe(scheduler))).
-:- initialization(logtalk_load(banpipe(banpipe))).
+:- initialization(logtalk_load(banpipe(shell), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(config), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(uri), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(file), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(list_extras), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(term_extras), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(reporting), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(file_index), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(builtin_modules), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(module), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(invokers), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(parser), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(interpreter), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(sequential_interpreter), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(task_semantics), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(scheduler_tree), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(scheduler), [reload(skip)])).
+:- initialization(logtalk_load(banpipe(banpipe), [reload(skip)])).
 :- initialization(banpipe_module_path::check_set).
