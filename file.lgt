@@ -63,12 +63,9 @@
 		close(Stream).
 		
 	:- public(delete/0).
-% FIXME: I am not sure how portable delete_file is 
-%	:- if((current_logtalk_flag(prolog_dialect, b))).
-	delete :-
-		parameter(1,F),
-		{delete_file(F)}.
-%	:- endif.
+        delete :-
+                parameter(1,F),
+                catch({delete_file(F)}, _, true).
 		
 	:- public(dirname/1).
 	:- info(dirname/1,
