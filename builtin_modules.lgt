@@ -32,11 +32,11 @@
 		::wget(TargetURL,OutputFile).
 
 	% Getting a file from the local file system
-	get([FileURI],_Options,[OutputFile]) :-
-		uri(FileURI)::elements('file://',Filename),
-		file(Filename)::canonical(File),
-		file(File)::exists(File),
-		file(File)::copy_to(OutputFile).
+        get([FileURI],_Options,[OutputFile]) :-
+                uri(FileURI)::elements('file://',Filename),
+                file(Filename)::canonical(File),
+                file(File)::exists,
+                file(File)::copy_to(OutputFile).
 		
 		
 	:- private(wget/2).
@@ -45,3 +45,4 @@
 		meta::foldl(atom_concat,'',[wget, ' "', URL, '" --output-document=', OutputFile],Command),
 		shell::exec(Command).
 :- end_object.
+
