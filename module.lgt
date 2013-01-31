@@ -50,27 +50,46 @@
 		date is 2012/11/09,
 		comment is 'A proxy object which represent a particular banpipe module.']).
 
-	:- public(interface_file/1).
+	:- public(interface_file/2).
 	
-	interface_file(File) :-
+	interface_file(File,prolog) :-
 		parameter(1,ModuleName),
 		banpipe_module_path::get_paths(Paths),
 		list::member(Path,Paths),
 		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.pl'],File),
 		file(File)::exists.
-		
+	
+	interface_file(File,generic) :-
+		parameter(1,ModuleName),
+		banpipe_module_path::get_paths(Paths),
+		list::member(Path,Paths),
+		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.banpipe'],File),
+		file(File)::exists.
+
 	:- public(builtin/0). 
 	:- info(builtin/0,[comment is 'True if module is a builtin module']).
 	builtin :-
 		parameter(1,Module),
 		implements_protocol(Module,banpipe_builtin_module).
+
+	:- public(module_type/1). 
+	:- info(module_type/1,[comment is 'True if module is a builtin module']).
+	module_type(builtin) :-
+		self::builtin.
+
+	module_type(prolog) :-
+		interface_file(_,prolog).
+
+	module_type(generic) :-
+		interface_file(_,generic).
+
 		
 	:- public(available/0).
 	:- info(available/0,[comment is 'True if a module with the given name is available.']).
 	available :-
 		::builtin 
 		;
-		::interface_file(_).
+		::interface_file(_,_).
 :- end_object.
 
 :- object(module_task(_Module,_Task)).
@@ -134,9 +153,17 @@
 	has_implementation :-
 		parameter(1,Module),
 		parameter(2,Task),
-		module(Module)::interface_file(File),
+		module(Module)::interface_file(File,prolog),
 		prolog_file(File)::read_terms(Terms),
 		term_extras::has_rule_with_head(Terms,Task,3).
+
+	% has_implementation/0 for external generic banpipe modules
+	% In this case we do not check for implementation (implementation is program/shell command)
+	has_implementation :-
+		parameter(1,Module),
+		parameter(2,Task),
+		module(Module)::interface_file(File,generic),
+		prolog_file(File)::member(invoke(Task,_Method)).
 
 	:- public(declaration/1).
 	:- info(declaration/1,
@@ -153,9 +180,17 @@
 	declaration(Declaration) :-
 		parameter(1,Module),
 		parameter(2,Task),
-		module(Module)::interface_file(InterfaceFile),
+		module(Module)::interface_file(InterfaceFile,prolog),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
 		TaskMatcher =.. [ ':-', task(Declaration) ],
+		Declaration =.. [ Task | _ ].
+
+	declaration(Declaration) :- 
+		parameter(1,Module),
+		parameter(2,Task),
+		module(Module)::interface_file(InterfaceFile,generic),
+		prolog_file(InterfaceFile)::member(TaskMatcher),
+		TaskMatcher = task(Declaration), 
 		Declaration =.. [ Task | _ ].
 		
 	:- public(options/1).
@@ -235,7 +270,7 @@
 				Module::Goal
 				;
 				::invoker(Invoker),
-				module(Module)::interface_file(InterfaceFile),
+				module(Module)::interface_file(InterfaceFile,_),
 				Invoker::run(InterfaceFile,Goal)),
 			!,
 			FileManager::result_files_commit(Module,Task,InputFilesCanonical,ExpandedOptions)).
@@ -262,14 +297,19 @@
 	invoker(builtin) :-
 		parameter(1,Module),
 		module(Module)::builtin.
+
+	invoker(generic_invoker) :-
+		parameter(1,Module),
+		module(Module)::interface_file(_,generic).
 		
 	invoker(InvokerName) :-
 		parameter(1,Module),
-		module(Module)::interface_file(InterfaceFile),
+		module(Module)::interface_file(InterfaceFile,prolog),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
 		TaskMatcher =.. [ ':-', invoke_with(PrologName) ],
 		atom_concat(PrologName,'_invoker',InvokerName),
 		!.
+
 	invoker(Invoker) :-
 		config::get(default_invoker,Invoker).
 		

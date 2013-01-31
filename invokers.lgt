@@ -26,6 +26,38 @@
 		writeln(InterfaceFile).
 :- end_object.
 
+:- object(generic_invoker, implements(invokerp)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2013/01/30,
+		comment is 'Invoker which launces a program or script as specified by a generic interface file']).
+
+	run(InterfaceFile,Goal) :-
+		shell::working_directory(CurrentDir),
+		file(InterfaceFile)::dirname(ModuleDir),
+		shell::change_directory(ModuleDir),
+		Goal =.. [ Task, InputFiles, Options, OutputFiles ],
+		prolog_file(InterfaceFile)::read_terms(Terms),
+		list::member(invoke(Task,BaseCommand), Terms),
+		meta::map([Opt,OptStr]>>(generic_invoker::option_str(Opt,OptStr)), Options,OptStrings),
+		list_extras::intersperse(' ', OptStrings,OptStringsSep),
+		list_extras::intersperse(' ', InputFiles, InputFilesSep),
+		list_extras::intersperse(' ', OutputFiles, OutputFilesSep),
+		meta::foldl(list::append,[],[[BaseCommand],[' '], InputFilesSep, [' '], OutputFilesSep, [' '], OptStringsSep],CommandList),
+		meta::foldl(atom_concat,'', CommandList, Command),
+		writeln(shell_command(Command)),
+		shell::exec(Command),
+		shell::change_directory(CurrentDir).
+
+
+	:- private(option_str/2).
+	option_str(Option, OptionStr) :-
+		Option =.. [ Key, Value ],
+		meta::foldl(atom_concat,'',['--',Key,' ',Value],OptionStr).
+
+:- end_object.
+
 :- object(prolog_invoker, implements(invokerp)).
 	:- info([
 		version is 1.0,

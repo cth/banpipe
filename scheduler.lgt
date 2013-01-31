@@ -30,6 +30,7 @@
 
 	enqueue_ready(TreeIn,TreeOut,QueueIn,QueueOut) :-
 		scheduler_tree::ready_task(TreeIn,TaskId),
+		%TODO: findall ready_task followed by a selection based on resources
 		!,
 		scheduler_tree::lookup(TaskId,TreeIn,[node(TaskId,ready,Module,Task,[])]),!,
 		scheduler_tree::set_running(TaskId,TreeIn,TreeNext),!,
