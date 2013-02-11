@@ -28,6 +28,12 @@
 		comment is 'Enqueue all ready tasks from TreeIn, resulting in update TreeOut and QueueOut',
 		argnames is ['TreeIn','TreeOut','QueueIn','QueueOut']]).
 
+	% In the case where the queue is full, 
+	enqueue_ready(Tree,Tree,Queue,Queue) :-
+		config::get(available_cpus,CPUS),
+		length(Queue,QueueLen),
+		QueueLen >= CPUS.
+
 	enqueue_ready(TreeIn,TreeOut,QueueIn,QueueOut) :-
 		scheduler_tree::ready_task(TreeIn,TaskId),
 		%TODO: findall ready_task followed by a selection based on resources
@@ -44,7 +50,7 @@
 		enqueue_ready(TreeNext,TreeOut,[[TaskId,TaskObject]|QueueIn],QueueOut).
 		
 	enqueue_ready(Tree,Tree,Queue,Queue).
-	
+
 	:- private(dequeue_completed/4).
 	:- info(dequeue_completed/4,[
 		comment is 'Remove from TreeIn and QueueIn all completed tasks, resulting in TreeOut and QueueOut',
