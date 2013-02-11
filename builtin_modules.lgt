@@ -46,3 +46,19 @@
 		shell::exec(Command).
 :- end_object.
 
+:- object(aggregate, implements(banpipe_builtin_module)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2013/02/11,
+		comment is 'Aggregate a series of files.']).
+
+	% This is defined to work for all with upto 100 input files
+	task(depend_all(L,[],[pseudo])) :-
+		between(2,100,N),	
+		list::length(L,N).
+
+	depend_all(InputFiles,_Options,[OutputFile]) :-
+		file(OutputFile)::touch.
+:- end_object.
+
