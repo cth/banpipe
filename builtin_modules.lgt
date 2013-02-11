@@ -58,7 +58,12 @@
 		between(2,100,N),	
 		list::length(L,N).
 
-	depend_all(InputFiles,_Options,[OutputFile]) :-
+	:- public(depend_all/3).
+	:- info(depend_all/3, [
+		comment is 'Create a (empty) file to represent aggregation relation of all input files.',
+		argnames is ['Inputfiles','Options','Outputfiles']]).
+
+	depend_all(_InputFiles,_Options,[OutputFile]) :-
 		file(OutputFile)::touch.
 :- end_object.
 
