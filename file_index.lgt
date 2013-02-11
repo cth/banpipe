@@ -72,6 +72,8 @@
 	consistency_check. % FIXME: do somethinh useful
 	
 	result_files_allocate(Module,Task,InputFiles,Options,ResultFiles) :-
+		% Rollback if previously allocated
+		(result_files_rollback(Module,Task,InputFiles,Options) -> true ; true),
 		get_index_file(IndexFile),
  		current_timestamp(AllocatedTimestamp),
  		IndexFile::dirname(IndexDir),
