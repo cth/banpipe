@@ -128,9 +128,9 @@
 		argnames is ['TaskId','Node','Tree','UpdatedTree']]).
 
 	replace_by_taskid(TaskId,Node,[MaxId,Tree],[MaxId,UpdatedTree]) :-
-		scheduler_tree_replace_by_taskid_rec(TaskId,Node,Tree,UpdatedTree).
+		::scheduler_tree_replace_by_taskid_rec(TaskId,Node,Tree,UpdatedTree).
 		
-	:- private(scheduleder_tree_replace_by_taskid_rec/4).
+	:- private(scheduler_tree_replace_by_taskid_rec/4).
 
 	scheduler_tree_replace_by_taskid_rec(TaskId,UpdatedNode,[node(TaskId,_,_,_,_)],UpdatedNode).
 
