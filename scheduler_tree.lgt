@@ -9,7 +9,6 @@
 				'state running' - 'tasks being run, but has not yet completed',
 				'state completed' - 'completed tasks are removed from the tree']]).
 
-
 	:- public(from_trace/2).
 	from_trace(Trace,Tree) :-
 		::create(EmptyTree),
@@ -23,13 +22,13 @@
 
 	from_trace_rec(Parent,[(task(Module,Task,InputFiles,Options),_),ChildCalls],InTree,OutTree) :-
 		Goal =.. [Task,InputFiles,Options],
-		::add(Module,Goal,Parent,InTree,OutTree1,TaskId),
+		::add(Module,Goal,Parent,InTree,OutTree1,TaskId),!,
 		::from_trace_rec(TaskId,ChildCalls,OutTree1,OutTree).
 
 	from_trace_rec(Parent,[[(task(Module,Task,InputFiles,Options),_),Children]|Siblings],InTree,OutTree) :-
 		Goal =.. [Task,InputFiles,Options],
-		::add(Module,Goal,Parent,InTree,Tree1,TaskId),
-		from_trace_rec(TaskId,Children,Tree1,Tree2),
+		::add(Module,Goal,Parent,InTree,Tree1,TaskId),!,
+		from_trace_rec(TaskId,Children,Tree1,Tree2),!,
 		from_trace_rec(Parent,Siblings,Tree2,OutTree).
 
 	:- public(create/1).
@@ -44,7 +43,10 @@
 		argnames is ['Module','Task','ParentId','Tree','UpdatedTree','NextId']]).
 	add(Module,Task,ParentId,[MaxId,Tree],[NextId,UpdatedTree],NextId) :-
 		NextId is MaxId + 1,
+		writeln(NextId),
 		::scheduler_tree_add_rec(NextId,Module,Task,ParentId,Tree,UpdatedTree).
+%		!,
+%		::reduce_tree(UpdatedTree1,UpdatedTree).
 		
 	:- private(scheduler_tree_add_rec/6).
 
@@ -152,9 +154,45 @@
 		comment is 'This reduces a scheduler tree by compacting nodes which are structurally the same (i.e. only differing in the task id. Such task will be given the same task id.',
 		argnames is ['Tree','ReducedTree']]).
 
-	reduce_tree([MaxId,Tree],[NewMaxId,ReducedTree]) :-
-		scheduler_tree_reduce_rec([MaxId,Tree],[NewMaxId,ReducedTree]).
-		
+	reduce_tree(Tree,ReducedTree) :-
+		fast_tree_reduce(Tree,ReducedTree).
+
+%	reduce_tree([MaxId,Tree],[NewMaxId,ReducedTree]) :-
+%		fast_tree_reduce([MaxId,Tree],[NewMaxId,ReducedTree]).
+%		scheduler_tree_reduce_rec([MaxId,Tree],[NewMaxId,ReducedTree]).
+
+
+  :- private(fast_tree_reduce/2).
+	fast_tree_reduce(Tree,ReducedTree) :-
+		%writeln(fast_tree_reduce),
+		findall([TaskId,[Module,Goal]],::lookup(TaskId,Tree,[node(TaskId,_State,Module,Goal,_Children)]),TaskIds),
+		!,
+		fast_tree_reduce_rec(TaskIds,Tree,ReducedTree).
+
+  :- private(fast_tree_reduce_rec/2).
+	fast_tree_reduce_rec([],Tree,Tree).
+
+	fast_tree_reduce_rec(TaskIds,Tree,UpdTree) :-
+		TaskIds=[[FirstId,Task]|_],
+%		writeln(partition),
+		meta::partition([X]>>(X=[_,Task]),TaskIds,TaskIdsSame,TaskIdsRest),
+		!,
+%		writeln(same_as_first(TaskIdsSame)),
+%		writeln(rest(TaskIdsRest)),
+%		writeln(fold_left),
+		meta::fold_left([TreeP,TaskNode,MergeTree]>>(TaskNode=[CurrentId,_], ::merge_task_ids(FirstId,CurrentId,TreeP,MergeTree)), Tree, TaskIdsSame, UpdTree1),
+		!,
+		%::print(UpdTree1),
+		fast_tree_reduce_rec(TaskIdsRest,UpdTree1,UpdTree).
+
+	:- private(merge_task_ids/4).
+	merge_task_ids(SameId,SameId,SameTree,SameTree).
+
+	merge_task_ids(Id,OtherId,Tree,MergeTree) :-
+		write('.'),
+		::lookup(OtherId,Tree,[node(OtherId,State,Module,Goal,Children)]),
+		::replace_by_taskid(OtherId,[node(Id,State,Module,Goal,Children)],Tree,MergeTree).
+
 	:- private(scheduler_tree_reduce_rec/2).
 
 	scheduler_tree_reduce_rec([MaxId,Tree],[NewMaxId,ReducedTree]) :-
