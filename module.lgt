@@ -75,7 +75,8 @@
 	:- public(module_type/1). 
 	:- info(module_type/1,[comment is 'True if module is a builtin module']).
 	module_type(builtin) :-
-		self::builtin.
+		self(Self),
+		Self::builtin.
 
 	module_type(prolog) :-
 		interface_file(_,prolog).
