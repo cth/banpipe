@@ -21,11 +21,33 @@
 			[Separator] = ":",
 			atom_codes(PathAtom,PathCodes),	
 			list_extras::sublist_split(Separator,PathCodes,PathsCodes),
-			meta::map([X,Y]>>atom_codes(Y,X),PathsCodes,EnvPaths)
+			meta::map([X,Y]>>(expand_path(X,ExpandPath),atom_codes(Y,ExpandPath)),PathsCodes,EnvPaths)
 			;
 			EnvPaths = []),
 		findall(Dir,::path_dir(Dir),AdditionalDirs),
-		list::append(AdditionalDirs,EnvPaths,Paths).
+		meta::map([X,Y]>>(atom_codes(X,DirC),expand_path(DirC,ExpandDirC),atom_codes(Y,ExpandDirC)),AdditionalDirs,ExpandAdditionalDirs), 
+		list::append(ExpandAdditionalDirs,EnvPaths,Paths).
+
+	:- private(expand_path/2).
+	:- info(expand_path/2, [comment is 'Expand relative paths starting with . or not with /']).
+
+	% Windows style absolute path with drive letter
+	expand_path(Path,Path) :-
+		atom_codes(':',Colon),
+		Path = [_DriveLetter,Colon|_],
+		!.
+
+	% Unix style absolute path (starts with /)
+	expand_path(Path,Path) :- 
+		atom_codes('/',Slash),
+		Path = [ Slash | _ ],
+		!.
+
+	% Otherwise, we assume that it is a local relative path
+	expand_path(Path,ExpandPath) :-
+		shell::working_directory(AbsDir),
+		atom_codes(AbsDir,AbsDirCodes),
+		list::append(AbsDirCodes,Path,ExpandPath).
 		
 	:- public(check_set/0).
 	:- info(check_set/0, [comment is 'Check that BANPIPE_MODULE_PATH is set.']).
