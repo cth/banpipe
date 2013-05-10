@@ -70,7 +70,9 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/09,
-		comment is 'A proxy object which represent a particular banpipe module.']).
+		comment is 'A proxy object which represent a particular banpipe module.',
+		parnames is ['Name']
+	]).
 
 	:- public(interface_file/2).
 	
@@ -120,7 +122,9 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/09,
-		comment is 'Represents a task in a module']).
+		comment is 'Represents a task in a module',
+		parnames is ['Module', 'Task']
+	]).
 
 	:- public(valid/1).
 	:- info(valid/1,
@@ -246,8 +250,16 @@
 :- end_object.
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
-	:- public(run/1).
 
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/09,
+		comment is '.',
+		parnames is ['Module', 'Task', 'InputFiles', 'Options']
+	]).
+
+	:- public(run/1).
 	:- info(run/1,[
 		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). OutputFiles is a list of names of resulting files.',
 		argnames is ['OutputFiles']]).

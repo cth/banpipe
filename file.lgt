@@ -9,8 +9,10 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/06,
-		comment is 'File wrapper object. The parameter A is a filename atom.']).
-	
+		comment is 'File wrapper object. The parameter A is a filename atom.',
+		parnames is ['Path']
+	]).
+
 	:- public(read/1).
 	read(Contents) :-
 		parameter(1,F),
@@ -151,7 +153,8 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/06,
-		comment is 'File wrapper object for Prolog files. The parameter A is a filename atom.'
+		comment is 'File wrapper object for Prolog files. The parameter A is a filename atom.',
+		parnames is ['File']
 	]).
 
 	:- public(read_terms/1).
@@ -210,6 +213,15 @@
 :- end_object.
 
 :- object(directory(Path), extends(path(Path))).
+
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2012/11/06,
+		comment is '.',
+		parnames is ['Path']
+	]).
+
 	:- public(create/0).
 	:- info(create/0, [comment is 'Creates the directory if it does not allready exist']).
 	
