@@ -49,8 +49,10 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/11/19,
-		comment is 'A Semantics which implements a very simple tracer']).
-		
+		comment is 'A Semantics which implements a very simple tracer',
+		parnames is ['Semantics']
+	]).
+
 	apply(LHS+RHS,Task,Outputs) :-
 		write('call: '),
 		write(LHS),

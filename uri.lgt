@@ -3,8 +3,10 @@
 		version is 1.0,
 		author is 'Christian Theil Have',
 		date is 2012/12/06,
-		comment is 'Object to represent URLs']).
-		
+		comment is 'Object to represent URLs',
+		parnames is ['URI']
+	]).
+
 	:- private(internet_protocol/1).
 	internet_protocol('http://').
 	internet_protocol('ftp://').
