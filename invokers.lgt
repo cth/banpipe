@@ -66,16 +66,20 @@
 		comment is '(abstract) Invoker which launches a Prolog process and runs the goal within that process']).
 		
 	run(InterfaceFile,Goal) :-
+		writeln(run_prism),
 		shell::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
 		file(InterfaceFile)::basename(BaseFileName),
+			writeln(ModuleDir),
 		shell::change_directory(ModuleDir),
 		::key_invoke_command(InvokeCmdKey),
 		(config::get(InvokeCmdKey,Exec) ->
 			true
 			;
 			::default_invoke_command(Exec)),
+		writeq(term_extras::term_to_atom(Goal,GoalAtom)),nl,
 		term_extras::term_to_atom(Goal,GoalAtom),
+		writeln(here),
 		::goal_option(GoalOption),
 		meta::foldl(atom_concat,'',[Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', BaseFileName, '\'),', GoalAtom,',halt."'],Command),
 		writeln(shell_command(Command)),

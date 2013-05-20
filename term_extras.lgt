@@ -39,8 +39,7 @@
 		
 	vars(Term,Vars) :-
 		Term =.. [ _ | Arguments ],
-		self(Self),
-		meta::map([X,Y]>>(Self::vars(X,Y)),Arguments,VarsLists),
+		meta::map([X,Y]>>(term_extras::vars(X,Y)),Arguments,VarsLists),
 		list::flatten(VarsLists,VarsList),
 		set::insert_all(VarsList,[],Vars).
 
@@ -70,8 +69,7 @@
 	term_to_atom(List,Atom,Vars) :-
 		is_list(List),
 		!,
-		self(Self),
-		meta::map([X,Y]>>(Self::term_to_atom(X,Y,Vars)),List,ListAtoms),
+		meta::map([X,Y]>>(term_extras::term_to_atom(X,Y,Vars)),List,ListAtoms),
 		list_extras::intersperse(',',ListAtoms,CommaSepAtoms),
 		meta::foldl(atom_concat,'[',CommaSepAtoms,Atom1),
 		atom_concat(Atom1,']',Atom).
@@ -86,8 +84,7 @@
 	term_to_atom(Term,Atom,Vars) :-
 		Term =.. [ Functor | Arguments ],
 		atom(Functor),
-		self(Self),
-		meta::map([X,Y]>>(Self::term_to_atom(X,Y,Vars)),Arguments,ArgAtoms),
+		meta::map([X,Y]>>(term_extras::term_to_atom(X,Y,Vars)),Arguments,ArgAtoms),
 		list_extras::intersperse(',',ArgAtoms,CommaSepArgAtoms),
 		meta::foldl(list::append,[],[[Functor, '('], CommaSepArgAtoms, [')']],ListOfAtoms),
 		meta::foldl(atom_concat,'',ListOfAtoms,Atom).

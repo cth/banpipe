@@ -43,7 +43,6 @@
 		argnames is ['Module','Task','ParentId','Tree','UpdatedTree','NextId']]).
 	add(Module,Task,ParentId,[MaxId,Tree],[NextId,UpdatedTree],NextId) :-
 		NextId is MaxId + 1,
-		writeln(NextId),
 		::scheduler_tree_add_rec(NextId,Module,Task,ParentId,Tree,UpdatedTree).
 %		!,
 %		::reduce_tree(UpdatedTree1,UpdatedTree).

@@ -3,7 +3,7 @@
 
 	succeeds(get_defaults) :-
 		config::get(execution_mode,sequential),
-		config::get(default_invoker,prism),
+		config::get(default_invoker,prism_invoker),
 		config::get(result_file_directory,_),
 		config::get(index_file,_),
 		config::get(file_manager,_).
@@ -173,6 +173,8 @@
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
 		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		file('/tmp/module_task_1_1.gen')::touch,
+		file('/tmp/module_task_1_2.gen')::touch,
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
 		
 	succeeds(allocate_rollback) :-
@@ -250,13 +252,16 @@
 	succeeds(test_report_unles) :-
 		catch(report_unless(false)::error(blah),blah,true).
 		
+	/* FIXME:
 	succeeds(test_report_if_warning) :- 
-		tell('/tmp/warning'),
+		{tell('/tmp/warning')},
 		report_if(true)::warning(blah),
-		told,
+		{told},
+		writeln(here),
 		file('/tmp/warning')::read(Warning),
+		writeln(Warning),
 		list::member(NewLine,[[10],[10,13]]),
-		atom_codes(blah,Blah),
+		{atom_codes(blah,Blah)},
 		list::append(Blah,NewLine,Warning).
 
 	succeeds(test_report_unles_warning) :- 
@@ -267,6 +272,7 @@
 		list::member(NewLine,[[10],[10,13]]),
 		atom_codes(blah,Blah),
 		list::append(Blah,NewLine,Warning).
+	*/
 :- end_object.
 
 :- object(test_shell, extends(lgtunit)).
@@ -321,7 +327,7 @@
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::touch,
 		banpipe_module_path::include_directory('/tmp'),
-		module(testmodule)::interface_file('/tmp/testmodule/interface.pl'),
+		module(testmodule)::interface_file('/tmp/testmodule/interface.pl',prolog),
 		file('/tmp/testmodule/interface.pl')::delete,
 		shell::delete_directory('/tmp/testmodule').
 :- end_object.
@@ -546,6 +552,7 @@
 	
 	succeeds(type_check1) :-
 		task(file,get,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
+		writeln(output_type(OutputType)),
 		OutputType == test(type).
 	
 	% No filetype option supplied

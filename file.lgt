@@ -41,6 +41,20 @@
 		meta::foldl(atom_concat,'',['cp ',File,' ',TargetFile],ShellCopyCommand),
 		shell::exec(ShellCopyCommand).
 
+	:- public(size/1).
+	:- if(current_logtalk_flag(prolog_dialect, swi)).
+	size(Size) :-
+		parameter(1,F),
+		{size_file(F, Size)}.
+	:- elif(current_logtalk_flag(prolog_dialect, yap)).
+	size(Size) :-
+		parameter(1,F),
+		{file_property(F,size(Size))}.
+	:- elif(current_logtalk_flag(prolog_dialect,b)).
+	size(Size) :-
+		parameter(1,F),
+		{file_property(F,size(Size))}.
+	:- endif.
 
 	:- public(exists/0).
 	:- info(exists/0, [ comment is 'True if the file (or directory) A exists.']).

@@ -23,6 +23,17 @@
 		Task::run(Result).
 :- end_object.
 
+:- object(check_available_semantics, implements(task_semantics)).
+	:- info([
+		version is 1.0,
+		author is 'Christian Theil Have',
+		date is 2013/05/14,
+		comment is 'A semantics for tasks, which evaluates to files if their are allready available.']).
+		
+	apply(_,Task,Result) :-
+		Task::available_files(Result).
+:- end_object.
+
 :- object(typecheck_semantics, implements(task_semantics)).
 	:- info([
 		version is 1.0,

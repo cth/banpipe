@@ -33,13 +33,13 @@
 
 	% Windows style absolute path with drive letter
 	expand_path(Path,Path) :-
-		atom_codes(':',Colon),
+		atom_codes(':',[Colon]),
 		Path = [_DriveLetter,Colon|_],
 		!.
 
 	% Unix style absolute path (starts with /)
 	expand_path(Path,Path) :- 
-		atom_codes('/',Slash),
+		atom_codes('/',[Slash]),
 		Path = [ Slash | _ ],
 		!.
 
@@ -108,7 +108,6 @@
 	module_type(generic) :-
 		interface_file(_,generic).
 
-		
 	:- public(available/0).
 	:- info(available/0,[comment is 'True if a module with the given name is available.']).
 	available :-
@@ -150,13 +149,25 @@
 		::options(DefaultOptions),
 		::expand_options(Options,DefaultOptions,SortedExpandedOptions).
 
+	:- private(option_expand/3).
+	
+	% Option given is same as default option:
+	%option_expand(Option,Options,Option) :-
+	%		list::member(Option,Options),!.
+
+	% Option given has same functor, but different value than default option: 
+	option_expand(Options,Option,OverrideOption) :-
+		functor(Option,F,A),
+		list::member(OverrideOption,Options),
+		functor(OverrideOption,F,A),
+		!.
+	% Otherwise, use default option
+	option_expand(_,Option,Option).
+
 	:- public(expand_options/3).
 	expand_options(Options,DefaultOptions,SortedExpandedOptions) :-
 		::valid(Options),
-		meta::map([OptIn,OptOut]>>((OptIn=..[F,X],OptOut=..[F,X], list::member(OptOut,Options) -> true
-						; (OptIn=..[F,_],OptOut=..[F,_],list::member(OptOut,Options)) -> true
-							; OptOut=OptIn)),
-			DefaultOptions,ExpandedOptions),
+		meta::map({Options}/(option_expand(Options)),DefaultOptions,ExpandedOptions),
 		list::sort(ExpandedOptions,SortedExpandedOptions).
 
 	:- public(has_declaration/0).
@@ -264,7 +275,41 @@
 		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). OutputFiles is a list of names of resulting files.',
 		argnames is ['OutputFiles']]).
 	
-	run(OutputFilesList) :-
+	run(OutputFiles) :-
+		parameter(1,Module),
+		::get_goal(Goal),
+		%writeln(Goal),
+		Goal =.. [ Task, InputFiles, Options, OutputFiles ],
+		config::get(file_manager,FileManager),
+
+		(FileManager::result_files(Module,Task,InputFiles,Options,OutputFiles) ->
+			true % The task has allready been run 
+			;
+			FileManager::result_files_allocate(Module,Task,InputFiles,Options,OutputFiles),
+			(module(Module)::builtin ->
+				Module::Goal
+				;
+				::invoker(Invoker),
+				module(Module)::interface_file(InterfaceFile,_),
+				Invoker::run(InterfaceFile,Goal)),
+			!,
+			FileManager::result_files_commit(Module,Task,InputFiles,Options)).
+
+			
+	:- public(available_files/1).
+	:- info(available_files/1, [
+		comment is 'Check if the task(Module,Task,InputFiles,Options) has available files',
+		argnames is ['OutputFiles']]).
+		
+	available_files(OutputFiles) :-
+		::get_goal(Goal),
+		Goal =.. [ Task, InputFiles, Options, OutputFiles ],
+		parameter(1,Module),
+		config::get(file_manager,FileManager),
+		FileManager::result_files(Module,Task,InputFiles,Options,OutputFiles).
+		
+	:- private(get_goal/1).
+	get_goal(Goal):-
 		self(Self),
 		parameter(1,Module),
 		parameter(2,Task),
@@ -284,7 +329,6 @@
 			;
 			OutputTypesList = [OutputTypes],
 			OutputFilesList = [OutputFiles]),
-		config::get(file_manager,FileManager),
 		::expand_options(Options,ExpandedOptions),
 		meta::map([X,Y]>>(file(X)::canonical(Y)),InputFiles,InputFilesCanonical),
 		% If the input-types are not declared as a list, 
@@ -295,20 +339,7 @@
 			;
 			% Strip the list if it is not declared in the argument
 			[InputFilesCanonicalAdapt] = InputFilesCanonical),
-		Goal =.. [ Task, InputFilesCanonicalAdapt, ExpandedOptions, OutputFiles ],
-		writeln(Goal),
-		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFilesList) ->
-			true % The task has allready been run 
-			;
-			FileManager::result_files_allocate(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFilesList),
-			(module(Module)::builtin ->
-				Module::Goal
-				;
-				::invoker(Invoker),
-				module(Module)::interface_file(InterfaceFile,_),
-				Invoker::run(InterfaceFile,Goal)),
-			!,
-			FileManager::result_files_commit(Module,Task,InputFilesCanonical,ExpandedOptions)).
+		Goal =.. [ Task, InputFilesCanonicalAdapt, ExpandedOptions, OutputFiles ].
 
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
@@ -323,6 +354,7 @@
 		::declaration(TaskDeclaration),
 		TaskDeclaration =.. [ Task, InputTypes, DeclOptions, OutputTypes ],
 		::expand_options(Options,DeclOptions,_),
+		writeln(DeclOptions),
 		term::subsumes(InputTypes,SuppliedInputTypes).
 
 	:- public(invoker/1).

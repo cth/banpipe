@@ -47,7 +47,7 @@
 	
 	:- public(run/1).
 	:- info(run/1, [
-		comment is 'RRecursively (sequentially) compute the File associated with Goal.',
+		comment is 'Recursively (sequentially) compute the File associated with Goal.',
 		argnames is ['Goal']]).
 	run(Goal) :-
 		::run(Goal,_).
@@ -119,7 +119,17 @@
 		argnames is ['Goal','Type']]).
 	typecheck(Goal,Type) :-
 		run_with_semantics(typecheck_semantics,Goal,Type).
-			
+		
+		
+	:- public(filesize/2).
+	:- info(filesize/2, [
+		comment is 'Check the filesize (in bytes) of a generated file. Fails for files that have not yet been generated.',
+		argnames is ['Goal','Size']]).
+		
+	filesize(Goal,Size) :-
+		run_with_semantics(check_available_sematics,Goal,File),
+		file(File)::size(Size).
+
 	:- public(trace/0).
 	trace :- config::set(trace).
 	

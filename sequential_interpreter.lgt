@@ -37,8 +37,7 @@
 		{call(Guard)},
 		Body =.. [ '::', Module, TaskSpec],
 		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),!,
-		self(Self),
-		meta::map([I,[O,C]]>>(Self::run(I,O,C)),Inputs,OutputsAndChildSpecs),
+		meta::map([I,[O,C]]>>(run(I,O,C)),Inputs,OutputsAndChildSpecs),
 		meta::map([[O,_],O]>>true,OutputsAndChildSpecs,InputsResults),
 		meta::map([[_,C],C]>>true,OutputsAndChildSpecs,ChildSpecs),
 		TaskObject = task(Module,Task,InputsResults,Options),
@@ -50,7 +49,6 @@
 		self(Self),
 		term_extras::term_to_atom(Self,SelfAtom),
 		term_extras::term_to_atom(Target,TargetAtom),
-		writeln(SelfAtom),
 		meta::foldl(atom_concat,'',[SelfAtom, '::run - ', 'Failed to run goal: ', TargetAtom],Error),
 		reporting::error(Error).
 :- end_object.

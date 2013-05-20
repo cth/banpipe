@@ -2,5 +2,5 @@
 :- dynamic(logtalk_library_path/2).
 
 % Change '$HOME/banpipe' to reflect where you installed banpipe
-logtalk_library_path(banpipe, '$HOME/Documents/Prolog/banpipe/').
+logtalk_library_path(banpipe, '$HOME/Dropbox/code/banpipe/').
 
