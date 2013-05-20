@@ -283,7 +283,9 @@
 		config::get(file_manager,FileManager),
 
 		(FileManager::result_files(Module,Task,InputFiles,Options,OutputFiles) ->
-			true % The task has allready been run 
+			forall(list::member(F,OutputFiles), events::add_event(available(F)))
+			%true % The task has allready been run 
+
 			;
 			FileManager::result_files_allocate(Module,Task,InputFiles,Options,OutputFiles),
 			(module(Module)::builtin ->
@@ -293,7 +295,10 @@
 				module(Module)::interface_file(InterfaceFile,_),
 				Invoker::run(InterfaceFile,Goal)),
 			!,
-			FileManager::result_files_commit(Module,Task,InputFiles,Options)).
+			FileManager::result_files_commit(Module,Task,InputFiles,Options),
+			forall(list::member(F,OutputFiles),events::add_event(generated(F))),
+			forall(list::member(F,OutputFiles),events::add_event(available(F)))
+		).
 
 			
 	:- public(available_files/1).

@@ -27,6 +27,7 @@ banpipe_own_files([
 	banpipe(reporting),
 	banpipe(file_index),
 	banpipe(builtin_modules),
+	banpipe(events),
 	banpipe(module),
 	banpipe(invokers),
 	banpipe(parser),
