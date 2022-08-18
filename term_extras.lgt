@@ -18,7 +18,9 @@
 	:- public(has_rule_with_head/3).
 	:- info(has_rule_with_head/3, [ 
 		comment is 'True if the list Terms has a rule with a given Functor and Arity',
-		argnames is ['Terms','Functor','Arity']	]).
+		argnames is ['Terms','Functor','Arity']
+	]).
+
 	has_rule_with_head(Terms,Functor,Arity) :-
 		list::member(Rule, Terms),
 		Rule = (Head :- _),
@@ -27,7 +29,8 @@
 	:- public(atom_integer/2).
 	:- info(atom_integer/2, [
 		comment is 'True if Atom is the "same as" Integer',
-		argnames is ['Atom','Integer']]).
+		argnames is ['Atom','Integer']
+	]).
 
 	atom_integer(Atom,Integer) :-
         	ground(Atom),
@@ -57,7 +60,8 @@
 	:- public(term_to_atom/2).
 	:- info(term_to_atom/2, [
 		comment is 'Converts Prolog terms to atoms.',
-		argnames is ['Term','Atom']]).
+		argnames is ['Term','Atom']
+	]).
 		
 	term_to_atom(Term,Atom) :-
 		vars(Term,Vars),
@@ -103,9 +107,10 @@
 		meta::foldl(atom_concat,'',ListOfAtoms,Atom).
 
 	:- private(atom_verbatim/1).
-	:- info(atom_verbatim/1,
-		[ comment is 'True if atom is unquoted',
-	          argnamas is ['Atom']]).
+	:- info(atom_verbatim/1, [
+		comment is 'True if atom is unquoted',
+		argnamas is ['Atom']
+	]).
 	
 	atom_verbatim(Atom) :-
 		set::insert_all("abcdefghijklmnopqrstuvwxyz_1234567890",[],WhitelistCodes),
@@ -119,9 +124,12 @@
 	:- public(conjunction_as_list/2).
 	:- info(conjunction_as_list/2,[
 		comments is 'Converversion from Conjunction to List, i.e., (A,B,C) => [A,B,C].',
-		argnames is ['Conjunction','List']]).
+		argnames is ['Conjunction','List']
+	]).
+
 	conjunction_as_list((A,ConjRest),[A|ListRest]) :-
 		!,
-		::conjunction_as_list(ConjRest,ListRest).
+		conjunction_as_list(ConjRest,ListRest).
 	conjunction_as_list(X,[X]).
+
 :- end_object.

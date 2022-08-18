@@ -30,7 +30,7 @@
 	from_trace_rec(Parent,[(task(Module,Task,InputFiles,Options),_),ChildCalls],InTree,OutTree) :-
 		Goal =.. [Task,InputFiles,Options],
 		::add(Module,Goal,Parent,InTree,OutTree1,TaskId),!,
-		::from_trace_rec(TaskId,ChildCalls,OutTree1,OutTree).
+		from_trace_rec(TaskId,ChildCalls,OutTree1,OutTree).
 
 	from_trace_rec(Parent,[[(task(Module,Task,InputFiles,Options),_),Children]|Siblings],InTree,OutTree) :-
 		Goal =.. [Task,InputFiles,Options],
@@ -67,15 +67,17 @@
 	scheduler_tree_add_rec(NextId,Module,Goal,Parent,
 						[node(OtherTaskId,ready,OtherModule,OtherGoal,Children)],
 						[node(OtherTaskId,ready,OtherModule,OtherGoal,UpdatedChildren)]) :-
-			findall(UpdatedChild,
+			findall(
+				UpdatedChild,
 				(
 					list::member(Child,Children),
-					(::scheduler_tree_add_rec(NextId,Module,Goal,Parent,[Child],[UpdatedTree]) ->
+					(	scheduler_tree_add_rec(NextId,Module,Goal,Parent,[Child],[UpdatedTree]) ->
 						UpdatedChild = UpdatedTree
-						;
-						UpdatedChild = Child)
+					;	UpdatedChild = Child
+					)
 				),
-				UpdatedChildren).
+				UpdatedChildren
+			).
 
 	:- public(remove/3).
 	:- info(remove/3, [
@@ -100,7 +102,7 @@
 					list::member(Child,Children),
 					Child=node(ChildTaskId,_,_,_,_),
 					ChildTaskId \= TaskId,
-					::scheduler_tree_remove_rec(TaskId,[Child],[UpdatedChild])
+					scheduler_tree_remove_rec(TaskId,[Child],[UpdatedChild])
 				),
 				UpdatedChildren).
 
@@ -126,7 +128,13 @@
 		TaskId \== OtherTaskId,
 		length(OtherChildren,X),
 		1 =< X,
-		findall(UpdatedChild,(list::member(Child,OtherChildren),::scheduler_tree_replace_rec(node(TaskId,State,Module,Goal,Children),[Child],[UpdatedChild])),OtherUpdatedChildren).
+		findall(
+			UpdatedChild,
+			(	list::member(Child,OtherChildren),
+				scheduler_tree_replace_rec(node(TaskId,State,Module,Goal,Children),[Child],[UpdatedChild])
+			),
+			OtherUpdatedChildren
+		).
 
 	%% scheduler_tree_replace_by_taskid(+TaskId,+Node,+Tree,UpdatedTree)
 	% Node replaces the subtree of the root node has the same task id as node
@@ -152,7 +160,13 @@
 		TaskId \== OtherTaskId,
 		list::length(OtherChildren,X),
 		1 =< X,
-		findall(UpdatedChild,(list::member(Child,OtherChildren),::scheduler_tree_replace_by_taskid_rec(TaskId,UpdatedNode,[Child],[UpdatedChild])),OtherUpdatedChildren).
+		findall(
+			UpdatedChild,
+			(	list::member(Child,OtherChildren),
+				scheduler_tree_replace_by_taskid_rec(TaskId,UpdatedNode,[Child],[UpdatedChild])
+			),
+			OtherUpdatedChildren
+		).
 
 	%% scheduler_tree_reduce(+Tree,-ReducedTree)
 	% This reduces a scheduler tree by compacting nodes which are structurally the same (i.e. only differing in the task id. Such task will be given the same task id
@@ -205,7 +219,7 @@
 	scheduler_tree_reduce_rec([MaxId,Tree],[NewMaxId,ReducedTree]) :-
 		::scheduler_tree_reduce_once([MaxId,Tree],[NewMaxId1,ReducedTree1]),
 		!,
-		::scheduler_tree_reduce_rec([NewMaxId1,ReducedTree1],[NewMaxId,ReducedTree]).
+		scheduler_tree_reduce_rec([NewMaxId1,ReducedTree1],[NewMaxId,ReducedTree]).
 
 	scheduler_tree_reduce_rec([MaxId,Tree],[MaxId,Tree]).
 	
@@ -303,7 +317,7 @@
 		write('+'), write(TaskId), write(' '), write(State), write(' '), write(Module), write('::'), write(SimpleGoal), nl,
 		NextIndent is Indent + 1,
 		!,
-		forall(list::member(Child,Children), ::scheduler_tree_print_rec(NextIndent,[Child])).
+		forall(list::member(Child,Children), scheduler_tree_print_rec(NextIndent,[Child])).
 		% orig: foreach(Child in Children, scheduler_tree_print_rec(NextIndent,[Child])).
 		
 	:- private(indent/1).
