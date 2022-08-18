@@ -55,7 +55,7 @@ The `$BANPIPE_MODULE_PATH` environment variable works like the normal PATH varia
 
 Now, you should be able to start Logtalk (e.g., using `swilgt`) and call,
 
-`{banpipe(init)}.`
+`{banpipe(loader)}.`
 
 which will load the BANpipe library. 
 
@@ -73,7 +73,7 @@ and subsequently run the script using
 
 Once installation of BANpipe is completed, you can load BANpipe using the command
 
-`{banpipe(init)}.`
+`{banpipe(loader)}.`
 
 
 ### Loading a BANpipe script
