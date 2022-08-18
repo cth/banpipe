@@ -291,8 +291,8 @@
 
 	succeeds(make_change_change_delete) :-
 	    D=testdir42,
-	    shell::working_directory(Current),
-	    shell::make_directory(D),
+	    os::working_directory(Current),
+	    os::make_directory(D),
 	    os::change_directory(D),
 	    os::change_directory(Current),
 	    shell::delete_directory(D).
@@ -318,7 +318,7 @@
 		os::shell('rm -rf /tmp/testmodule').
 	
 	succeeds(interface_file) :-
-		shell::make_directory('/tmp/testmodule'),
+		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::touch,
 		banpipe_module_path::include_directory('/tmp'),
 		module(testmodule)::interface_file('/tmp/testmodule/interface.pl'),
@@ -338,7 +338,7 @@
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
-		shell::make_directory('/tmp/testmodule'),
+		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents).
 		
 	succeeds(task_options) :-
@@ -384,7 +384,7 @@
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
-		shell::make_directory('/tmp/testmodule'),
+		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		banpipe_module_path::include_directory('/tmp'),
 		config::push(result_file_directory,'/tmp/'),
@@ -465,7 +465,7 @@
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
-		shell::make_directory('/tmp/testmodule'),
+		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		%os::shell('cat /tmp/testmodule/interface.pl'),
 		banpipe_module_path::include_directory('/tmp'),
@@ -525,7 +525,7 @@
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
-		shell::make_directory('/tmp/testmodule'),
+		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		banpipe_module_path::include_directory('/tmp').
 

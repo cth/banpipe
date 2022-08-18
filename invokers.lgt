@@ -40,7 +40,7 @@
 	]).
 
 	run(InterfaceFile,Goal) :-
-		shell::working_directory(CurrentDir),
+		os::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
 		os::change_directory(ModuleDir),
 		Goal =.. [ Task, InputFiles, Options, OutputFiles ],
@@ -77,7 +77,7 @@
 	]).
 
 	run(InterfaceFile,Goal) :-
-		shell::working_directory(CurrentDir),
+		os::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
 		file(InterfaceFile)::basename(BaseFileName),
 		os::change_directory(ModuleDir),

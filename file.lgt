@@ -234,7 +234,7 @@
 		((::exists) ->
 			true
 			;
-			shell::make_directory(Path)).
+			os::make_directory(Path)).
 
 	:- public(exists/0).
 	:- info(exists/0,[comment is 'True if the directory exists']).

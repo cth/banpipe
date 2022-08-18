@@ -45,7 +45,7 @@
 
 	% Otherwise, we assume that it is a local relative path
 	expand_path(Path,ExpandPath) :-
-		shell::working_directory(AbsDir),
+		os::working_directory(AbsDir),
 		atom_codes(AbsDir,AbsDirCodes),
 		list::append(AbsDirCodes,Path,ExpandPath).
 		
