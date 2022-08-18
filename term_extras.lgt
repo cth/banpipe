@@ -1,9 +1,19 @@
 :- object(term_extras).
+
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-06,
-		comment is 'Utility predicates for term manipulation']).
+		comment is 'Utility predicates for term manipulation'
+	]).
+
+	:- uses(list, [
+		valid/1 as is_list/1
+	]).
+
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
 
 	:- public(has_rule_with_head/3).
 	:- info(has_rule_with_head/3, [ 
@@ -81,7 +91,7 @@
 		(::atom_verbatim(AtomTerm) ->
 			Atom=AtomTerm
 			;
-			meta::foldl(atom_concat,'',['\'',AtomTerm,'\''],Atom)).
+			atomic_list_concat(['\'',AtomTerm,'\''],Atom)).
 
 	term_to_atom(Term,Atom,Vars) :-
 		Term =.. [ Functor | Arguments ],

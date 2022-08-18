@@ -74,20 +74,24 @@
 		parnames is ['Name']
 	]).
 
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	:- public(interface_file/2).
-	
+
 	interface_file(File,prolog) :-
 		parameter(1,ModuleName),
 		banpipe_module_path::get_paths(Paths),
 		list::member(Path,Paths),
-		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.pl'],File),
+		atomic_list_concat([Path, '/', ModuleName, '/', 'interface.pl'],File),
 		file(File)::exists.
 	
 	interface_file(File,generic) :-
 		parameter(1,ModuleName),
 		banpipe_module_path::get_paths(Paths),
 		list::member(Path,Paths),
-		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.banpipe'],File),
+		atomic_list_concat([Path, '/', ModuleName, '/', 'interface.banpipe'],File),
 		file(File)::exists.
 
 	:- public(builtin/0). 

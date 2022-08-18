@@ -1,6 +1,13 @@
 :- object(sequential_interpreter(_Semantics), implements(banpipe_interpreter)).
-	:- uses(banpipe_parser, [match_target_rule/3]).
-	
+
+	:- uses(banpipe_parser, [
+		match_target_rule/3
+	]).
+
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	:- public(run/1).
 	:- info(run/1, [
 		comment is 'Will run the script goal Goal using sequential bottom-up semantics (one task/process at a time). The semantics is parameterized by Semantics.',
@@ -51,6 +58,6 @@
 		term_extras::term_to_atom(Self,SelfAtom),
 		term_extras::term_to_atom(Target,TargetAtom),
 		write(SelfAtom), nl,
-		meta::foldl(atom_concat,'',[SelfAtom, '::run - ', 'Failed to run goal: ', TargetAtom],Error),
+		atomic_list_concat([SelfAtom, '::run - ', 'Failed to run goal: ', TargetAtom],Error),
 		reporting::error(Error).
 :- end_object.

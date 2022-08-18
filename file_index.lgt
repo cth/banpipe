@@ -48,7 +48,11 @@
 			  warning - 'Simultaneous updates may damage index (run only one banpipe process for one index)'],
 		parnames is ['IndexFile']
 	]).
-	
+
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	:- synchronized([
 		result_files_allocate/5, result_files_commit/4, result_files_rollback/4,
 		result_files/5, result_files_allocate_time/5, result_files_commit_time/5
@@ -87,7 +91,7 @@
  		findall(Filename, (
 			list::nth1(FileNo,ResultFiles,Filename),
 			term_extras::term_to_atom(FileNo,FileNoAtom),
-			meta::foldl(atom_concat,'',[IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Gen),
+			atomic_list_concat([IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Gen),
 			file(Gen)::canonical(Filename)
 		),ResultFiles),
 		IndexFile::append([files(IndexAtom,AllocatedTimestamp,null,ResultFiles,Module,Task,InputFiles,Options)]).

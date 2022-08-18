@@ -17,7 +17,8 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-14,
-		comment is 'Simple invoker which does nothing, but logs the invocation.']).
+		comment is 'Simple invoker which does nothing, but logs the invocation.'
+	]).
 		
 	run(InterfaceFile,Goal) :-
 		write('(simulating) Running goal '),
@@ -31,7 +32,12 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2013-01-30,
-		comment is 'Invoker which launces a program or script as specified by a generic interface file']).
+		comment is 'Invoker which launces a program or script as specified by a generic interface file'
+	]).
+
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
 
 	run(InterfaceFile,Goal) :-
 		shell::working_directory(CurrentDir),
@@ -47,14 +53,14 @@
 		meta::foldl(list::append,[],[[BaseCommand],[' '], InputFilesSep, [' '], OutputFilesSep, [' '], OptStringsSep],CommandList),
 		meta::foldl(atom_concat,'', CommandList, Command),
 		write(shell_command(Command)), nl,
-		shell::exec(Command),
+		os::shell(Command),
 		os::change_directory(CurrentDir).
 
 
 	:- private(option_str/2).
 	option_str(Option, OptionStr) :-
 		Option =.. [ Key, Value ],
-		meta::foldl(atom_concat,'',['--',Key,' ',Value],OptionStr).
+		atomic_list_concat(['--',Key,' ',Value],OptionStr).
 
 :- end_object.
 
@@ -63,8 +69,13 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-14,
-		comment is '(abstract) Invoker which launches a Prolog process and runs the goal within that process']).
-		
+		comment is '(abstract) Invoker which launches a Prolog process and runs the goal within that process'
+	]).
+
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	run(InterfaceFile,Goal) :-
 		shell::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
@@ -77,9 +88,9 @@
 			::default_invoke_command(Exec)),
 		term_extras::term_to_atom(Goal,GoalAtom),
 		::goal_option(GoalOption),
-		meta::foldl(atom_concat,'',[Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', BaseFileName, '\'),', GoalAtom,',halt."'],Command),
+		atomic_list_concat([Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', BaseFileName, '\'),', GoalAtom,',halt."'],Command),
 		write(shell_command(Command)), nl,
-		shell::exec(Command),
+		os::shell(Command),
 		os::change_directory(CurrentDir).
 
 	:- protected(key_invoke_command/1).

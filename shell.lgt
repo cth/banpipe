@@ -45,7 +45,7 @@
 	:- public(exec/1).
 	:- info(exec/1, [comment is 'Send Command to the OS shell', argnames is ['Command']]).
     	exec(Command) :-
-	    shell::exec(Command,_).
+	    os::shell(Command,_).
 	
 	:- public(exec/2).
 	:- info(exec/2, [comment is 'Send Command to the OS shell and bind Status to the status returned from the OS', argnames is ['Command', 'Status']]).	

@@ -16,8 +16,13 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-17,
-		comment is 'Built-in module "file" ']).
-		
+		comment is 'Built-in module "file" '
+	]).
+
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	% Task declaration: get/3.
 	task(get([_],[filetype(T)],[T])).
 	
@@ -42,16 +47,23 @@
 	:- private(wget/2).
 	:- info(wget/2,[argnames is ['URL','OutputFile'],comment is 'fetching a file via http/ftp using wget utility']).
 	wget(URL,OutputFile) :-
-		meta::foldl(atom_concat,'',[wget, ' "', URL, '" --output-document=', OutputFile],Command),
-		shell::exec(Command).
+		atomic_list_concat([wget, ' "', URL, '" --output-document=', OutputFile],Command),
+		os::shell(Command).
 :- end_object.
 
+
 :- object(aggregate, implements(banpipe_builtin_module)).
+
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2013-02-11,
-		comment is 'Aggregate a series of files.']).
+		comment is 'Aggregate a series of files.'
+	]).
+
+	:- uses(integer, [
+		between/3
+	]).
 
 	% This is defined to work for all with upto 100 input files
 	task(depend_all(L,[],[pseudo])) :-
@@ -65,5 +77,6 @@
 
 	depend_all(_InputFiles,_Options,[OutputFile]) :-
 		file(OutputFile)::touch.
+
 :- end_object.
 

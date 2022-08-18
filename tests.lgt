@@ -273,14 +273,14 @@
 	:- initialization(::run).
 	
 	succeeds(execute_simple_cmd) :-
-		shell::exec('echo "hello from testcase"').
+		os::shell('echo "hello from testcase"').
 		
 	succeeds(execute_simple_cmd_with_status) :-
-		shell::exec('echo "hello from testcase"',X),
+		os::shell('echo "hello from testcase"',X),
 		X == 0.
 		
 	fails(execute_non_exist_cmd_with_status) :-
-		shell::exec('this_command_is_bogus',X),
+		os::shell('this_command_is_bogus',X),
 		X == 0.
 		
 	succeeds(evironment_variable) :-
@@ -315,7 +315,7 @@
 	:- initialization(::run).
 	
 	setup :-
-		shell::exec('rm -rf /tmp/testmodule').
+		os::shell('rm -rf /tmp/testmodule').
 	
 	succeeds(interface_file) :-
 		shell::make_directory('/tmp/testmodule'),
@@ -337,7 +337,7 @@
 		"test(In,Opt,Out) :- true.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
-		shell::exec('rm -rf /tmp/testmodule'),
+		os::shell('rm -rf /tmp/testmodule'),
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents).
 		
@@ -383,7 +383,7 @@
 		"test(In,Opt,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
-		shell::exec('rm -rf /tmp/testmodule'),
+		os::shell('rm -rf /tmp/testmodule'),
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		banpipe_module_path::include_directory('/tmp'),
@@ -464,10 +464,10 @@
 		"test(_,_,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
-		shell::exec('rm -rf /tmp/testmodule'),
+		os::shell('rm -rf /tmp/testmodule'),
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
-		%shell::exec('cat /tmp/testmodule/interface.pl'),
+		%os::shell('cat /tmp/testmodule/interface.pl'),
 		banpipe_module_path::include_directory('/tmp'),
 		config::push(result_file_directory,'/tmp/'),
 		config::push(index_file,'/tmp/index-file'),
@@ -524,7 +524,7 @@
 		"test([InFile],_Options,[OutFile]) :- atom_concat('cp ',InFile,T1),atom_concat(T1,' ',T2),atom_concat(T2,OutFile,Cmd),system(Cmd).\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
-		shell::exec('rm -rf /tmp/testmodule'),
+		os::shell('rm -rf /tmp/testmodule'),
 		shell::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		banpipe_module_path::include_directory('/tmp').

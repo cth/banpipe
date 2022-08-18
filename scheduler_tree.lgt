@@ -5,9 +5,16 @@
 		author is 'Christian Theil Have',
 		date is 2012-11-19,
 		comment is 'Tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks.  Tasks one of three states.',
-		remarks is [ 	'state ready' - 'in the tree, but not yet running', 
-				'state running' - 'tasks being run, but has not yet completed',
-				'state completed' - 'completed tasks are removed from the tree']]).
+		remarks is [
+			'state ready' - 'in the tree, but not yet running', 
+			'state running' - 'tasks being run, but has not yet completed',
+			'state completed' - 'completed tasks are removed from the tree'
+		]
+	]).
+
+	:- uses(list, [
+		length/2
+	]).
 
 	:- public(from_trace/2).
 	from_trace(Trace,Tree) :-

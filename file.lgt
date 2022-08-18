@@ -13,6 +13,10 @@
 		parnames is ['Path']
 	]).
 
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	:- public(read/1).
 	read(Contents) :-
 		parameter(1,F),
@@ -38,8 +42,8 @@
 	:- public(copy_to/1).
 	copy_to(TargetFile) :-
 		parameter(1,File),
-		meta::foldl(atom_concat,'',['cp ',File,' ',TargetFile],ShellCopyCommand),
-		shell::exec(ShellCopyCommand).
+		atomic_list_concat(['cp ',File,' ',TargetFile],ShellCopyCommand),
+		os::shell(ShellCopyCommand).
 
 
 	:- public(exists/0).
