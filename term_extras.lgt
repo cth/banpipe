@@ -1,8 +1,8 @@
 :- object(term_extras).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/06,
+		date is 2012-11-06,
 		comment is 'Utility predicates for term manipulation']).
 
 	:- public(has_rule_with_head/3).
@@ -11,7 +11,7 @@
 		argnames is ['Terms','Functor','Arity']	]).
 	has_rule_with_head(Terms,Functor,Arity) :-
 		list::member(Rule, Terms),
-		Rule =.. [ (:-), Head, _ ],
+		Rule = (Head :- _),
 		functor(Head, Functor, Arity).
 
 	:- public(atom_integer/2).
@@ -40,7 +40,7 @@
 	vars(Term,Vars) :-
 		Term =.. [ _ | Arguments ],
 		self(Self),
-		meta::map([X,Y]>>(Self::vars(X,Y)),Arguments,VarsLists),
+		meta::map({Self}/[X,Y]>>(Self::vars(X,Y)),Arguments,VarsLists),
 		list::flatten(VarsLists,VarsList),
 		set::insert_all(VarsList,[],Vars).
 
@@ -71,7 +71,7 @@
 		is_list(List),
 		!,
 		self(Self),
-		meta::map([X,Y]>>(Self::term_to_atom(X,Y,Vars)),List,ListAtoms),
+		meta::map({Self}/[X,Y]>>(Self::term_to_atom(X,Y,Vars)),List,ListAtoms),
 		list_extras::intersperse(',',ListAtoms,CommaSepAtoms),
 		meta::foldl(atom_concat,'[',CommaSepAtoms,Atom1),
 		atom_concat(Atom1,']',Atom).
@@ -87,7 +87,7 @@
 		Term =.. [ Functor | Arguments ],
 		atom(Functor),
 		self(Self),
-		meta::map([X,Y]>>(Self::term_to_atom(X,Y,Vars)),Arguments,ArgAtoms),
+		meta::map({Self}/[X,Y]>>(Self::term_to_atom(X,Y,Vars)),Arguments,ArgAtoms),
 		list_extras::intersperse(',',ArgAtoms,CommaSepArgAtoms),
 		meta::foldl(list::append,[],[[Functor, '('], CommaSepArgAtoms, [')']],ListOfAtoms),
 		meta::foldl(atom_concat,'',ListOfAtoms,Atom).

@@ -22,7 +22,7 @@
 		argnames is ['Goal','Result','Trace']]).
 	
 	run(A,B,C) :-
-		writeln(run(A,B,C)),
+		write(run(A,B,C)), nl,
 		fail.
 
 	run(Target,Target,(nil,[Target])) :-
@@ -35,7 +35,7 @@
 		match_target_rule(Target,LHS+RHS,TargetIndex),
 		banpipe_parser::parse_guard_and_body(RHS,Guard,Body),
 		{call(Guard)},
-		Body =.. [ '::', Module, TaskSpec],
+		Body = (Module :: TaskSpec),
 		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),!,
 		self(Self),
 		meta::map([I,[O,C]]>>(Self::run(I,O,C)),Inputs,OutputsAndChildSpecs),
@@ -50,7 +50,7 @@
 		self(Self),
 		term_extras::term_to_atom(Self,SelfAtom),
 		term_extras::term_to_atom(Target,TargetAtom),
-		writeln(SelfAtom),
+		write(SelfAtom), nl,
 		meta::foldl(atom_concat,'',[SelfAtom, '::run - ', 'Failed to run goal: ', TargetAtom],Error),
 		reporting::error(Error).
 :- end_object.

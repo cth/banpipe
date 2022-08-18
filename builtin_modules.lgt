@@ -1,8 +1,8 @@
 :- protocol(banpipe_builtin_module).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/17,
+		date is 2012-11-17,
 		comment is 'Built-in modules are Logtalk objects which are like banpipe modules (they contain tasks) but they are executed within the main process.']).
 		
 	:- public(task/1).
@@ -13,9 +13,9 @@
 
 :- object(file, implements(banpipe_builtin_module)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/17,
+		date is 2012-11-17,
 		comment is 'Built-in module "file" ']).
 		
 	% Task declaration: get/3.
@@ -48,9 +48,9 @@
 
 :- object(aggregate, implements(banpipe_builtin_module)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2013/02/11,
+		date is 2013-02-11,
 		comment is 'Aggregate a series of files.']).
 
 	% This is defined to work for all with upto 100 input files

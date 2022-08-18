@@ -1,8 +1,8 @@
 :- object(uri(_URI)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/12/06,
+		date is 2012-12-06,
 		comment is 'Object to represent URLs',
 		parnames is ['URI']
 	]).

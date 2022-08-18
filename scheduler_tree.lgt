@@ -1,9 +1,9 @@
 :- object(scheduler_tree).
     	% The object is used by the process scheduler to infer which tasks can be run in parallel.
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/19,
+		date is 2012-11-19,
 		comment is 'Tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks.  Tasks one of three states.',
 		remarks is [ 	'state ready' - 'in the tree, but not yet running', 
 				'state running' - 'tasks being run, but has not yet completed',
@@ -43,7 +43,7 @@
 		argnames is ['Module','Task','ParentId','Tree','UpdatedTree','NextId']]).
 	add(Module,Task,ParentId,[MaxId,Tree],[NextId,UpdatedTree],NextId) :-
 		NextId is MaxId + 1,
-		writeln(NextId),
+		write(NextId), nl,
 		::scheduler_tree_add_rec(NextId,Module,Task,ParentId,Tree,UpdatedTree).
 %		!,
 %		::reduce_tree(UpdatedTree1,UpdatedTree).
@@ -164,7 +164,7 @@
 
   :- private(fast_tree_reduce/2).
 	fast_tree_reduce(Tree,ReducedTree) :-
-		%writeln(fast_tree_reduce),
+		%write(fast_tree_reduce), nl,
 		findall([TaskId,[Module,Goal]],::lookup(TaskId,Tree,[node(TaskId,_State,Module,Goal,_Children)]),TaskIds),
 		!,
 		fast_tree_reduce_rec(TaskIds,Tree,ReducedTree).
@@ -174,12 +174,12 @@
 
 	fast_tree_reduce_rec(TaskIds,Tree,UpdTree) :-
 		TaskIds=[[FirstId,Task]|_],
-%		writeln(partition),
+%		write(partition), nl,
 		meta::partition([X]>>(X=[_,Task]),TaskIds,TaskIdsSame,TaskIdsRest),
 		!,
-%		writeln(same_as_first(TaskIdsSame)),
-%		writeln(rest(TaskIdsRest)),
-%		writeln(fold_left),
+%		write(same_as_first(TaskIdsSame)), nl,
+%		write(rest(TaskIdsRest)), nl,
+%		write(fold_left), nl,
 		meta::fold_left([TreeP,TaskNode,MergeTree]>>(TaskNode=[CurrentId,_], ::merge_task_ids(FirstId,CurrentId,TreeP,MergeTree)), Tree, TaskIdsSame, UpdTree1),
 		!,
 		%::print(UpdTree1),
@@ -276,7 +276,7 @@
 		argnames is ['Tree']]).
 
 	print([_,[]]) :-
-		writeln('Tree is empty!').
+		write('Tree is empty!'), nl.
 
 	print([_,Tree]) :-
 		scheduler_tree_print_rec(0,Tree).

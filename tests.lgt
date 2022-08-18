@@ -284,17 +284,17 @@
 		X == 0.
 		
 	succeeds(evironment_variable) :-
-		shell::environment_variable('PATH',_).
+		os::environment_variable('PATH',_).
 		
 	fails(environment_variable_nonexisting) :-
-		shell::environment_variable('NO_SUCH_VARIABLE','').
+		os::environment_variable('NO_SUCH_VARIABLE','').
 
 	succeeds(make_change_change_delete) :-
 	    D=testdir42,
 	    shell::working_directory(Current),
 	    shell::make_directory(D),
-	    shell::change_directory(D),
-	    shell::change_directory(Current),
+	    os::change_directory(D),
+	    os::change_directory(Current),
 	    shell::delete_directory(D).
 
 
@@ -432,7 +432,7 @@
 				
 	:- private(invoke_task/0).
 	invoke_task :-
-		writeln(task(testmodule,test,[],[])::run([F1,F2])),
+		write(task(testmodule,test,[],[])::run([F1,F2])), nl,
 		task(testmodule,test,[],[])::run([F1,F2]),
 		file(F1)::read("file1"),
 		file(F2)::read("file2"),
@@ -503,7 +503,7 @@
 				
 	:- private(invoke_task/0).
 	invoke_task :-
-		writeln(task(testmodule,test,[],[])::run([F1,F2])),
+		write(task(testmodule,test,[],[])::run([F1,F2])), nl,
 		task(testmodule,test,[],[])::run([F1,F2]),
 		file(F1)::read("file1"),
 		file(F2)::read("file2"),

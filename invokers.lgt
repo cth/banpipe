@@ -1,8 +1,8 @@
 :- protocol(invokerp).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Protocal that invokers must implement']).
 		
 	:- public(run/2).
@@ -14,29 +14,29 @@
 
 :- object(logger_invoker,implements(invokerp)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Simple invoker which does nothing, but logs the invocation.']).
 		
 	run(InterfaceFile,Goal) :-
 		write('(simulating) Running goal '),
-		writeln(Goal),
-		writeln(' in file '),
-		writeln(InterfaceFile).
+		write(Goal), nl,
+		write(' in file '), nl,
+		write(InterfaceFile), nl.
 :- end_object.
 
 :- object(generic_invoker, implements(invokerp)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2013/01/30,
+		date is 2013-01-30,
 		comment is 'Invoker which launces a program or script as specified by a generic interface file']).
 
 	run(InterfaceFile,Goal) :-
 		shell::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
-		shell::change_directory(ModuleDir),
+		os::change_directory(ModuleDir),
 		Goal =.. [ Task, InputFiles, Options, OutputFiles ],
 		prolog_file(InterfaceFile)::read_terms(Terms),
 		list::member(invoke(Task,BaseCommand), Terms),
@@ -46,9 +46,9 @@
 		list_extras::intersperse(' ', OutputFiles, OutputFilesSep),
 		meta::foldl(list::append,[],[[BaseCommand],[' '], InputFilesSep, [' '], OutputFilesSep, [' '], OptStringsSep],CommandList),
 		meta::foldl(atom_concat,'', CommandList, Command),
-		writeln(shell_command(Command)),
+		write(shell_command(Command)), nl,
 		shell::exec(Command),
-		shell::change_directory(CurrentDir).
+		os::change_directory(CurrentDir).
 
 
 	:- private(option_str/2).
@@ -60,16 +60,16 @@
 
 :- object(prolog_invoker, implements(invokerp)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is '(abstract) Invoker which launches a Prolog process and runs the goal within that process']).
 		
 	run(InterfaceFile,Goal) :-
 		shell::working_directory(CurrentDir),
 		file(InterfaceFile)::dirname(ModuleDir),
 		file(InterfaceFile)::basename(BaseFileName),
-		shell::change_directory(ModuleDir),
+		os::change_directory(ModuleDir),
 		::key_invoke_command(InvokeCmdKey),
 		(config::get(InvokeCmdKey,Exec) ->
 			true
@@ -78,9 +78,9 @@
 		term_extras::term_to_atom(Goal,GoalAtom),
 		::goal_option(GoalOption),
 		meta::foldl(atom_concat,'',[Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', BaseFileName, '\'),', GoalAtom,',halt."'],Command),
-		writeln(shell_command(Command)),
+		write(shell_command(Command)), nl,
 		shell::exec(Command),
-		shell::change_directory(CurrentDir).
+		os::change_directory(CurrentDir).
 
 	:- protected(key_invoke_command/1).
 	key_invoke_command(invoke_command(prolog)).
@@ -98,9 +98,9 @@
 
 :- object(bp_invoker,extends(prolog_invoker)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Invoker which launches a B-Prolog process and runs the goal within that process']).
 		
 	key_invoke_command(invoke_command(bp)).
@@ -110,9 +110,9 @@
 
 :- object(prism_invoker,extends(prolog_invoker)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Invoker which launches a PRISM process and runs the goal within that process']).
 		
 	key_invoke_command(invoke_command(prism)).
@@ -123,9 +123,9 @@
 
 :- object(swipl_invoker, extends(prolog_invoker)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Invoker which launches a SWI-Prolog process and runs the goal within that process']).
 	
 	key_invoke_command(invoke_command(swipl)).
@@ -136,9 +136,9 @@
 
 :- object(yap_invoker, extends(prolog_invoker)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Invoker which launches a YAP process and runs the goal within that process']).
 	
 	key_invoke_command(invoke_command(yap)).
@@ -148,9 +148,9 @@
 
 :- object(gprolog_invoker, extends(prolog_invoker)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/14,
+		date is 2012-11-14,
 		comment is 'Invoker which launches a GNU-Prolog process and runs the goal within that process']).
 		
 	key_invoke_command(invoke_command(gprolog)).

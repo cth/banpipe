@@ -6,9 +6,9 @@
 	:- public(load/1).
 	
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/13,
+		date is 2012-11-13,
 		comment is 'The main object for interaction with banpipe scripts.']).
 
 	:- dynamic('<-'/2).
@@ -17,7 +17,7 @@
 	:- info(version/0,[comment is 'Writes current version of BANpipe.']).
 	version :-
 		version(V),
-		writeln(V).
+		write(V), nl.
 
     	:- public(version/1).
     	:- info(version/1, [
@@ -32,7 +32,7 @@
 	listing(Goal) :-
 		% escaped using {}/1 operator to find clause from "global" database rather than this objects database
 		findall([Head,Body],({clause('<-'(Head,Body),true)},term_extras::conjunction_as_list(Head,HeadList),list::nth1(_,HeadList,Goal)),Rules),
-		forall(list::member([Head,Body],Rules),(write(Head), write(' <- '), writeln(Body))).
+		forall(list::member([Head,Body],Rules),(write(Head), write(' <- '), write(Body), nl)).
 
 	:- public(listing/0).
 	:- info(listing/0,
@@ -124,6 +124,8 @@
 	trace :- config::set(trace).
 	
 	:- public(notrace/0).
-	notrace :- config::pop(trace) ; true.
+	notrace :-
+		config::pop(trace).
+	notrace.
 	
 :- end_object.

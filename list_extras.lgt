@@ -1,8 +1,8 @@
 :- object(list_extras).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/06,
+		date is 2012-11-06,
 		comment is 'Various semi-useful predicates for working with lists.']).
 		
 	:- public(intersperse/3).

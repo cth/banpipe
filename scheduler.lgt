@@ -2,9 +2,9 @@
 
 :- object(scheduler).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/20,
+		date is 2012-11-20,
 		comment is 'Schedules parallel invocation of tasks.']).
 	
 	:- threaded.

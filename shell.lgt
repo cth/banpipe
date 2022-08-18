@@ -1,8 +1,8 @@
 :- object(shell).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/13,
+		date is 2012-11-13,
 		comment is 'Interaction with shell/OS. Sending shell commands, environment variables etc.']).
 
 	:- public(environment_variable/2).

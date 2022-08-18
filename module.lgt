@@ -1,8 +1,8 @@
 :- object(banpipe_module_path).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is 'Manages the module directory search paths.',
 		remarks is [ 
 			'environment_variable $BANPIPE_MODULE_PATH'  - 'Search paths are obtained from the BANPIPE_MODULE_PATH (paths separated by : (unix) or ; (windows)',
@@ -17,7 +17,7 @@
 		[ comment is 'Extract module directories from the BANPIPE_MODULE_PATH environment variable.',
 		  argnames is ['Paths']]).
 	get_paths(Paths) :-
-		(shell::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
+		(os::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
 			[Separator] = ":",
 			atom_codes(PathAtom,PathCodes),	
 			list_extras::sublist_split(Separator,PathCodes,PathsCodes),
@@ -52,7 +52,7 @@
 	:- public(check_set/0).
 	:- info(check_set/0, [comment is 'Check that BANPIPE_MODULE_PATH is set.']).
 	check_set :-
-		report_unless(shell::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
+		report_unless(os::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
 		
 	:- public(include_directory/1).
 	:- info(include_directory/1,
@@ -67,9 +67,9 @@
 
 :- object(module(_Name)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is 'A proxy object which represent a particular banpipe module.',
 		parnames is ['Name']
 	]).
@@ -112,16 +112,16 @@
 	:- public(available/0).
 	:- info(available/0,[comment is 'True if a module with the given name is available.']).
 	available :-
-		::builtin 
-		;
+		::builtin.
+	available :-
 		::interface_file(_,_).
 :- end_object.
 
 :- object(module_task(_Module,_Task)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is 'Represents a task in a module',
 		parnames is ['Module', 'Task']
 	]).
@@ -202,15 +202,15 @@
 		!,
 		parameter(2,Task),
 		Module::task(Declaration),
-		Declaration =.. [ Task | _ ].
+		functor(Declaration, Task, _).
 		
 	declaration(Declaration) :-
 		parameter(1,Module),
 		parameter(2,Task),
 		module(Module)::interface_file(InterfaceFile,prolog),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
-		TaskMatcher =.. [ ':-', task(Declaration) ],
-		Declaration =.. [ Task | _ ].
+		TaskMatcher = (:- task(Declaration)),
+		functor(Declaration, Task, _).
 
 	declaration(Declaration) :- 
 		parameter(1,Module),
@@ -218,7 +218,7 @@
 		module(Module)::interface_file(InterfaceFile,generic),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
 		TaskMatcher = task(Declaration), 
-		Declaration =.. [ Task | _ ].
+		functor(Declaration, Task, _).
 		
 	:- public(options/1).
 	:- info(options/1, 
@@ -227,10 +227,10 @@
 	options(Options) :-
 		::declaration(Decl),
 		Decl =.. [ _ , _, OptionsDecl, _ ],
-		(list::member(version(_),OptionsDecl) ->
+		(	list::member(version(_),OptionsDecl) ->
 			Options = OptionsDecl
-			;
-			Options = [version(na)|OptionsDecl]).
+		;	Options = [version(na)|OptionsDecl]
+		).
 	
 	:- public(input_types/1).
 	:- info(input_types/1,
@@ -252,9 +252,9 @@
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
 
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is '.',
 		parnames is ['Module', 'Task', 'InputFiles', 'Options']
 	]).
@@ -296,7 +296,7 @@
 			% Strip the list if it is not declared in the argument
 			[InputFilesCanonicalAdapt] = InputFilesCanonical),
 		Goal =.. [ Task, InputFilesCanonicalAdapt, ExpandedOptions, OutputFiles ],
-		writeln(Goal),
+		write(Goal), nl,
 		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFilesList) ->
 			true % The task has allready been run 
 			;
@@ -341,7 +341,7 @@
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile,prolog),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
-		TaskMatcher =.. [ ':-', invoke_with(PrologName) ],
+		TaskMatcher = (:- invoke_with(PrologName)),
 		atom_concat(PrologName,'_invoker',InvokerName),
 		!.
 

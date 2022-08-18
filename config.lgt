@@ -1,8 +1,8 @@
 :- object(config).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/15,
+		date is 2012-11-15,
 		comment is 'Configuration of banpipe.']).
 		
 	:- private(directive/2).
@@ -66,10 +66,11 @@
 		::push(execution_mode,sequential),
 		::push(default_invoker,prism_invoker),
 		::push(invoke_command(prism),prism),
-		shell::working_directory(WorkingDir),
+		os::working_directory(WorkingDir),
 		atom_concat(WorkingDir,'/result_files',ResultFileDir),
 		::push(result_file_directory,ResultFileDir),
 		atom_concat(ResultFileDir,'/result_file_index',IndexFile),
 		::push(index_file,IndexFile),
 		::push(file_manager,term_file_index(IndexFile)).
+
 :- end_object.

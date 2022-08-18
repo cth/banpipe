@@ -6,9 +6,9 @@
 
 :- object(file(Path), extends(path(Path))).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/06,
+		date is 2012-11-06,
 		comment is 'File wrapper object. The parameter A is a filename atom.',
 		parnames is ['Path']
 	]).
@@ -17,7 +17,7 @@
 	read(Contents) :-
 		parameter(1,F),
 		open(F,read,Stream),
-		writeln(F),
+		write(F), nl,
 		catch(read_characters(Stream,Contents),_,true),
 		close(Stream).
 
@@ -150,9 +150,9 @@
 
 :- object(prolog_file(F), extends(file(F))).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/06,
+		date is 2012-11-06,
 		comment is 'File wrapper object for Prolog files. The parameter A is a filename atom.',
 		parnames is ['File']
 	]).
@@ -215,9 +215,9 @@
 :- object(directory(Path), extends(path(Path))).
 
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/06,
+		date is 2012-11-06,
 		comment is '.',
 		parnames is ['Path']
 	]).

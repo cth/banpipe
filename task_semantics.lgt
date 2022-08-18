@@ -1,8 +1,8 @@
 :- protocol(task_semantics).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/16,
+		date is 2012-11-16,
 		comment is 'Protocol for applying a particular semantics to a task.']).
 	
 	:- public(apply/3).
@@ -14,9 +14,9 @@
 
 :- object(execution_semantics, implements(task_semantics)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/16,
+		date is 2012-11-16,
 		comment is 'A semantics for tasks, which computes output files.']).
 		
 	apply(_,Task,Result) :-
@@ -25,9 +25,9 @@
 
 :- object(typecheck_semantics, implements(task_semantics)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/16,
+		date is 2012-11-16,
 		comment is 'A semantics for tasks, which performs type checking.']).
 		
 	apply(_,Task,Result) :-
@@ -36,9 +36,9 @@
 
 :- object(callgraph_semantics, implements(task_semantics)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/19,
+		date is 2012-11-19,
 		comment is 'Semantics used for generating call graph. Only the syntactical Rule is relevant.']).
 		
 	apply(LHS+_RHS,_Task,LHS).
@@ -46,9 +46,9 @@
 
 :- object(trace(_Semantics), implements(task_semantics)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/19,
+		date is 2012-11-19,
 		comment is 'A Semantics which implements a very simple tracer',
 		parnames is ['Semantics']
 	]).
@@ -57,8 +57,8 @@
 		write('call: '),
 		write(LHS),
 		write(' <- '),
-		writeln(RHS),
-		writeln('(c)reep (a)bort>'),
+		write(RHS), nl,
+		write('(c)reep (a)bort>'), nl,
 		get_char(Action),
 		perform_action(Action,LHS+RHS,Task,Outputs).
 		
@@ -70,9 +70,9 @@
 		
 	% creep
 	perform_action(_,Rule,Task,Outputs) :-
-		writeln(creep),
+		write(creep), nl,
 		parameter(1,Semantics),
 		Semantics::apply(Rule,Task,Outputs),
-		write('-->'), writeln(Outputs).
+		write('-->'), write(Outputs), nl.
 :- end_object.
 

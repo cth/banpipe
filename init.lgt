@@ -1,20 +1,11 @@
 
 banpipe_required_libraries([
-	library(termp),
-	library(term),
-	library(compound),
-	library(listp),
-	library(list),
-	library(setp),
-	library(set),
-	library(metap),
-	library(meta),
-	library(timep),
-	library(time),
-	library(datep),
-	library(date),
-	library(gensym),
-	library(meta_compiler)
+	basic_types(loader),
+	sets(loader),
+	metapredicates(loader),
+	dates(loader),
+	meta_compiler(loader),
+	os(loader)
 ]).
 
 banpipe_own_files([
@@ -38,11 +29,7 @@ banpipe_own_files([
 	banpipe(banpipe)
 ]).
 
-:- if(current_logtalk_flag(version, version(3,_,_))).
-	banpipe_file_options([hook(meta_compiler), optimize(on)]).
-:- else.
-	banpipe_file_options([hook(meta_compiler), optimize(on), reload(skip)]).
-:- endif.
+banpipe_file_options([hook(meta_compiler), optimize(on)]).
 
 :- initialization((
 	banpipe_required_libraries(Libraries),

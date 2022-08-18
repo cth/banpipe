@@ -1,8 +1,8 @@
 :- object(banpipe_parser).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/13,
+		date is 2012-11-13,
 		comment is 'Predicates for decomposing banpipe rules.']).
 
 	:- public(match_target_rule/3).
@@ -43,12 +43,12 @@
 	% caase pattern example: task1(file,[opt1(foo)])
 	parse_task_specification(TaskSpecification,Task,[Inputs],Options) :-
 		TaskSpecification =.. [ Task, Inputs, Options ],
-		not(list::valid(Inputs)),
+		\+ list::valid(Inputs),
 		list::valid(Options),
 		!.
 	% case pattern example: task1(file1,file2).
 	parse_task_specification(TaskSpecification,Task,Inputs,[]) :-
 		TaskSpecification =.. [ Task | Inputs ],
 		list::valid(Inputs),
-		forall(list::member(L,Inputs),not(list::valid(L))).
+		forall(list::member(L,Inputs), \+ list::valid(L)).
 :- end_object.
