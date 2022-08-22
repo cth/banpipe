@@ -493,11 +493,9 @@
 :- object(test_task_typecheck1,extends(lgtunit)).
 
 	setup :-
-		InterfaceFileContentsLines = [
-		":- task(test([_], [filetype(X)], [X])).\n",
-		"test([InFile],_Options,[OutFile]) :- atom_concat('cp ',InFile,T1),atom_concat(T1,' ',T2),atom_concat(T2,OutFile,Cmd),system(Cmd).\n"
-		],
-		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		atom_codes(':- task(test([_], [filetype(X)], [X])).\n', Line1),
+		atom_codes('test([InFile],_Options,[OutFile]) :- atom_concat(\'cp \',InFile,T1),atom_concat(T1,\' \',T2),atom_concat(T2,OutFile,Cmd),system(Cmd).\n', Line2),
+		list::append(Line1,Line1,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
