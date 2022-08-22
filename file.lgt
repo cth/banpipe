@@ -52,19 +52,9 @@
 		comment is 'True if the file (or directory) A exists.'
 	]).
 
-	:- if((current_logtalk_flag(prolog_dialect, swi))).
-		exists :-
-			parameter(1,F),
-			{exists_file(F) ; exists_directory(F) }.
-	:- elif((current_logtalk_flag(prolog_dialect, yap))).
-		exists :-
-			parameter(1,F),
-			{file_exists(F)}.
-	:- elif((current_logtalk_flag(prolog_dialect, b))).
-		exists :-
-			parameter(1,F),
-			{exists(F)}.
-	:- endif.
+	exists :-
+		parameter(1,F),
+		os::file_exists(F).
 
 	:- public(touch/0).
 	touch :-
@@ -76,7 +66,7 @@
 
 	delete :-
 		parameter(1,F),
-		catch({delete_file(F)}, _, true).
+		catch(os::delete_file(F), _, true).
 
 	:- public(dirname/1).
 	:- info(dirname/1, [
