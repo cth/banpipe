@@ -310,13 +310,11 @@
 :- object(test_module_task, extends(lgtunit)).
 
 	setup :-
-		InterfaceFileContentsLines = [
 		% Task declaration
-		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
+		atom_codes(':- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n', Line1),
 		% (dummy) Task implementation
-		"test(In,Opt,Out) :- true.\n"
-		],
-		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		atom_codes('test(In,Opt,Out) :- true.\n', Line2),
+		list::append(Line1, Line2, InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents).
@@ -357,13 +355,11 @@
 			true).
 
 	task_setup :-
-		InterfaceFileContentsLines = [
-			% Task declaration
-			":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
-			% (dummy) Task implementation
-			"test(In,Opt,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
-		],
-		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		% Task declaration
+		atom_codes(':- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n', Line1),
+		% (dummy) Task implementation
+		atom_codes('test(In,Opt,[Out1,Out2]) :- write(\'hello from prolog\'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n', Line2),
+		list::append(Line1,Line2,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
@@ -429,20 +425,18 @@
 
 	% Just in case the previous test didn't finish well and forgot cleanup of file
 	setup :-
-		(file('/tmp/index-file')::exists ->
+		(	file('/tmp/index-file')::exists ->
 			file('/tmp/index-file')::delete
-			;
-			true).
+		;	true
+		).
 
 	task_setup(PrologName) :-
-		InterfaceFileContentsLines = [
 		% Task declaration
-		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
-		":- invoke_with(", PrologName, ").\n",
+		atom_codes(':- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n', Line1),
+		atom_codes(':- invoke_with(", PrologName, ").\n', Line2),
 		% (dummy) Task implementation
-		"test(_,_,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
-		],
-		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
+		atom_codes('test(_,_,[Out1,Out2]) :- write(\'hello from prolog\'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n', Line3),
+		list::append([Line1,Line2,Line3],InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),

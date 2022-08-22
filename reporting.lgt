@@ -10,7 +10,7 @@
 		::check_condition,
 		!,
 		write('ERROR: '),
-		write(Msg), nl,
+		writeq(Msg), nl,
 		throw(Msg).
 	error(_).
 
@@ -18,14 +18,14 @@
 		::check_condition,
 		!,
 		write('WARNING: '),
-		write(Msg), nl.
+		writeq(Msg), nl.
 	warning(_).
 
 	info(Msg) :-
 		::check_condition,
 		!,
 		write('INFO: '),
-		write(Msg), nl.
+		writeq(Msg), nl.
 	info(_).
 
 	check_condition.
