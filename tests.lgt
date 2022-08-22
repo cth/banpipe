@@ -356,10 +356,10 @@
 :- object(test_invoke_task,extends(lgtunit)).
 
 	setup :-
-		(file('$HOME/tmp/index-file')::exists ->
+		(	file('$HOME/tmp/index-file')::exists ->
 			file('$HOME/tmp/index-file')::delete
-			;
-			true).
+		;	true
+		).
 
 	task_setup :-
 		% Task declaration
@@ -455,10 +455,12 @@
 		os::make_directory('$HOME/tmp/testmodule'),
 		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
 		%os::shell('cat $HOME/tmp/testmodule/interface.pl'),
-		banpipe_module_path::include_directory('$HOME/tmp'),
-		config::push(result_file_directory,'$HOME/tmp/'),
-		config::push(index_file,'$HOME/tmp/index-file'),
-		config::push(file_manager,term_file_index('$HOME/tmp/index-file')).
+		os::absolute_file_name('$HOME/tmp', Directory),
+		banpipe_module_path::include_directory(Directory),
+		config::push(result_file_directory,Directory),
+		os::absolute_file_name('$HOME/tmp/index-file', File),
+		config::push(index_file,File),
+		config::push(file_manager,term_file_index(File)).
 
 	succeeds(invoke_task_prism) :-
 		task_setup(prism),

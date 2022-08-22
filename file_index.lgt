@@ -88,7 +88,7 @@
 		directory(Dir)::create,
 		(IndexFile::exists -> true ; IndexFile::touch).
 
-	consistency_check. % FIXME: do somethinh useful
+	consistency_check. % FIXME: do something useful
 
 	result_files_allocate(Module,Task,InputFiles,Options,ResultFiles) :-
 		% Rollback if previously allocated
@@ -99,12 +99,15 @@
 		IndexFile::read_terms(Terms),
 		next_available_index(Terms, Index),
 		term_extras::term_to_atom(Index,IndexAtom),
-		findall(Filename, (
-			list::nth1(FileNo,ResultFiles,Filename),
-			term_extras::term_to_atom(FileNo,FileNoAtom),
-			atomic_list_concat([IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Gen),
-			file(Gen)::canonical(Filename)
-		),ResultFiles),
+		findall(
+			Filename,
+			(	list::nth1(FileNo,ResultFiles,Filename),
+				term_extras::term_to_atom(FileNo,FileNoAtom),
+				atomic_list_concat([IndexDir, Module, '_',Task,'_',IndexAtom,'_', FileNoAtom, '.gen'], Gen),
+				file(Gen)::canonical(Filename)
+			),
+			ResultFiles
+		),
 		IndexFile::append([files(IndexAtom,AllocatedTimestamp,null,ResultFiles,Module,Task,InputFiles,Options)]).
 
 	result_files_commit(Module,Task,InputFiles,Options) :-
