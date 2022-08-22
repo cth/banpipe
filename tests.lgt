@@ -6,7 +6,7 @@
 
 	succeeds(get_defaults) :-
 		config::get(execution_mode,sequential),
-		config::get(default_invoker,prism),
+		config::get(default_invoker,prism_invoker),
 		config::get(result_file_directory,_),
 		config::get(index_file,_),
 		config::get(file_manager,_).
