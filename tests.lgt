@@ -674,7 +674,8 @@
 		file('$HOME/tmp/test.2')::delete.
 
 	succeeds(test_file_get2) :-
-		file::get(['http://banpipe.org/'],[],['$HOME/tmp/test.banpipe']),
-		file('$HOME/tmp/test.banpipe')::delete.
+		os::absolute_file_name('$HOME/tmp/test.banpipe', File),
+		file::get(['https://logtalk.org/'],[],[File]),
+		file(File)::delete.
 
 :- end_object.

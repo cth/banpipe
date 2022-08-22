@@ -9,6 +9,7 @@
 	]).
 
 	:- private(internet_protocol/1).
+	internet_protocol('https://').
 	internet_protocol('http://').
 	internet_protocol('ftp://').
 
