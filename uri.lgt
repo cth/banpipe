@@ -1,4 +1,5 @@
 :- object(uri(_URI)).
+
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
@@ -34,7 +35,9 @@
 	:- public(elements/2).
 	:- info(elements/2, [
 		comment is 'For, e.g., http://banpipe.org/index.html, Protocol is \'http://\' and Filepart is \'banpipe.org/index.html\'',
-		argnames is ['Protocol','Filepart']]).
+		argnames is ['Protocol','Filepart']
+	]).
+
 	elements(Protocol,Filepart) :-
 		parameter(1,URI),
 		atom_codes(URI,URICodes),
@@ -42,4 +45,5 @@
 		atom_codes(Protocol,ProtocolCodes),
 		list::append(ProtocolCodes,FilepartCodes,URICodes),
 		atom_codes(Filepart,FilepartCodes).
+
 :- end_object.

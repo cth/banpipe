@@ -3,83 +3,102 @@
 :- dynamic('<-'/2).
 
 :- object(banpipe).
-	:- public(load/1).
 	
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-13,
-		comment is 'The main object for interaction with banpipe scripts.']).
+		comment is 'The main object for interaction with banpipe scripts.'
+	]).
+
+	:- public(load/1).
 
 	:- dynamic('<-'/2).
 	
 	:- public(version/0).
-	:- info(version/0,[comment is 'Writes current version of BANpipe.']).
+	:- info(version/0,[
+		comment is 'Writes current version of BANpipe.'
+	]).
+
 	version :-
 		version(V),
 		write(V), nl.
 
-    	:- public(version/1).
-    	:- info(version/1, [
+	:- public(version/1).
+	:- info(version/1, [
 		comment is 'Version is the current version of banpipe',
-		argnames is ['Version']]).
+		argnames is ['Version']
+	]).
+
 	version('1.0 alpha release 1').
 
 	:- public(listing/1).
 	:- info(listing/1, 
 		[ comment is 'Lists all banpipe dependency rules where the goal G occurs in the head.',
-		argnames is ['G']]).
+		argnames is ['G']
+	]).
+
 	listing(Goal) :-
 		% escaped using {}/1 operator to find clause from "global" database rather than this objects database
 		findall([Head,Body],({clause('<-'(Head,Body),true)},term_extras::conjunction_as_list(Head,HeadList),list::nth1(_,HeadList,Goal)),Rules),
 		forall(list::member([Head,Body],Rules),(write(Head), write(' <- '), write(Body), nl)).
 
 	:- public(listing/0).
-	:- info(listing/0,
-		[ comment is 'Lists all banpipe dependency rules.']).
+	:- info(listing/0, [
+		comment is 'Lists all banpipe dependency rules.'
+	]).
+	
 	listing :- listing(_).
 	
 	% This simply loads a script using Prologs normal mechanism
 	:- info(load/1, [
 		comment is 'Loads a banpipe script. Script is the (quoted) filename of the script (absolute or relative to current directory).',
-		argnames is ['Script']]).
+		argnames is ['Script']
+	]).
+
 	load(Script) :- {[Script]}.
 	
 	:- public(run/1).
 	:- info(run/1, [
 		comment is 'RRecursively (sequentially) compute the File associated with Goal.',
-		argnames is ['Goal']]).
+		argnames is ['Goal']
+	]).
+
 	run(Goal) :-
 		::run(Goal,_).
 
 	:- public(run/2).
 	:- info(run/2, [
 		comment is 'Recursively (sequentially) compute the File associated with Goal.',
-		argnames is ['Goal','File']]).
+		argnames is ['Goal','File']
+	]).
 
 	run(Goal,Result) :-
 		run_with_semantics(execution_semantics,Goal,Result).
 		
 	:- private(run_with_semantics/3).
 	run_with_semantics(Semantics,Goal,Result) :-
-		(config::get(trace,true) ->
+		(	config::get(trace,true) ->
 			Sem=trace(Semantics)
-			;
-			Sem=Semantics),
+		;	Sem=Semantics
+		),
 		sequential_interpreter(Sem)::run(Goal,Result).
 
 
 	:- public(prun/1).
 	:- info(prun/1, [
 		comment is 'Compute the File associated with Goal. Independent sub-tasks are computed in parallel.',
-		argnames is ['Goal']]).
+		argnames is ['Goal']
+	]).
+
 	prun(Goal) :-
 		prun(Goal,_).
 
 	:- public(prun/2).
 	:- info(prun/2,[
 		comment is 'Compute the File associated with Goal. Independent sub-tasks are computed in parallel.',
-		argnames is ['Goal','File']]).
+		argnames is ['Goal','File']
+	]).
 
 :- if(current_logtalk_flag(threads,supported)).
 	prun(Goal,Result) :-
@@ -108,18 +127,21 @@
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
 		comment is 'Typecheck Goal -- recursively check that the types of input files for Goal are compatible.',
-		argnames is ['Goal']]).
+		argnames is ['Goal']
+	]).
 
 	typecheck(Goal) :-
 		typecheck(Goal,_).
-		
+
 	:- public(typecheck/2).
 	:- info(typecheck/2,[
 		comment is 'Typecheck Goal -- recursively check that the types of input files for Goal are compatible and unify resulting Type.',
-		argnames is ['Goal','Type']]).
+		argnames is ['Goal','Type']
+	]).
+
 	typecheck(Goal,Type) :-
 		run_with_semantics(typecheck_semantics,Goal,Type).
-			
+
 	:- public(trace/0).
 	trace :- config::set(trace).
 	

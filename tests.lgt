@@ -1,4 +1,5 @@
 :- object(test_config, extends(lgtunit)).
+
 	:- initialization(::run).
 
 	succeeds(get_defaults) :-
@@ -7,7 +8,7 @@
 		config::get(result_file_directory,_),
 		config::get(index_file,_),
 		config::get(file_manager,_).
-		
+
 	succeeds(push_and_pop) :-
 		config::push(test,1),
 		config::get(test,1),
@@ -15,9 +16,12 @@
 		config::get(test,2),
 		config::pop(test),
 		config::get(test,1).
+
 :- end_object.
 
+
 :- object(test_file, extends(lgtunit)).	
+
 	:- initialization(::run).
 
 	succeeds(write_and_read) :-
@@ -57,7 +61,6 @@
 		From::delete,
 		file(To)::delete.
 
-
 	succeeds(canonical_normal_file) :-
 		file('/tmp//file')::canonical('/tmp/file').	
 
@@ -66,9 +69,12 @@
 
 	succeeds(canonical_url) :-
 		file('http://banpipe.org//index.html')::canonical('http://banpipe.org/index.html').
+
 :- end_object.
 
+
 :- object(test_prolog_file, extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	succeeds(write_and_read) :-
@@ -97,9 +103,12 @@
 		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
 		prolog_file('/tmp/prolog-test-file')::append(Terms),
 		prolog_file('/tmp/prolog-test-file')::read_terms(T2).
+
 :- end_object.
 
+
 :- object(test_list_extras, extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	succeeds(intersperse1) :-
@@ -115,9 +124,12 @@
 		
 	succeeds(sublist_split1) :-
 		list_extras::sublist_split(':',[a,':',b,c,':',d], [[a],[b,c],[d]]).
+
 :- end_object.
 
+
 :- object(test_term_extras, extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	succeeds(atom_integer1) :-
@@ -154,9 +166,12 @@
 		
 	succeeds(conjunction_as_list) :-
 		term_extras::conjunction_as_list((a,b,c,d),[a,b,c,d]).
+
 :- end_object.
 
+
 :- object(test_term_file_index, extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	index_file('/tmp/test-file-index').
@@ -239,17 +254,20 @@
 		time::valid(AHour,AMin,ASec),
 		date::valid(CYear,CMon,CDay),
 		time::valid(CHour,CMin,CSec).
+
 :- end_object.
 
+
 :- object(test_reporting, extends(lgtunit)).
+
 	:- initialization(::run).
 
 	succeeds(test_report_if) :- 
 		catch(report_if(true)::error(blah), blah,true).
-		
+
 	succeeds(test_report_unles) :-
 		catch(report_unless(false)::error(blah),blah,true).
-		
+
 	succeeds(test_report_if_warning) :- 
 		tell('/tmp/warning'),
 		report_if(true)::warning(blah),
@@ -267,35 +285,38 @@
 		list::member(NewLine,[[10],[10,13]]),
 		atom_codes(blah,Blah),
 		list::append(Blah,NewLine,Warning).
+
 :- end_object.
 
+
 :- object(test_shell, extends(lgtunit)).
+
 	:- initialization(::run).
-	
+
 	succeeds(execute_simple_cmd) :-
 		os::shell('echo "hello from testcase"').
-		
+
 	succeeds(execute_simple_cmd_with_status) :-
 		os::shell('echo "hello from testcase"',X),
 		X == 0.
-		
+
 	fails(execute_non_exist_cmd_with_status) :-
 		os::shell('this_command_is_bogus',X),
 		X == 0.
-		
+
 	succeeds(evironment_variable) :-
 		os::environment_variable('PATH',_).
-		
+
 	fails(environment_variable_nonexisting) :-
 		os::environment_variable('NO_SUCH_VARIABLE','').
 
 	succeeds(make_change_change_delete) :-
-	    D=testdir42,
-	    os::working_directory(Current),
-	    os::make_directory(D),
-	    os::change_directory(D),
-	    os::change_directory(Current),
-	    shell::delete_directory(D).
+		D=testdir42,
+		os::working_directory(Current),
+		os::make_directory(D),
+		os::change_directory(D),
+		os::change_directory(Current),
+		shell::delete_directory(D).
 
 
 	% FIXME: More test-cases needed for shell object
@@ -303,15 +324,20 @@
 
 
 :- object(test_banpipe_module_path, extends(lgtunit)).
+
 	:- initialization(::run).
+
 	succeeds(get_module_paths) :-
 		TestDirs = ['/tmp/mod1','/tmp/mod2'],
 		forall(list::member(Dir,TestDirs),banpipe_module_path::include_directory(Dir)),
 		banpipe_module_path::get_paths(SearchDirectories),
 		forall(list::member(TD,TestDirs),list::member(TD,SearchDirectories)).
+
 :- end_object.
 
+
 :- object(test_module, extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	setup :-
@@ -324,9 +350,12 @@
 		module(testmodule)::interface_file('/tmp/testmodule/interface.pl'),
 		file('/tmp/testmodule/interface.pl')::delete,
 		shell::delete_directory('/tmp/testmodule').
+
 :- end_object.
 
+
 :- object(test_module_task, extends(lgtunit)).
+
 	:- initialization(::run).
 
 	setup :-
@@ -340,7 +369,7 @@
 		os::shell('rm -rf /tmp/testmodule'),
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents).
-		
+
 	succeeds(task_options) :-
 		module_task(testmodule,test)::options(Options),
 		list::member(version(1.0), Options),
@@ -350,23 +379,26 @@
 		module_task(testmodule,test)::input_types(InputTypes),
 		list::member(test(in_type1),InputTypes),
 		list::member(test(in_type2),InputTypes).
-		
+
 	succeeds(task_output_types) :-
 		module_task(testmodule,test)::output_types(OutputTypes),
 		list::member(out_type(1),OutputTypes),
 		list::member(out_type(2),OutputTypes).
-	
+
 	succeeds(valid_task_call) :-
 		module_task(testmodule,test)::valid([version(1.0),debug(true)]).
-		
+
 	succeeds(expand_options1) :-
 		module_task(testmodule,test)::expand_options([], [debug(true),version(1.0)]).
 
 	succeeds(expand_options2) :-
 		module_task(testmodule,test)::expand_options([version(2.0)], [debug(true),version(2.0)]).
+
 :- end_object.
 
+
 :- object(test_invoke_task,extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	setup :-
@@ -390,30 +422,30 @@
 		config::push(result_file_directory,'/tmp/'),
 		config::push(index_file,'/tmp/index-file'),
 		config::push(file_manager,term_file_index('/tmp/index-file')).
-	
+
 	succeeds(invoke_task_default) :-
 		task_setup,
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_prism) :-
 		task_setup,		
 		config::push(default_invoker,prism_invoker),
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_bp) :-
 		task_setup,
 		config::push(default_invoker,bp_invoker),
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_swipl) :-
 		task_setup,
 		config::push(default_invoker,swipl_invoker),
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_yap) :-
 		task_setup,
 		config::push(default_invoker,yap_invoker),
@@ -427,9 +459,7 @@
 		invoke_task,
 		task_cleanup.
 	*/
-	
-	
-				
+
 	:- private(invoke_task/0).
 	invoke_task :-
 		write(task(testmodule,test,[],[])::run([F1,F2])), nl,
@@ -438,14 +468,16 @@
 		file(F2)::read("file2"),
 		file(F1)::delete,
 		file(F2)::delete.
-				
+
 	task_cleanup :-
 		config::setup_defaults,
 		file('/tmp/index-file')::delete.
+
 :- end_object.
 
 
 :- object(test_invoke_task_custom,extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	% Just in case the previous test didn't finish well and forgot cleanup of file
@@ -500,7 +532,7 @@
 		invoke_task,
 		task_cleanup.
 	*/
-				
+
 	:- private(invoke_task/0).
 	invoke_task :-
 		write(task(testmodule,test,[],[])::run([F1,F2])), nl,
@@ -509,11 +541,13 @@
 		file(F2)::read("file2"),
 		file(F1)::delete,
 		file(F2)::delete.
-				
+
 	task_cleanup :-
 		config::setup_defaults,
 		file('/tmp/index-file')::delete.
+
 :- end_object.
+
 
 :- object(test_task_typecheck1,extends(lgtunit)).
 	:- initialization(::run).
@@ -539,9 +573,12 @@
 
 	cleanup :-
 		config::setup_defaults.
+
 :- end_object.
 
+
 :- object(test_typecheck_builtin_file,extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	succeeds(type_check1) :-
@@ -552,6 +589,7 @@
 	succeeds(type_check2) :-
 		task(file,get,[type(blah)],[])::typecheck([OutputType]),
 		var(OutputType).
+
 :- end_object.
 
 
@@ -655,10 +693,12 @@
 		scheduler_tree::set_running(1,T5,T6),
 		scheduler_tree::set_completed(1,T6,T7),
 		scheduler_tree::empty(T7).
+
 :- end_object.
 
 
 :- object(test_uri,extends(lgtunit)).
+
 	:- initialization(::run).
 	
 	succeeds(elements) :-
@@ -672,6 +712,7 @@
 		
 	fails(uri_invalid_file) :-
 		uri('/just/a/file')::valid.
+
 :- end_object.
 
 
@@ -689,4 +730,3 @@
 		file('/tmp/test.banpipe')::delete.
 		
 :- end_object.
-	

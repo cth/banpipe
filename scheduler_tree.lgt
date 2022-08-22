@@ -41,13 +41,17 @@
 	:- public(create/1).
 	:- info(create/1,[
 		comment is 'Creates an empty scheduler tree (EmptyTree)',
-		argnames is ['EmptyTree']]).
+		argnames is ['EmptyTree']
+	]).
+
 	create([0,[]]).
 
 	:- public(add/6).
 	:- info(add/6, [
 		comment is 'UpdatedTree is Tree with a node inserted as a child to ParentId. NextId is the Id of the newly inserted node. If there are allready an existing node for the same Module and Task, but possibly a different parent, then the new node is given the same task id',
-		argnames is ['Module','Task','ParentId','Tree','UpdatedTree','NextId']]).
+		argnames is ['Module','Task','ParentId','Tree','UpdatedTree','NextId']
+	]).
+
 	add(Module,Task,ParentId,[MaxId,Tree],[NextId,UpdatedTree],NextId) :-
 		NextId is MaxId + 1,
 		write(NextId), nl,
@@ -82,7 +86,8 @@
 	:- public(remove/3).
 	:- info(remove/3, [
 		comment is 'Description is the initial tree without the subtrees rooted at the nodes with TaskId',
-		argnames is ['TaskId','InitialTree','UpdatedTree']]).
+		argnames is ['TaskId','InitialTree','UpdatedTree']
+	]).
 
 	remove(TaskId,[MaxId,Tree],[MaxId,UpdatedTree]) :-
 		::scheduler_tree_remove_rec(TaskId,Tree,UpdatedTree).
@@ -110,7 +115,8 @@
 	:- public(replace/3).
 	:- info(replace/3, [
 		comment is 'Node replaces the subtree of the root node has the same task id as node',
-		argnames is ['Node','Tree','UpdatedTree']]).
+		argnames is ['Node','Tree','UpdatedTree']
+	]).
 
 	replace(Node,[MaxId,Tree],[MaxId,UpdatedTree]) :-
 		::scheduler_tree_replace_rec(Node,Tree,UpdatedTree).
@@ -142,7 +148,8 @@
 	:- public(replace_by_taskid/4).
 	:- info(replace_by_taskid/4, [
 		comment is 'Node replaces the subtree of the root node has the same task id as node',
-		argnames is ['TaskId','Node','Tree','UpdatedTree']]).
+		argnames is ['TaskId','Node','Tree','UpdatedTree']
+	]).
 
 	replace_by_taskid(TaskId,Node,[MaxId,Tree],[MaxId,UpdatedTree]) :-
 		::scheduler_tree_replace_by_taskid_rec(TaskId,Node,Tree,UpdatedTree).
@@ -173,7 +180,8 @@
 	:- public(reduce_tree/2).
 	:- info(reduce_tree/2, [
 		comment is 'This reduces a scheduler tree by compacting nodes which are structurally the same (i.e. only differing in the task id. Such task will be given the same task id.',
-		argnames is ['Tree','ReducedTree']]).
+		argnames is ['Tree','ReducedTree']
+	]).
 
 	reduce_tree(Tree,ReducedTree) :-
 		fast_tree_reduce(Tree,ReducedTree).
@@ -244,7 +252,8 @@
 	:- public(lookup/3).
 	:- info(lookup/3, [
 		comment is 'Node is the subtree which rooted at the node identified by TaskId',
-		argnames is ['TaskId','Tree','Node']]).
+		argnames is ['TaskId','Tree','Node']
+	]).
 
 	lookup(TaskId,[_,Tree],Subtree) :-
 		::scheduler_tree_lookup_rec(TaskId,Tree,Subtree).
@@ -261,7 +270,8 @@
 	:- public(ready_task/2).
 	:- info(ready_task/2, [
 		comment is 'Find a task in the tree which is ready to run. This task must be a node which a) is a leaf node and b) has the state \'ready\'.',
-		argnames is ['Tree','TaskId']]).
+		argnames is ['Tree','TaskId']
+	]).
 
 	ready_task(Tree,TaskId) :-
 		lookup(TaskId,Tree,[node(TaskId,ready,_,_,[])]).
@@ -269,7 +279,8 @@
 	:- public(set_running/3).
 	:- info(set_running/3, [
 		comment is 'True if, a) TaskId points to leaf node and b) that node has state \'ready\'',
-		argnames is ['TaskId','Tree','UpdatedTree']]).
+		argnames is ['TaskId','Tree','UpdatedTree']
+	]).
 
 	set_running(TaskId,Tree,UpdatedTree) :-
 		::lookup(TaskId,Tree,[node(TaskId,ready,Module,Goal,[])]),
@@ -278,7 +289,8 @@
 	:- public(set_completed/3).
 	:- info(set_completed/3, [
 		comment is 'If TaskId corresponds to a leaf node in state state \'running\', then UpdatedTree is InitialTree without the node for TaskId.',
-		argnames is ['TaskId','InitialTree','UpdatedTree']]).
+		argnames is ['TaskId','InitialTree','UpdatedTree']
+	]).
 
 	set_completed(TaskId,Tree,UpdatedTree) :-
 		::lookup(TaskId,Tree,[node(TaskId,running,_,_,[])]),
@@ -287,14 +299,16 @@
 	:- public(empty/1).
 	:- info(empty/1, [
 		comment is 'True if Tree is empty',
-		argnames is ['Tree']]).
+		argnames is ['Tree']
+	]).
 
 	empty([_,[]]).
 
 	:- public(print/1).
 	:- info(print/1, [
 		comment is 'Pretty-prints a scheduler tree',
-		argnames is ['Tree']]).
+		argnames is ['Tree']
+	]).
 
 	print([_,[]]) :-
 		write('Tree is empty!'), nl.

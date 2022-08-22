@@ -11,23 +11,26 @@
 	:- public(run/1).
 	:- info(run/1, [
 		comment is 'Will run the script goal Goal using sequential bottom-up semantics (one task/process at a time). The semantics is parameterized by Semantics.',
-		argnames is ['Goal']]).
-		
+		argnames is ['Goal']
+	]).
+
 	run(Target) :- ::run(Target,_).
 
 	:- public(run/2).
 	:- info(run/2, [
 		comment is 'Same as run/1, but additionally Result is unified to the result file/type/... (depending on Semantics parameterization).',
-		argnames is ['Goal','Result']]).
-		
+		argnames is ['Goal','Result']
+	]).
+
 	run(Goal,Result) :-
 		::run(Goal,Result,_).
 		
 	:- public(run/3).
 	:- info(run/3, [
 		comment is 'Same as run/2, but additionally generates a trace',
-		argnames is ['Goal','Result','Trace']]).
-	
+		argnames is ['Goal','Result','Trace']
+	]).
+
 	run(A,B,C) :-
 		write(run(A,B,C)), nl,
 		fail.
@@ -60,4 +63,5 @@
 		write(SelfAtom), nl,
 		atomic_list_concat([SelfAtom, '::run - ', 'Failed to run goal: ', TargetAtom],Error),
 		reporting::error(Error).
+
 :- end_object.

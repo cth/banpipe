@@ -45,11 +45,12 @@
 	:- public(vars/2).
 	:- info(vars/2,[
 		comment is 'Vars is the set (ordered list) of variables in Term',
-		argnames is ['Term','Vars']]).
-	
+		argnames is ['Term','Vars']
+	]).
+
 	vars(X,[X]) :-
 		var(X), !.
-		
+
 	vars(Term,Vars) :-
 		Term =.. [ _ | Arguments ],
 		self(Self),

@@ -1,4 +1,5 @@
 :- object(reporting).
+
 	:- public(error/1).
 	:- public(warning/1).
 	:- public(info/1).
@@ -28,16 +29,23 @@
 	info(_).
 
 	check_condition.
+
 :- end_object.
 
+
 :- object(report_if(_Cond), extends(reporting)).
+
 	check_condition :-
 		parameter(1,Goal),
 		call(Goal).
+
 :- end_object.
 
+
 :- object(report_unless(_Cond), extends(reporting)).
+
 	check_condition :-
 		parameter(1,Goal),
 		(call(Goal) -> fail ; true).
+
 :- end_object.

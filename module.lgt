@@ -1,4 +1,5 @@
 :- object(banpipe_module_path).
+
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
@@ -13,9 +14,11 @@
 	:- dynamic(path_dir/1).
 
 	:- public(get_paths/1).
-	:- info(get_paths/1,
-		[ comment is 'Extract module directories from the BANPIPE_MODULE_PATH environment variable.',
-		  argnames is ['Paths']]).
+	:- info(get_paths/1, [
+		comment is 'Extract module directories from the BANPIPE_MODULE_PATH environment variable.',
+		argnames is ['Paths']
+	]).
+
 	get_paths(Paths) :-
 		(os::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
 			[Separator] = ":",
@@ -29,7 +32,9 @@
 		list::append(ExpandAdditionalDirs,EnvPaths,Paths).
 
 	:- private(expand_path/2).
-	:- info(expand_path/2, [comment is 'Expand relative paths starting with . or not with /']).
+	:- info(expand_path/2, [
+		comment is 'Expand relative paths starting with . or not with /'
+	]).
 
 	% Windows style absolute path with drive letter
 	expand_path(Path,Path) :-
@@ -50,20 +55,27 @@
 		list::append(AbsDirCodes,Path,ExpandPath).
 		
 	:- public(check_set/0).
-	:- info(check_set/0, [comment is 'Check that BANPIPE_MODULE_PATH is set.']).
+	:- info(check_set/0, [
+		comment is 'Check that BANPIPE_MODULE_PATH is set.'
+	]).
+
 	check_set :-
 		report_unless(os::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
 		
 	:- public(include_directory/1).
-	:- info(include_directory/1,
-		[ comment is 'Programmatically appends a directory to the module search path',
-		  argnames is ['Directory']]).
+	:- info(include_directory/1, [
+		comment is 'Programmatically appends a directory to the module search path',
+		argnames is ['Directory']
+	]).
+
 	include_directory(Directory) :-
 		(::path_dir(Directory) -> 
 			true
 			;
 			::assertz(path_dir(Directory))).
+
 :- end_object.
+
 
 :- object(module(_Name)).
 	:- info([
@@ -94,14 +106,20 @@
 		atomic_list_concat([Path, '/', ModuleName, '/', 'interface.banpipe'],File),
 		file(File)::exists.
 
-	:- public(builtin/0). 
-	:- info(builtin/0,[comment is 'True if module is a builtin module']).
+	:- public(builtin/0).
+	:- info(builtin/0, [
+		comment is 'True if module is a builtin module'
+	]).
+
 	builtin :-
 		parameter(1,Module),
 		implements_protocol(Module,banpipe_builtin_module).
 
-	:- public(module_type/1). 
-	:- info(module_type/1,[comment is 'True if module is a builtin module']).
+	:- public(module_type/1).
+	:- info(module_type/1, [
+		comment is 'True if module is a builtin module'
+	]).
+
 	module_type(builtin) :-
 		self(Self),
 		Self::builtin.
@@ -112,16 +130,21 @@
 	module_type(generic) :-
 		interface_file(_,generic).
 
-		
 	:- public(available/0).
-	:- info(available/0,[comment is 'True if a module with the given name is available.']).
+	:- info(available/0, [
+		comment is 'True if a module with the given name is available.'
+	]).
+
 	available :-
 		::builtin.
 	available :-
 		::interface_file(_,_).
+
 :- end_object.
 
+
 :- object(module_task(_Module,_Task)).
+
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
@@ -131,9 +154,11 @@
 	]).
 
 	:- public(valid/1).
-	:- info(valid/1,
-		[ comment is 'True if module+task exists, have a declaration+implementation in the interface file and Options matches (is a subset of) declared options.',
-		  argnames is ['Options']]).
+	:- info(valid/1, [
+		comment is 'True if module+task exists, have a declaration+implementation in the interface file and Options matches (is a subset of) declared options.',
+		argnames is ['Options']
+	]).
+
 	valid(Options) :-
 		parameter(1,Module),
 		parameter(2,Task),
@@ -147,9 +172,11 @@
 			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
 			
 	:- public(expand_options/2).
- 	:- info(expand_options/2,
-		[ comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
-		  argnams is [ 'Options', 'SortedExpandedOptions' ]]).
+	:- info(expand_options/2, [
+		comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
+		argnams is [ 'Options', 'SortedExpandedOptions' ]
+	]).
+
 	expand_options(Options,SortedExpandedOptions) :-
 		::options(DefaultOptions),
 		::expand_options(Options,DefaultOptions,SortedExpandedOptions).
@@ -199,7 +226,9 @@
 	:- public(declaration/1).
 	:- info(declaration/1,
 		[ comment is 'Declaration is the task declation, e.g, taskname(input_types,options,output_types).',
-		argnames is ['Declaration']]).
+		argnames is ['Declaration']
+	]).
+
 	declaration(Declaration) :-
 		parameter(1,Module),
 		module(Module)::builtin,
@@ -225,9 +254,11 @@
 		functor(Declaration, Task, _).
 		
 	:- public(options/1).
-	:- info(options/1, 
-		[ comment is 'Options is the list of declared options for task.',
-		  argnames is ['Options']]).
+	:- info(options/1, [
+		comment is 'Options is the list of declared options for task.',
+		argnames is ['Options']
+	]).
+
 	options(Options) :-
 		::declaration(Decl),
 		Decl =.. [ _ , _, OptionsDecl, _ ],
@@ -237,21 +268,27 @@
 		).
 	
 	:- public(input_types/1).
-	:- info(input_types/1,
-		[ comment is 'InputTypes is a sequence of file types accepted as input to the task.',
-		  argnames is ['InputTypes']]).
+	:- info(input_types/1, [
+		comment is 'InputTypes is a sequence of file types accepted as input to the task.',
+		argnames is ['InputTypes']
+	]).
+
 	input_types(InputTypes) :-
 		::declaration(Decl),
 		Decl =.. [ _ , InputTypes, _, _ ].
 
 	:- public(output_types/1).
-	:- info(output_types/1,
-		[ comment is 'OutputTypes is a sequence of file types produced by the task.',
-		  argnames is ['OutputTypes']]).
+	:- info(output_types/1, [
+		comment is 'OutputTypes is a sequence of file types produced by the task.',
+		argnames is ['OutputTypes']
+	]).
+
 	output_types(OutputTypes) :-
 		::declaration(Decl),
 		Decl =.. [ _ , _, _, OutputTypes ].
+
 :- end_object.
+
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
 
@@ -266,8 +303,9 @@
 	:- public(run/1).
 	:- info(run/1,[
 		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). OutputFiles is a list of names of resulting files.',
-		argnames is ['OutputFiles']]).
-	
+		argnames is ['OutputFiles']
+	]).
+
 	run(OutputFilesList) :-
 		self(Self),
 		parameter(1,Module),
@@ -317,8 +355,9 @@
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
 		comments is 'Check that supplied types of the input types are valid and unify OutputTypes to the resulting output types.',
-		argnames is ['OutputTypes']]).
-	
+		argnames is ['OutputTypes']
+	]).
+
 	% FIXME: Typecheck needs adaptation to non-list types
 	typecheck(OutputTypes) :-
 		parameter(2,Task),
@@ -330,9 +369,11 @@
 		term::subsumes(InputTypes,SuppliedInputTypes).
 
 	:- public(invoker/1).
-	:- info(invoker/1,
-		[ comment is 'Determine InvokerObject to use: module may declare invoke_with/1; otherwise use banpipe_config default_invoker',
-		  argnames is ['InvokerObject']]).
+	:- info(invoker/1, [
+		comment is 'Determine InvokerObject to use: module may declare invoke_with/1; otherwise use banpipe_config default_invoker',
+		argnames is ['InvokerObject']
+	]).
+
 	invoker(builtin) :-
 		parameter(1,Module),
 		module(Module)::builtin.
@@ -354,4 +395,5 @@
 		
 	% TODO: Eventually, I might move guard invokation to run/1 (rather than in script interpreter)
 	% to allow unifying variables from the default option settings
+
 :- end_object.
