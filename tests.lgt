@@ -1,6 +1,8 @@
-:- object(test_config, extends(lgtunit)).
 
-	:- initialization(::run).
+:- set_prolog_flag(double_quotes, codes).
+
+
+:- object(test_config, extends(lgtunit)).
 
 	succeeds(get_defaults) :-
 		config::get(execution_mode,sequential),
@@ -21,8 +23,6 @@
 
 
 :- object(test_file, extends(lgtunit)).
-
-	:- initialization(::run).
 
 	succeeds(write_and_read) :-
 		Contents = "This is a test\nwith multiple\nlines.\n",
@@ -75,8 +75,6 @@
 
 :- object(test_prolog_file, extends(lgtunit)).
 
-	:- initialization(::run).
-
 	succeeds(write_and_read) :-
 		Contents = "This is a test\nwith multiple\nlines.\n",
 		prolog_file('/tmp/test-file')::write(Contents),
@@ -109,14 +107,12 @@
 
 :- object(test_list_extras, extends(lgtunit)).
 
-	:- initialization(::run).
-
 	succeeds(intersperse1) :-
 		list_extras::intersperse(',', ['a','b','c'], ['a',',','b',',','c']).
 
 	succeeds(intersperse2) :-
 		list_extras::intersperse(X, ['a','b','c'], ['a',',','b',',','c']),
-		X == ','.
+		X == (',').
 
 	succeeds(intersperse3) :-
 		list_extras::intersperse(',', X, ['a',',','b',',','c']),
@@ -129,8 +125,6 @@
 
 
 :- object(test_term_extras, extends(lgtunit)).
-
-	:- initialization(::run).
 
 	succeeds(atom_integer1) :-
 		term_extras::atom_integer('123',X),
@@ -171,8 +165,6 @@
 
 
 :- object(test_term_file_index, extends(lgtunit)).
-
-	:- initialization(::run).
 
 	index_file('/tmp/test-file-index').
 
@@ -260,8 +252,6 @@
 
 :- object(test_reporting, extends(lgtunit)).
 
-	:- initialization(::run).
-
 	succeeds(test_report_if) :- 
 		catch(report_if(true)::error(blah), blah,true).
 
@@ -289,43 +279,7 @@
 :- end_object.
 
 
-:- object(test_shell, extends(lgtunit)).
-
-	:- initialization(::run).
-
-	succeeds(execute_simple_cmd) :-
-		os::shell('echo "hello from testcase"').
-
-	succeeds(execute_simple_cmd_with_status) :-
-		os::shell('echo "hello from testcase"',X),
-		X == 0.
-
-	fails(execute_non_exist_cmd_with_status) :-
-		os::shell('this_command_is_bogus',X),
-		X == 0.
-
-	succeeds(evironment_variable) :-
-		os::environment_variable('PATH',_).
-
-	fails(environment_variable_nonexisting) :-
-		os::environment_variable('NO_SUCH_VARIABLE','').
-
-	succeeds(make_change_change_delete) :-
-		D=testdir42,
-		os::working_directory(Current),
-		os::make_directory(D),
-		os::change_directory(D),
-		os::change_directory(Current),
-		os::delete_directory(D).
-
-
-	% FIXME: More test-cases needed for shell object
-:- end_object.
-
-
 :- object(test_banpipe_module_path, extends(lgtunit)).
-
-	:- initialization(::run).
 
 	succeeds(get_module_paths) :-
 		TestDirs = ['/tmp/mod1','/tmp/mod2'],
@@ -338,8 +292,6 @@
 
 :- object(test_module, extends(lgtunit)).
 
-	:- initialization(::run).
-
 	setup :-
 		os::shell('rm -rf /tmp/testmodule').
 
@@ -347,7 +299,7 @@
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::touch,
 		banpipe_module_path::include_directory('/tmp'),
-		module(testmodule)::interface_file('/tmp/testmodule/interface.pl'),
+		module(testmodule)::interface_file('/tmp/testmodule/interface.pl', _),
 		file('/tmp/testmodule/interface.pl')::delete,
 		os::delete_directory('/tmp/testmodule').
 
@@ -355,8 +307,6 @@
 
 
 :- object(test_module_task, extends(lgtunit)).
-
-	:- initialization(::run).
 
 	setup :-
 		InterfaceFileContentsLines = [
@@ -399,8 +349,6 @@
 
 :- object(test_invoke_task,extends(lgtunit)).
 
-	:- initialization(::run).
-
 	setup :-
 		(file('/tmp/index-file')::exists ->
 			file('/tmp/index-file')::delete
@@ -409,10 +357,10 @@
 
 	task_setup :-
 		InterfaceFileContentsLines = [
-		% Task declaration
-		":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
-		% (dummy) Task implementation
-		"test(In,Opt,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
+			% Task declaration
+			":- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n",
+			% (dummy) Task implementation
+			"test(In,Opt,[Out1,Out2]) :- write('hello from prolog'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n"
 		],
 		list::flatten(InterfaceFileContentsLines,InterfaceFileContents),
 		os::shell('rm -rf /tmp/testmodule'),
@@ -477,8 +425,6 @@
 
 
 :- object(test_invoke_task_custom,extends(lgtunit)).
-
-	:- initialization(::run).
 
 	% Just in case the previous test didn't finish well and forgot cleanup of file
 	setup :-
@@ -551,8 +497,6 @@
 
 :- object(test_task_typecheck1,extends(lgtunit)).
 
-	:- initialization(::run).
-
 	setup :-
 		InterfaceFileContentsLines = [
 		":- task(test([_], [filetype(X)], [X])).\n",
@@ -580,8 +524,6 @@
 
 :- object(test_typecheck_builtin_file,extends(lgtunit)).
 
-	:- initialization(::run).
-
 	succeeds(type_check1) :-
 		task(file,get,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
 		OutputType == test(type).
@@ -595,8 +537,6 @@
 
 
 :- object(test_scheduler_tree,extends(lgtunit)).
-
-	:- initialization(::run).
 
 
 	/*
@@ -678,7 +618,7 @@
 	succeeds(test_set_completed) :-
 		make_small_tree(T1),
 		scheduler_tree::set_running(2,T1,T2),
-		scheduler_tree::set_completed(2,T2,T3).
+		scheduler_tree::set_completed(2,T2,_T3).
 
 	fails(test_set_completed_write) :-
 		make_small_tree(T1),
@@ -701,8 +641,6 @@
 
 :- object(test_uri,extends(lgtunit)).
 
-	:- initialization(::run).
-
 	succeeds(elements) :-
 		uri('http://banpipe.org/index.html')::elements('http://','banpipe.org/index.html').
 
@@ -719,8 +657,6 @@
 
 
 :- object(test_builtin_module_file,extends(lgtunit)).
-
-	:- initialization(::run).
 
 	succeeds(test_file_get1) :-
 		file('/tmp/test.1')::touch,

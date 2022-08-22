@@ -1,6 +1,7 @@
 % Dependency rule operator, note that it has same precendece as :-
-:- op(1200,xfx,'<-').
-:- dynamic('<-'/2).
+:- op(1200, xfx, '<-').
+:- dynamic(('<-')/2).
+
 
 :- object(banpipe).
 
@@ -13,7 +14,7 @@
 
 	:- public(load/1).
 
-	:- dynamic('<-'/2).
+	:- dynamic(('<-')/2).
 
 	:- public(version/0).
 	:- info(version/0,[
