@@ -423,6 +423,10 @@
 
 :- object(test_invoke_task_custom,extends(lgtunit)).
 
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	% Just in case the previous test didn't finish well and forgot cleanup of file
 	setup :-
 		(	file('/tmp/index-file')::exists ->
@@ -433,7 +437,8 @@
 	task_setup(PrologName) :-
 		% Task declaration
 		atom_codes(':- task(test([test(in_type1),test(in_type2)], [version(1.0),debug(true)], [out_type(1),out_type(2)])).\n', Line1),
-		atom_codes(':- invoke_with(", PrologName, ").\n', Line2),
+		atomic_list_concat([':- invoke_with(', PrologName, ').\n'], Atom),
+		atom_codes(Atom, Line2),
 		% (dummy) Task implementation
 		atom_codes('test(_,_,[Out1,Out2]) :- write(\'hello from prolog\'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n', Line3),
 		list::append([Line1,Line2,Line3],InterfaceFileContents),
@@ -447,22 +452,22 @@
 		config::push(file_manager,term_file_index('/tmp/index-file')).
 
 	succeeds(invoke_task_prism) :-
-		task_setup("prism"),
+		task_setup(prism),
 		invoke_task,
 		task_cleanup.
 
 	succeeds(invoke_task_bp) :-
-		task_setup("bp"),
+		task_setup(bp),
 		invoke_task,
 		task_cleanup.
 
 	succeeds(invoke_task_swipl) :-
-		task_setup("swipl"),
+		task_setup(swipl),
 		invoke_task,
 		task_cleanup.
 
 	succeeds(invoke_task_yap) :-
-		task_setup("yap"),
+		task_setup(yap),
 		invoke_task,
 		task_cleanup.
 
