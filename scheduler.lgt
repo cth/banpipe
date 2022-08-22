@@ -25,7 +25,7 @@
 		::enqueue_ready(Tree,Tree1,Queue,Queue1),!,
 		%{sleep(1.1)}, % Add a delay 
 		::dequeue_completed(Tree1,Tree2,Queue1,Queue2),	!,
-		::run(Tree2,Queue2).
+		run(Tree2,Queue2).
 
 	:- private(enqueue_ready/4).
 	:- info(enqueue_ready/4, [
@@ -70,10 +70,10 @@
 		!,
 		threaded_exit(scheduler::run_task_thread(TaskId,TaskObject)),
 		scheduler_tree::set_completed(TaskId,TreeIn,TreeNext),
-		::dequeue_completed(TreeNext,TreeOut,QueueInRest,QueueOutRest).
+		dequeue_completed(TreeNext,TreeOut,QueueInRest,QueueOutRest).
 
 	dequeue_completed(TreeIn,TreeOut,[[TaskId,TaskObject]|QueueInRest],[[TaskId,TaskObject]|QueueOutRest]) :-
-		::dequeue_completed(TreeIn,TreeOut,QueueInRest,QueueOutRest).
+		dequeue_completed(TreeIn,TreeOut,QueueInRest,QueueOutRest).
 
 	:- private(run_task_thread/2).
 	:- info(run_task_thread/2,[
