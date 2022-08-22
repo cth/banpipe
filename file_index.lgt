@@ -12,7 +12,7 @@
 		comment is 'Generates and reserves a list of filenames (Filenames) for given task-call. If the task-call succeeds and generates the files, result_files_commit/4 should be called',
 		argnames is [ 'Module', 'Task', 'InputFiles', 'Options', 'Filenames' ]
 	]).
-	
+
 	:- public(result_files_commit/4).
 	:- info(result_files_commit/4, [
 		comment is 'Finalizes transaction: Reserved filenames are marked as available. Only after result_files_commit have been called will the corresponding files be return by result_files/5',
@@ -24,7 +24,7 @@
 		comment is 'Remove filename allocations from database.',
 		argnames is ['Module', 'Task', 'InputFiles', 'Options']
 	]).
-	
+
 	:- public(result_files/5).
 	:- info(result_files/5, [
 		comment is 'Retrieve the Filenames matching (Module,Task,Options,InputFiles) from the file index.',
@@ -68,7 +68,7 @@
 		result_files_allocate/5, result_files_commit/4, result_files_rollback/4,
 		result_files/5, result_files_allocate_time/5, result_files_commit_time/5
 	]).
-	
+
 	% This file index represents the file index using terms on the form
 	% files(Index,AllocatedTimestamp,CommitTimestamp,ResultFiles,Module,Task,InputFiles,Options)
 	% Index: is an atom representing an integer
@@ -79,7 +79,7 @@
 	% Task: task name
 	% InputFiles: Fully qualified list of input files
 	% Options: List of option terms on the form key(value)
-	
+
 	:- private(get_index_file/1).
 	get_index_file(IndexFile) :-
 		parameter(1,Param1),
@@ -87,9 +87,9 @@
 		IndexFile::dirname(Dir),
 		directory(Dir)::create,
 		(IndexFile::exists -> true ; IndexFile::touch).
-	
+
 	consistency_check. % FIXME: do somethinh useful
-	
+
 	result_files_allocate(Module,Task,InputFiles,Options,ResultFiles) :-
 		% Rollback if previously allocated
 		(result_files_rollback(Module,Task,InputFiles,Options) -> true ; true),
@@ -118,7 +118,7 @@
 		get_index_file(IndexFile),
 		IndexFile::select(files(_,_,null,_,Module,Task,InputFiles,Options),RestEntries),
 		IndexFile::write_terms(RestEntries).
-		
+
 	result_files(Module,Task,InputFiles,Options,ResultFiles) :-
 		get_index_file(IndexFile),
 		IndexFile::member(files(_,_,time(_,_,_,_,_,_),ResultFiles,Module,Task,InputFiles,Options)).
@@ -126,7 +126,7 @@
 	result_files_allocate_time(Module,Task,InputFiles,Options,AllocTs) :-
 		get_index_file(IndexFile),
 		IndexFile::member(files(_,AllocTs,_,_ResultFiles,Module,Task,InputFiles,Options)).
-	
+
 	result_files_commit_time(Module,Task,InputFiles,Options,time(Year,Day,Mon,Hour,Min,Sec)) :-
 		get_index_file(IndexFile),
 		IndexFile::member(files(_,_AllocTs,time(Year,Day,Mon,Hour,Min,Sec),_ResultFiles,Module,Task,InputFiles,Options)).

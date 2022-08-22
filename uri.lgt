@@ -11,21 +11,21 @@
 	:- private(internet_protocol/1).
 	internet_protocol('http://').
 	internet_protocol('ftp://').
-	
+
 	:- private(local_protocol/1).
 	local_protocol('file://').
-	
+
 	:- private(protocol/1).
 	protocol(P) :-
 		::internet_protocol(P).
 	protocol(P) :-
 		::local_protocol(P).
-		
+
 	:- public(valid/0).
 	:- info(valid/0,[comment is 'True if URI represented by object is valid.']).
 	valid :- 
 		::elements(_,_).
-	
+
 	:- public(is_url/0).
 	:- info(is_url/0,[comment is 'True if the file name begins with an URL identifier (e.g. http://...)']).
 	is_url :-

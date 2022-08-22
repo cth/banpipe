@@ -6,7 +6,7 @@
 		date is 2012-11-16,
 		comment is 'Protocol for applying a particular semantics to a task.'
 	]).
-	
+
 	:- public(apply/3).
 	:- info(apply/3, [
 		comment is 'Apply semantics for Task to obtain Result',
@@ -24,7 +24,7 @@
 		date is 2012-11-16,
 		comment is 'A semantics for tasks, which computes output files.'
 	]).
-		
+
 	apply(_,Task,Result) :-
 		Task::run(Result).
 
@@ -39,7 +39,7 @@
 		date is 2012-11-16,
 		comment is 'A semantics for tasks, which performs type checking.'
 	]).
-		
+
 	apply(_,Task,Result) :-
 		Task::typecheck(Result).
 
@@ -78,13 +78,13 @@
 		write('(c)reep (a)bort>'), nl,
 		get_char(Action),
 		perform_action(Action,LHS+RHS,Task,Outputs).
-		
+
 	:- private(perform_action/4).
-		
+
 	perform_action(a,_,_,_) :-
 		!,
-		throw(tracer(abort)).	
-		
+		throw(tracer(abort)).
+
 	% creep
 	perform_action(_,Rule,Task,Outputs) :-
 		write(creep), nl,

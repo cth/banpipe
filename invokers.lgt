@@ -24,7 +24,7 @@
 		date is 2012-11-14,
 		comment is 'Simple invoker which does nothing, but logs the invocation.'
 	]).
-		
+
 	run(InterfaceFile,Goal) :-
 		write('(simulating) Running goal '),
 		write(Goal), nl,
@@ -104,10 +104,10 @@
 
 	:- protected(key_invoke_command/1).
 	key_invoke_command(invoke_command(prolog)).
-	
+
 	:- protected(default_invoke_command/1).
 	default_invoke_command(prolog).
-	
+
 	:- protected(goal_option/1).
 	:- info(goal_option/1, [
 		comment is 'Option is an atom which specifies a command line option which is used to indicated to the prolog process that the following entity is a string representing a goal to be executed.',
@@ -115,7 +115,7 @@
 	]).
 
 	goal_option('-g').
-	
+
 :- end_object.
 
 
@@ -127,7 +127,7 @@
 		date is 2012-11-14,
 		comment is 'Invoker which launches a B-Prolog process and runs the goal within that process'
 	]).
-		
+
 	key_invoke_command(invoke_command(bp)).
 	default_invoke_command(bp).
 	goal_option('-g').
@@ -143,7 +143,7 @@
 		date is 2012-11-14,
 		comment is 'Invoker which launches a PRISM process and runs the goal within that process'
 	]).
-		
+
 	key_invoke_command(invoke_command(prism)).
 	default_invoke_command(prism).
 	goal_option('-g').
@@ -159,7 +159,7 @@
 		date is 2012-11-14,
 		comment is 'Invoker which launches a SWI-Prolog process and runs the goal within that process'
 	]).
-	
+
 	key_invoke_command(invoke_command(swipl)).
 	default_invoke_command(swipl).
 	goal_option('-g').
@@ -175,7 +175,7 @@
 		date is 2012-11-14,
 		comment is 'Invoker which launches a YAP process and runs the goal within that process'
 	]).
-	
+
 	key_invoke_command(invoke_command(yap)).
 	default_invoke_command(yap).
 	goal_option('-g').

@@ -33,14 +33,14 @@
 	]).
 
 	atom_integer(Atom,Integer) :-
-        	ground(Atom),
-        	atom_chars(Atom, Chars),
-        	number_chars(Integer, Chars).
+		ground(Atom),
+		atom_chars(Atom, Chars),
+		number_chars(Integer, Chars).
 
 	atom_integer(Atom,Integer) :-
-        	ground(Integer),
-        	number_chars(Integer,Chars),
-        	atom_chars(Atom,Chars).
+		ground(Integer),
+		number_chars(Integer,Chars),
+		atom_chars(Atom,Chars).
 
 	:- public(vars/2).
 	:- info(vars/2,[
@@ -63,11 +63,11 @@
 		comment is 'Converts Prolog terms to atoms.',
 		argnames is ['Term','Atom']
 	]).
-		
+
 	term_to_atom(Term,Atom) :-
 		vars(Term,Vars),
 		term_to_atom(Term,Atom,Vars).
-	
+
 	:- public(term_to_atom/3).
 	term_to_atom(X,Atom,Vars) :-
 		var(X),
@@ -76,7 +76,7 @@
 		term_to_atom(N,AtomN),
 		atom_concat('V',AtomN,Atom).
 
-		
+
 	term_to_atom(Number, Atom, _) :-
 		number(Number),
 		!,
@@ -90,7 +90,7 @@
 		list_extras::intersperse(',',ListAtoms,CommaSepAtoms),
 		meta::foldl(atom_concat,'[',CommaSepAtoms,Atom1),
 		atom_concat(Atom1,']',Atom).
-		
+
 	term_to_atom(AtomTerm,Atom,_) :-
 		atom(AtomTerm),
 		(::atom_verbatim(AtomTerm) ->
@@ -112,7 +112,7 @@
 		comment is 'True if atom is unquoted',
 		argnamas is ['Atom']
 	]).
-	
+
 	atom_verbatim(Atom) :-
 		set::insert_all("abcdefghijklmnopqrstuvwxyz_1234567890",[],WhitelistCodes),
 		atom_codes(Atom,AtomCodes),
@@ -120,7 +120,7 @@
 		AtomCodes \= [UnderScore|_],
 		set::insert_all(AtomCodes,[],AtomSet),
 		set::subset(AtomSet,WhitelistCodes).
-		
+
 
 	:- public(conjunction_as_list/2).
 	:- info(conjunction_as_list/2,[

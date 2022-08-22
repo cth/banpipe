@@ -20,7 +20,7 @@
 :- end_object.
 
 
-:- object(test_file, extends(lgtunit)).	
+:- object(test_file, extends(lgtunit)).
 
 	:- initialization(::run).
 
@@ -35,23 +35,23 @@
 
 	fails(exists_2) :-
 		file('/tmp/no-such-file')::exists.
-		
+
 	succeeds(dirname) :-
 		file('/path/to/somefile')::dirname('/path/to/').
-		
+
 	succeeds(touch_exists) :-
 		file('/tmp/touchme')::touch,
 		file('/tmp/touchme')::exists.
-		
+
 	succeeds(touch_delete) :-
 		file('/tmp/touchme')::touch,
 		file('/tmp/touchme')::delete.
-	
+
 	fails(touch_delete_exists) :-
 		file('/tmp/touchme')::touch,
 		file('/tmp/touchme')::delete,
 		file('/tmp/touchme')::exists.
-		
+
 	succeeds(copy_to) :-
 		From = file('/tmp/somefile'),
 		To = '/tmp/otherfile',
@@ -62,10 +62,10 @@
 		file(To)::delete.
 
 	succeeds(canonical_normal_file) :-
-		file('/tmp//file')::canonical('/tmp/file').	
+		file('/tmp//file')::canonical('/tmp/file').
 
 	succeeds(canonical_windows_file) :-
-		file('c:\\some\\file')::canonical('c:/some/file').	
+		file('c:\\some\\file')::canonical('c:/some/file').
 
 	succeeds(canonical_url) :-
 		file('http://banpipe.org//index.html')::canonical('http://banpipe.org/index.html').
@@ -76,27 +76,27 @@
 :- object(test_prolog_file, extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	succeeds(write_and_read) :-
 		Contents = "This is a test\nwith multiple\nlines.\n",
 		prolog_file('/tmp/test-file')::write(Contents),
 		prolog_file('/tmp/test-file')::read(Contents).
-	
+
 	succeeds(write_and_read_terms) :-
 		Terms = [a(1),b('2'),c("3")],
 		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
 		prolog_file('/tmp/prolog-test-file')::read_terms(Terms).
-		
+
 	succeeds(member) :-
 		Terms = [a(1),b('2'),c("3")],
 		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
 		forall(list::member(T,Terms), prolog_file('/tmp/prolog-test-file')::member(T)).
-		
+
 	succeeds(select) :-
 		Terms = [a(1),b('2'),c("3")],
 		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
 		forall(list::select(T,Terms,TermsRest), prolog_file('/tmp/prolog-test-file')::select(T,TermsRest)).
-		
+
 	succeeds(append) :-
 		Terms = [a(1),b('2'),c("3")],
 		list::append(Terms,Terms,T2),
@@ -110,18 +110,18 @@
 :- object(test_list_extras, extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	succeeds(intersperse1) :-
 		list_extras::intersperse(',', ['a','b','c'], ['a',',','b',',','c']).
-		
+
 	succeeds(intersperse2) :-
 		list_extras::intersperse(X, ['a','b','c'], ['a',',','b',',','c']),
 		X == ','.
-		
+
 	succeeds(intersperse3) :-
 		list_extras::intersperse(',', X, ['a',',','b',',','c']),
 		X == [a,b,c].
-		
+
 	succeeds(sublist_split1) :-
 		list_extras::sublist_split(':',[a,':',b,c,':',d], [[a],[b,c],[d]]).
 
@@ -131,39 +131,39 @@
 :- object(test_term_extras, extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	succeeds(atom_integer1) :-
 		term_extras::atom_integer('123',X),
 		X == 123.
-		
+
 	succeeds(atom_integer2) :-
 		term_extras::atom_integer(X,123),
 		X == '123'.
-		
+
 	succeeds(vars) :-
 		term_extras::vars([A,B,C],[A,B,C]),
 		term_extras::vars(a([A,B],C),[A,B,C]),
 		term_extras::vars(a(b(c)),[]),
 		term_extras::vars([A,A,A],A).
-		
+
 	succeeds(term_to_atom1) :-
 		term_extras::term_to_atom(a(b(c,d(1,f))), 'a(b(c,d(1,f)))').
-		
+
 	succeeds(term_to_atom2) :-
 		term_extras::term_to_atom([a,b,c],'[a,b,c]').
-		
+
 	succeeds(term_to_atom3) :-
 		term_extras::term_to_atom('_a','\'_a\'').
 
 	succeeds(term_to_atom4) :-
 		term_extras::term_to_atom(a(b(c(d(_,_)))),'a(b(c(d(V1,V2))))').
-		
+
 	succeeds(term_to_atom5) :-
 		term_extras::term_to_atom(a(b(c(d(X,X)))),'a(b(c(d(V1,V1))))').
-		
+
 	succeeds(term_to_atom6) :-
 		term_extras::term_to_atom([],'[]').
-		
+
 	succeeds(conjunction_as_list) :-
 		term_extras::conjunction_as_list((a,b,c,d),[a,b,c,d]).
 
@@ -173,7 +173,7 @@
 :- object(test_term_file_index, extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	index_file('/tmp/test-file-index').
 
 	succeeds(allocate0) :-
@@ -183,13 +183,13 @@
 		ground(Out1),
 		ground(Out2),
 		Out1 \= Out2.
-		
+
 	succeeds(allocate_commit0) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
 		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
-		
+
 	succeeds(allocate_rollback) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
@@ -213,7 +213,7 @@
 		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
 		!,
 		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
-		
+
 	succeeds(allocate_commmit_results) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
@@ -223,7 +223,7 @@
 		!,
 		term_file_index(FI)::result_files('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],ResultFiles),
 		ResultFiles == [Out1,Out2].
-		
+
 	succeeds(allocate_allocate_time) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
@@ -232,14 +232,14 @@
 		term_file_index(FI)::result_files_allocate_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
 		date::valid(AYear,AMon,ADay),
 		time::valid(AHour,AMin,ASec).
-		
+
 	fails(allocate_commit_time) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
 		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		!,
 		term_file_index(FI)::result_files_commit_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],_).
-				
+	
 	succeeds(allocate_commit_alloctime) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
@@ -339,10 +339,10 @@
 :- object(test_module, extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	setup :-
 		os::shell('rm -rf /tmp/testmodule').
-	
+
 	succeeds(interface_file) :-
 		os::make_directory('/tmp/testmodule'),
 		file('/tmp/testmodule/interface.pl')::touch,
@@ -400,7 +400,7 @@
 :- object(test_invoke_task,extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	setup :-
 		(file('/tmp/index-file')::exists ->
 			file('/tmp/index-file')::delete
@@ -429,7 +429,7 @@
 		task_cleanup.
 
 	succeeds(invoke_task_prism) :-
-		task_setup,		
+		task_setup,
 		config::push(default_invoker,prism_invoker),
 		invoke_task,
 		task_cleanup.
@@ -479,7 +479,7 @@
 :- object(test_invoke_task_custom,extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	% Just in case the previous test didn't finish well and forgot cleanup of file
 	setup :-
 		(file('/tmp/index-file')::exists ->
@@ -504,27 +504,27 @@
 		config::push(result_file_directory,'/tmp/'),
 		config::push(index_file,'/tmp/index-file'),
 		config::push(file_manager,term_file_index('/tmp/index-file')).
-	
+
 	succeeds(invoke_task_prism) :-
 		task_setup("prism"),
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_bp) :-
 		task_setup("bp"),
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_swipl) :-
 		task_setup("swipl"),
 		invoke_task,
 		task_cleanup.
-		
+
 	succeeds(invoke_task_yap) :-
 		task_setup("yap"),
 		invoke_task,
 		task_cleanup.
-		
+
 	/* FIXME: invocation on gprolog needs attention
 	succeeds(invoke_task_gprolog) :-
 		task_setup(gprolog),
@@ -551,7 +551,7 @@
 
 :- object(test_task_typecheck1,extends(lgtunit)).
 	:- initialization(::run).
-	
+
 	setup :-
 		InterfaceFileContentsLines = [
 		":- task(test([_], [filetype(X)], [X])).\n",
@@ -566,7 +566,7 @@
 	succeeds(type_check1) :-
 		task(testmodule,test,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
 		OutputType == test(type).
-		
+
 	fails(type_check2) :-
 		task(testmodule,test,[wrong,number,of,inputs],[filetype(test(type))])::typecheck([OutputType]),
 		OutputType == test(type).
@@ -580,11 +580,11 @@
 :- object(test_typecheck_builtin_file,extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	succeeds(type_check1) :-
 		task(file,get,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
 		OutputType == test(type).
-	
+
 	% No filetype option supplied
 	succeeds(type_check2) :-
 		task(file,get,[type(blah)],[])::typecheck([OutputType]),
@@ -595,8 +595,8 @@
 
 :- object(test_scheduler_tree,extends(lgtunit)).
 	:- initialization(::run).
-	
-	
+
+
 	/*
 	+1 ready module1::task1
 	|--+3 ready module3::task3
@@ -630,11 +630,11 @@
 		scheduler_tree::add(module6,task6,TaskId4,Tree7,Tree8,_TaskId7),
 		scheduler_tree::add(module7,task7,TaskId6,Tree8,Tree9,TaskId8),
 		scheduler_tree::add(module7,task7,TaskId4,Tree9,Tree10,_TaskId9).
-	
+
 	succeeds(make_small_tree) :-
 		make_small_tree(T),
 		scheduler_tree::print(T).
-		
+
 	succeeds(make_large_tree) :-
 		make_large_tree(T),
 		scheduler_tree::print(T).
@@ -649,7 +649,7 @@
 		make_small_tree(T),
 		scheduler_tree::remove(1,T,T2),
 		scheduler_tree::empty(T2).
-	
+
 	succeeds(test_replace_node) :-
 		make_small_tree(T),
 		scheduler_tree::lookup(2,T,SubTree1),
@@ -658,16 +658,16 @@
 		scheduler_tree::replace(SubTree1_new,T,T2), % replace it
 		T \= T2, % It is changed
 		scheduler_tree::replace(Subtree1,T2,T). % Replace it again with original subtree
-		
+
 	succeeds(test_set_running1) :-
 		make_small_tree(T1),
 		scheduler_tree::set_running(2,T1,T2),
 		scheduler_tree::lookup(2,T2,[node(2,running,_,_,_)]).
-			
+
 	fails(test_set_running2) :-
 		make_small_tree(T1),
 		scheduler_tree::set_running(4,T1,_). % there is no task with id 4
-		
+
 	fails(test_set_running_twice) :-
 		make_small_tree(T1),
 		scheduler_tree::set_running(2,T1,T2),
@@ -677,7 +677,7 @@
 		make_small_tree(T1),
 		scheduler_tree::set_running(2,T1,T2),
 		scheduler_tree::set_completed(2,T2,T3).
-		
+
 	fails(test_set_completed_write) :-
 		make_small_tree(T1),
 		scheduler_tree::set_running(2,T1,T2),
@@ -700,16 +700,16 @@
 :- object(test_uri,extends(lgtunit)).
 
 	:- initialization(::run).
-	
+
 	succeeds(elements) :-
 		uri('http://banpipe.org/index.html')::elements('http://','banpipe.org/index.html').
-		
+
 	succeeds(uri_valid_file) :-
 		uri('file:///tmp/blah')::valid.
-	
+
 	succeeds(uri_valid_url) :-
 		uri('ftp://user:pass@server.org/dir/file')::valid.
-		
+
 	fails(uri_invalid_file) :-
 		uri('/just/a/file')::valid.
 
@@ -724,9 +724,9 @@
 		file::get(['file:///tmp/test.1'],[],['/tmp/test.2']),
 		file('/tmp/test.1')::delete,
 		file('/tmp/test.2')::delete.
-		
+
 	succeeds(test_file_get2) :-
 		file::get(['http://banpipe.org/'],[],['/tmp/test.banpipe']),
 		file('/tmp/test.banpipe')::delete.
-		
+
 :- end_object.

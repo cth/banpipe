@@ -39,7 +39,7 @@
 		open(F,append,Stream),
 		write_characters(Stream,Contents),
 		close(Stream).
-	
+
 	:- public(copy_to/1).
 	copy_to(TargetFile) :-
 		parameter(1,File),
@@ -68,16 +68,16 @@
 
 	:- public(touch/0).
 	touch :-
-		parameter(1,F),		
+		parameter(1,F),
 		open(F,write,Stream),
 		close(Stream).
-		
+
 	:- public(delete/0).
-	
+
 	delete :-
 		parameter(1,F),
 		catch({delete_file(F)}, _, true).
-		
+
 	:- public(dirname/1).
 	:- info(dirname/1, [
 		comment is 'Separate out the directory part (Directory) of a filename',
@@ -114,7 +114,7 @@
 		comment is 'CanonicalFilename is Filename with backspaces->slashes and double slashes removed',
 		argnames is ['CanonicalFilename']
 	]).
-		
+
 	canonical(CanonicalFilename) :-
 		parameter(1,Filename),
 		uri(Filename)::valid,
@@ -126,7 +126,7 @@
 		remove_double_slashes(UnixFilenameCodes,Unslashed),
 		atom_codes(CanonicalFilepart,Unslashed),
 		atom_concat(Protocol,CanonicalFilepart,CanonicalFilename).
-		
+
 	canonical(CanonicalFilename) :-
 		parameter(1,Filename),
 		atom_codes(Filename,FileCodes),
@@ -134,7 +134,7 @@
 		meta::map([X,Y]>>((X==92) -> Y=47 ; Y=X),FileCodes,UnixFilenameCodes),
 		remove_double_slashes(UnixFilenameCodes,Unslashed),
 		atom_codes(CanonicalFilename,Unslashed).
-	
+
 	:- private(remove_double_slashes/2).
 	:- info(remove_double_slashes/2,[
 		comment is 'replace adjacent slashes with one slash',
@@ -186,7 +186,7 @@
 		open(F,read,Stream),
 		stream_read_terms(Stream,Terms),
 		close(Stream).
-	
+
 	:- public(write_terms/1).
 	:- info(write_terms/1, [
 		comment is 'writes Terms to file A', argnames is ['Terms']
@@ -197,7 +197,7 @@
 		open(F,write,Stream),
 		stream_write_terms(Stream,Terms),
 		close(Stream).
-	
+
 	:- public(member/1).
 	:- info(member/1, [
 		comment is 'Term is a member of file A', argnames is ['Term']
@@ -262,7 +262,7 @@
 	:- info(create/0, [
 		comment is 'Creates the directory if it does not allready exist'
 	]).
-	
+
 	create :-
 		parameter(1,Path),
 		((::exists) ->

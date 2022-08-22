@@ -20,7 +20,7 @@
 		comment is 'Process different forms of specifying patterns for running a particular task within a module.',
 		argnames is ['TaskSpec','Task','Inputs','Options']
 	]).
-		
+
 	match_target_rule(Target,TargetsList+Rule,TargetIndex) :-
 		{clause('<-'(Targets,Rule),true)},
 		term_extras::conjunction_as_list(Targets,TargetsList),

@@ -6,10 +6,10 @@
 		date is 2012-11-15,
 		comment is 'Configuration of banpipe.'
 	]).
-		
+
 	:- private(directive/2).
 	:- dynamic(directive/2).
-	
+
 	:- initialization(::setup_defaults).
 
 	:- public(push/2).
@@ -38,7 +38,7 @@
 
 	pop(Key) :-
 		::retract(directive(Key,_)).
-	
+
 	:- public(get/2).
 	:- info(get/2, [
 		comment is 'Get the current Value for Key',
@@ -48,7 +48,7 @@
 	get(Key,Value) :-
 		::directive(Key,Value),
 		!.
-	
+
 	:- public(set/2).
 	:- info(set/2,[
 		comment is 'Set is current Value for Key. No effect is current value for Key is Value',

@@ -1,10 +1,10 @@
 :- object(scheduler_tree).
-    	% The object is used by the process scheduler to infer which tasks can be run in parallel.
+	% The object is used by the process scheduler to infer which tasks can be run in parallel.
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-19,
-		comment is 'Tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks.  Tasks one of three states.',
+		comment is 'Tree data structure to represent call graphs of banpipe scripts, i.e. nodes in the tree represent tasks. Tasks one of three states.',
 		remarks is [
 			'state ready' - 'in the tree, but not yet running', 
 			'state running' - 'tasks being run, but has not yet completed',
@@ -20,7 +20,7 @@
 	from_trace(Trace,Tree) :-
 		::create(EmptyTree),
 		::from_trace_rec(nil,Trace,EmptyTree,Tree).
-		
+
 	:- private(from_trace_rec/4).
 
 	from_trace_rec(_,[],Tree,Tree).
@@ -58,7 +58,7 @@
 		::scheduler_tree_add_rec(NextId,Module,Task,ParentId,Tree,UpdatedTree).
 %		!,
 %		::reduce_tree(UpdatedTree1,UpdatedTree).
-		
+
 	:- private(scheduler_tree_add_rec/6).
 
 	% This one adds to the top of the tree (e.g. the grand parent)
@@ -91,9 +91,9 @@
 
 	remove(TaskId,[MaxId,Tree],[MaxId,UpdatedTree]) :-
 		::scheduler_tree_remove_rec(TaskId,Tree,UpdatedTree).
-		
+
 	:- private(scheduler_tree_remove_rec/3).
-	
+
 	scheduler_tree_remove_rec(TaskId,[node(TaskId,_State,_Module,_Goal,_Children)],[]).
 
 	scheduler_tree_remove_rec(TaskId,[node(OtherTaskId,State,Module,Goal,[])],[node(OtherTaskId,State,Module,Goal,[])]) :-
@@ -120,7 +120,7 @@
 
 	replace(Node,[MaxId,Tree],[MaxId,UpdatedTree]) :-
 		::scheduler_tree_replace_rec(Node,Tree,UpdatedTree).
-		
+
 	:- private(scheduler_tree_replace_rec/3).
 
 	scheduler_tree_replace_rec(node(TaskId,State,Module,Goal,Children),[node(TaskId,_,_,_,_)],[node(TaskId,State,Module,Goal,Children)]).
@@ -144,7 +144,7 @@
 
 	%% scheduler_tree_replace_by_taskid(+TaskId,+Node,+Tree,UpdatedTree)
 	% Node replaces the subtree of the root node has the same task id as node
-	
+
 	:- public(replace_by_taskid/4).
 	:- info(replace_by_taskid/4, [
 		comment is 'Node replaces the subtree of the root node has the same task id as node',
@@ -153,7 +153,7 @@
 
 	replace_by_taskid(TaskId,Node,[MaxId,Tree],[MaxId,UpdatedTree]) :-
 		::scheduler_tree_replace_by_taskid_rec(TaskId,Node,Tree,UpdatedTree).
-		
+
 	:- private(scheduler_tree_replace_by_taskid_rec/4).
 
 	scheduler_tree_replace_by_taskid_rec(TaskId,UpdatedNode,[node(TaskId,_,_,_,_)],UpdatedNode).
@@ -230,7 +230,7 @@
 		scheduler_tree_reduce_rec([NewMaxId1,ReducedTree1],[NewMaxId,ReducedTree]).
 
 	scheduler_tree_reduce_rec([MaxId,Tree],[MaxId,Tree]).
-	
+
 	:- private(scheduler_tree_reduce_once/2).
 
 	scheduler_tree_reduce_once([MaxId,Tree],[NewTaskId,ReducedTree]) :-
@@ -248,7 +248,7 @@
 
 	%% scheduler_tree_lookup(+TaskId,+Tree,-Node)
 	% Node is the subtree which rooted at the node identified by TaskId
-	
+
 	:- public(lookup/3).
 	:- info(lookup/3, [
 		comment is 'Node is the subtree which rooted at the node identified by TaskId',
@@ -257,7 +257,7 @@
 
 	lookup(TaskId,[_,Tree],Subtree) :-
 		::scheduler_tree_lookup_rec(TaskId,Tree,Subtree).
-		
+
 	:- private(scheduler_tree_lookup_rec/3).
 
 	scheduler_tree_lookup_rec(TaskId,[node(TaskId,State,Module,Goal,Children)],[node(TaskId,State,Module,Goal,Children)]).
@@ -333,7 +333,7 @@
 		!,
 		forall(list::member(Child,Children), scheduler_tree_print_rec(NextIndent,[Child])).
 		% orig: foreach(Child in Children, scheduler_tree_print_rec(NextIndent,[Child])).
-		
+
 	:- private(indent/1).
 
 	indent(0).

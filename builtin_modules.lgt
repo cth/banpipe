@@ -30,7 +30,7 @@
 
 	% Task declaration: get/3.
 	task(get([_],[filetype(T)],[T])).
-	
+
 	:- public(get/3).
 	:- info(get/3, [
 		comment is 'Implementation of the get task',
@@ -77,7 +77,7 @@
 
 	% This is defined to work for all with upto 100 input files
 	task(depend_all(L,[],[pseudo])) :-
-		between(2,100,N),	
+		between(2,100,N),
 		list::length(L,N).
 
 	:- public(depend_all/3).

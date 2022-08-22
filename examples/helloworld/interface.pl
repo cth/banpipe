@@ -9,7 +9,7 @@ hello([],Options,[OutFile]) :-
 	told.
 
 :- task(world([],[language(english)],[text(world)])).
-	
+
 world([],Options,[OutFile]) :-
 	membr(language(L), Options),
 	tell(OutFile),
@@ -17,7 +17,7 @@ world([],Options,[OutFile]) :-
 	((L == spanish) -> write(mundo)) ;
 	fail),
 	told.
-	
+
 :- task(helloworld([text(A),text(B)],[],[text(A+B)])).
 
 helloworld([HelloFile,WorldFile],_,[OutFile]) :-
@@ -36,7 +36,7 @@ helloworld([HelloFile,WorldFile],_,[OutFile]) :-
 	told.
 
 % Helper predicates
-	
+
 % member/2.
 membr(X,[X|_]).
 membr(X,[_|Xs]) :- membr(X,Xs).

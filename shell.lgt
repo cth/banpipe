@@ -9,10 +9,10 @@
 	:- public(delete_directory/1).
 	:- if((current_logtalk_flag(prolog_dialect,yap))).
 	delete_directory(Directory) :-
-    		{delete_file(Directory,[directory])}.
-   	:- else.
+		{delete_file(Directory,[directory])}.
+	:- else.
 	delete_directory(Directory) :-
 		{delete_directory(Directory)}.
 	:- endif.
-		
+
 :- end_object.

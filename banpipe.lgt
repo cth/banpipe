@@ -3,7 +3,7 @@
 :- dynamic('<-'/2).
 
 :- object(banpipe).
-	
+
 	:- info([
 		version is 1:0:0,
 		author is 'Christian Theil Have',
@@ -14,7 +14,7 @@
 	:- public(load/1).
 
 	:- dynamic('<-'/2).
-	
+
 	:- public(version/0).
 	:- info(version/0,[
 		comment is 'Writes current version of BANpipe.'
@@ -47,9 +47,9 @@
 	:- info(listing/0, [
 		comment is 'Lists all banpipe dependency rules.'
 	]).
-	
+
 	listing :- listing(_).
-	
+
 	% This simply loads a script using Prologs normal mechanism
 	:- info(load/1, [
 		comment is 'Loads a banpipe script. Script is the (quoted) filename of the script (absolute or relative to current directory).',
@@ -57,7 +57,7 @@
 	]).
 
 	load(Script) :- {[Script]}.
-	
+
 	:- public(run/1).
 	:- info(run/1, [
 		comment is 'RRecursively (sequentially) compute the File associated with Goal.',
@@ -75,7 +75,7 @@
 
 	run(Goal,Result) :-
 		run_with_semantics(execution_semantics,Goal,Result).
-		
+
 	:- private(run_with_semantics/3).
 	run_with_semantics(Semantics,Goal,Result) :-
 		(	config::get(trace,true) ->
@@ -119,7 +119,7 @@
 		scheduler_tree::from_trace(Callgraph,Tree1),
 		scheduler_tree::reduce_tree(Tree1,Tree2),
 		scheduler_tree::print(Tree2).
-	
+
 	:- public(callgraph/3).
 	callgraph(Goal,Result,Callgraph) :-
 		sequential_interpreter(callgraph_semantics)::run(Goal,Result,Callgraph), !.
@@ -144,10 +144,10 @@
 
 	:- public(trace/0).
 	trace :- config::set(trace).
-	
+
 	:- public(notrace/0).
 	notrace :-
 		config::pop(trace).
 	notrace.
-	
+
 :- end_object.

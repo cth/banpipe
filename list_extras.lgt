@@ -17,7 +17,7 @@
 	intersperse(_,[One],[One]).
 	intersperse(Separator,[One,Two|Rest],[One,Separator|NewRest]) :-
 		intersperse(Separator,[Two|Rest],NewRest).
-	
+
 	:- public(sublist_split/3).
 	:- info(sublist_split/3, [
 		comment is 'Splits List into SubList occuring between Separator elements of List',

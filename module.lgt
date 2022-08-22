@@ -9,7 +9,7 @@
 			'environment_variable $BANPIPE_MODULE_PATH'  - 'Search paths are obtained from the BANPIPE_MODULE_PATH (paths separated by : (unix) or ; (windows)',
 			'explicit paths in scripts' - 'module directories can be added explicitly from scripts, see include_directory/1']
 			]).
-		
+
 	:- private(path_dir/1).
 	:- dynamic(path_dir/1).
 
@@ -22,7 +22,7 @@
 	get_paths(Paths) :-
 		(os::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
 			[Separator] = ":",
-			atom_codes(PathAtom,PathCodes),	
+			atom_codes(PathAtom,PathCodes),
 			list_extras::sublist_split(Separator,PathCodes,PathsCodes),
 			meta::map([X,Y]>>(expand_path(X,ExpandPath),atom_codes(Y,ExpandPath)),PathsCodes,EnvPaths)
 			;
@@ -53,7 +53,7 @@
 		os::working_directory(AbsDir),
 		atom_codes(AbsDir,AbsDirCodes),
 		list::append(AbsDirCodes,Path,ExpandPath).
-		
+
 	:- public(check_set/0).
 	:- info(check_set/0, [
 		comment is 'Check that BANPIPE_MODULE_PATH is set.'
@@ -61,7 +61,7 @@
 
 	check_set :-
 		report_unless(os::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
-		
+
 	:- public(include_directory/1).
 	:- info(include_directory/1, [
 		comment is 'Programmatically appends a directory to the module search path',
@@ -98,7 +98,7 @@
 		list::member(Path,Paths),
 		atomic_list_concat([Path, '/', ModuleName, '/', 'interface.pl'],File),
 		file(File)::exists.
-	
+
 	interface_file(File,generic) :-
 		parameter(1,ModuleName),
 		banpipe_module_path::get_paths(Paths),
@@ -170,7 +170,7 @@
 			true
 			;
 			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
-			
+
 	:- public(expand_options/2).
 	:- info(expand_options/2, [
 		comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
@@ -206,7 +206,7 @@
 		parameter(2,Task),
 		TaskGoal =.. [ Task, _, _, _ ],
 		Module::predicate_property(TaskGoal,(public)).
-	
+
 	% has_implementation/0 for external prolog-based banpipe modules
 	has_implementation :-
 		parameter(1,Module),
@@ -236,7 +236,7 @@
 		parameter(2,Task),
 		Module::task(Declaration),
 		functor(Declaration, Task, _).
-		
+
 	declaration(Declaration) :-
 		parameter(1,Module),
 		parameter(2,Task),
@@ -252,7 +252,7 @@
 		prolog_file(InterfaceFile)::member(TaskMatcher),
 		TaskMatcher = task(Declaration), 
 		functor(Declaration, Task, _).
-		
+
 	:- public(options/1).
 	:- info(options/1, [
 		comment is 'Options is the list of declared options for task.',
@@ -266,7 +266,7 @@
 			Options = OptionsDecl
 		;	Options = [version(na)|OptionsDecl]
 		).
-	
+
 	:- public(input_types/1).
 	:- info(input_types/1, [
 		comment is 'InputTypes is a sequence of file types accepted as input to the task.',
@@ -381,7 +381,7 @@
 	invoker(generic_invoker) :-
 		parameter(1,Module),
 		module(Module)::interface_file(_,generic).
-		
+
 	invoker(InvokerName) :-
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile,prolog),
@@ -392,7 +392,7 @@
 
 	invoker(Invoker) :-
 		config::get(default_invoker,Invoker).
-		
+
 	% TODO: Eventually, I might move guard invokation to run/1 (rather than in script interpreter)
 	% to allow unifying variables from the default option settings
 

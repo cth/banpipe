@@ -3,9 +3,9 @@
 	:- public(error/1).
 	:- public(warning/1).
 	:- public(info/1).
-	
+
 	:- protected(check_condition/0).
-	
+
 	error(Msg) :-
 		::check_condition,
 		!,
@@ -20,7 +20,7 @@
 		write('WARNING: '),
 		write(Msg), nl.
 	warning(_).
-	
+
 	info(Msg) :-
 		::check_condition,
 		!,

@@ -24,7 +24,7 @@
 
 	run(Goal,Result) :-
 		::run(Goal,Result,_).
-		
+
 	:- public(run/3).
 	:- info(run/3, [
 		comment is 'Same as run/2, but additionally generates a trace',
@@ -55,7 +55,7 @@
 		parameter(1,Semantics),
 		Semantics::apply(LHS+RHS,TaskObject,Outputs),
 		list::nth1(TargetIndex,Outputs,Output).
-		
+
 	run(Target,_Output,_Trace) :-
 		self(Self),
 		term_extras::term_to_atom(Self,SelfAtom),
