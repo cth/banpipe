@@ -116,8 +116,7 @@
 	atom_verbatim(Atom) :-
 		set::insert_all("abcdefghijklmnopqrstuvwxyz_1234567890",[],WhitelistCodes),
 		atom_codes(Atom,AtomCodes),
-		[UnderScore] = "_",
-		AtomCodes \= [UnderScore|_],
+		AtomCodes \= [0'_|_],
 		set::insert_all(AtomCodes,[],AtomSet),
 		set::subset(AtomSet,WhitelistCodes).
 
