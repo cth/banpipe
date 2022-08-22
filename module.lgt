@@ -21,13 +21,12 @@
 
 	get_paths(Paths) :-
 		(	os::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
-			atom_codes(PathAtom,PathCodes),
-			list_extras::sublist_split(0':,PathCodes,PathsCodes),
-			meta::map([X,Y]>>(os::absolute_file_name(X,ExpandPath),atom_codes(Y,ExpandPath)),PathsCodes,EnvPaths)
+			atom::split(PathAtom, ':', EnvPaths0),
+			meta::map(os::absolute_file_name,EnvPaths0,EnvPaths)
 		;	EnvPaths = []
 		),
 		findall(Dir,::path_dir(Dir),AdditionalDirs),
-		meta::map([X,Y]>>(atom_codes(X,DirC),os::absolute_file_name(DirC,ExpandDirC),atom_codes(Y,ExpandDirC)),AdditionalDirs,ExpandAdditionalDirs),
+		meta::map(os::absolute_file_name,AdditionalDirs,ExpandAdditionalDirs),
 		list::append(ExpandAdditionalDirs,EnvPaths,Paths).
 
 	:- public(check_set/0).
@@ -45,10 +44,10 @@
 	]).
 
 	include_directory(Directory) :-
-		(::path_dir(Directory) -> 
+		(	::path_dir(Directory) ->
 			true
-			;
-			::assertz(path_dir(Directory))).
+		;	::assertz(path_dir(Directory))
+		).
 
 :- end_object.
 
