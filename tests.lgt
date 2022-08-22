@@ -264,18 +264,13 @@
 		report_if(true)::warning(blah),
 		told,
 		file('/tmp/warning')::read(Warning),
-		list::member(NewLine,[[10],[10,13]]),
-		atom_codes(blah,Blah),
-		list::append(Blah,NewLine,Warning).
+		atom_codes('WARNING: blah\n',Warning).
 
-	succeeds(test_report_unles_warning) :- 
+	succeeds(test_report_unless_warning) :-
 		tell('/tmp/warning'),
 		report_if(false)::warning(blah),
 		told,
-		file('/tmp/warning')::read(Warning),
-		list::member(NewLine,[[10],[10,13]]),
-		atom_codes(blah,Blah),
-		list::append(Blah,NewLine,Warning).
+		file('/tmp/warning')::read([]).
 
 :- end_object.
 
