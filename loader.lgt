@@ -9,7 +9,6 @@ banpipe_required_libraries([
 ]).
 
 banpipe_own_files([
-	banpipe(shell),
 	banpipe(config),
 	banpipe(uri),
 	banpipe(file),

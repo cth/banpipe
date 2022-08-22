@@ -316,7 +316,7 @@
 		os::make_directory(D),
 		os::change_directory(D),
 		os::change_directory(Current),
-		shell::delete_directory(D).
+		os::delete_directory(D).
 
 
 	% FIXME: More test-cases needed for shell object
@@ -349,7 +349,7 @@
 		banpipe_module_path::include_directory('/tmp'),
 		module(testmodule)::interface_file('/tmp/testmodule/interface.pl'),
 		file('/tmp/testmodule/interface.pl')::delete,
-		shell::delete_directory('/tmp/testmodule').
+		os::delete_directory('/tmp/testmodule').
 
 :- end_object.
 
@@ -550,6 +550,7 @@
 
 
 :- object(test_task_typecheck1,extends(lgtunit)).
+
 	:- initialization(::run).
 
 	setup :-
@@ -594,6 +595,7 @@
 
 
 :- object(test_scheduler_tree,extends(lgtunit)).
+
 	:- initialization(::run).
 
 
@@ -717,6 +719,7 @@
 
 
 :- object(test_builtin_module_file,extends(lgtunit)).
+
 	:- initialization(::run).
 
 	succeeds(test_file_get1) :-
