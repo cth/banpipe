@@ -22,7 +22,6 @@
 	read(Contents) :-
 		parameter(1,F),
 		open(F,read,Stream),
-		write(F), nl,
 		catch(read_characters(Stream,Contents),_,true),
 		close(Stream).
 
@@ -141,14 +140,14 @@
 	:- private(read_characters/2).
 	read_characters(Stream,Contents) :-
 		get_code(Stream,Code),
-		((Code == -1) ->
+		(	Code == -1 ->
 			Contents = []
-			;
-			Contents = [Code|Rest],
-			read_characters(Stream,Rest)).
+		;	Contents = [Code|Rest],
+			read_characters(Stream,Rest)
+		).
 
 	:- private(write_characters/2).
-	write_characters(_,[]).
+	write_characters(_,[]) :- !.
 	write_characters(Stream,[X|Xs]) :-
 		put_code(Stream,X),
 		write_characters(Stream,Xs).

@@ -25,12 +25,13 @@
 :- object(test_file, extends(lgtunit)).
 
 	succeeds(write_and_read) :-
-		Contents = "This is a test\nwith multiple\nlines.\n",
+		atom_codes('This is a test\nwith multiple\nlines.\n', Contents),
 		file('/tmp/test-file')::write(Contents),
 		file('/tmp/test-file')::read(Contents).
 
 	succeeds(exists_1) :-
-		file('/tmp/test-file')::write("test 123"),
+		atom_codes('test 123', Contents),
+		file('/tmp/test-file')::write(Contents),
 		file('/tmp/test-file')::exists.
 
 	fails(exists_2) :-
@@ -76,7 +77,7 @@
 :- object(test_prolog_file, extends(lgtunit)).
 
 	succeeds(write_and_read) :-
-		Contents = "This is a test\nwith multiple\nlines.\n",
+		atom_codes('This is a test\nwith multiple\nlines.\n', Contents),
 		prolog_file('/tmp/test-file')::write(Contents),
 		prolog_file('/tmp/test-file')::read(Contents).
 
