@@ -114,12 +114,12 @@
 	]).
 
 	atom_verbatim(Atom) :-
-		set::insert_all("abcdefghijklmnopqrstuvwxyz_1234567890",[],WhitelistCodes),
+		atom_codes('abcdefghijklmnopqrstuvwxyz_1234567890', WhitelistCodes0),
+		set::as_set(WhitelistCodes0, WhitelistCodes),
 		atom_codes(Atom,AtomCodes),
 		AtomCodes \= [0'_|_],
 		set::insert_all(AtomCodes,[],AtomSet),
 		set::subset(AtomSet,WhitelistCodes).
-
 
 	:- public(conjunction_as_list/2).
 	:- info(conjunction_as_list/2,[
