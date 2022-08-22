@@ -286,7 +286,9 @@
 :- object(test_banpipe_module_path, extends(lgtunit)).
 
 	succeeds(get_module_paths) :-
-		TestDirs = ['$HOME/tmp/mod1','$HOME/tmp/mod2'],
+		os::absolute_file_name('$HOME/tmp/mod1', Mod1),
+		os::absolute_file_name('$HOME/tmp/mod2', Mod2),
+		TestDirs = [Mod1,Mod2],
 		forall(list::member(Dir,TestDirs),banpipe_module_path::include_directory(Dir)),
 		banpipe_module_path::get_paths(SearchDirectories),
 		forall(list::member(TD,TestDirs),list::member(TD,SearchDirectories)).
@@ -503,7 +505,7 @@
 	setup :-
 		atom_codes(':- task(test([_], [filetype(X)], [X])).\n', Line1),
 		atom_codes('test([InFile],_Options,[OutFile]) :- atom_concat(\'cp \',InFile,T1),atom_concat(T1,\' \',T2),atom_concat(T2,OutFile,Cmd),system(Cmd).\n', Line2),
-		list::append(Line1,Line1,InterfaceFileContents),
+		list::append(Line1,Line2,InterfaceFileContents),
 		os::shell('rm -rf $HOME/tmp/testmodule'),
 		os::make_directory('$HOME/tmp/testmodule'),
 		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
