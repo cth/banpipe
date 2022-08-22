@@ -303,10 +303,12 @@
 
 	succeeds(interface_file) :-
 		os::make_directory('$HOME/tmp/testmodule'),
-		file('$HOME/tmp/testmodule/interface.pl')::touch,
-		banpipe_module_path::include_directory('$HOME/tmp'),
-		module(testmodule)::interface_file('$HOME/tmp/testmodule/interface.pl', _),
-		file('$HOME/tmp/testmodule/interface.pl')::delete,
+		os::absolute_file_name('$HOME/tmp/testmodule/interface.pl', Interface),
+		file(Interface)::touch,
+		os::absolute_file_name('$HOME/tmp', Directory),
+		banpipe_module_path::include_directory(Directory),
+		module(testmodule)::interface_file(Interface, _),
+		file(Interface)::delete,
 		os::delete_directory('$HOME/tmp/testmodule').
 
 :- end_object.
@@ -368,10 +370,12 @@
 		os::shell('rm -rf $HOME/tmp/testmodule'),
 		os::make_directory('$HOME/tmp/testmodule'),
 		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
-		banpipe_module_path::include_directory('$HOME/tmp'),
-		config::push(result_file_directory,'$HOME/tmp/'),
-		config::push(index_file,'$HOME/tmp/index-file'),
-		config::push(file_manager,term_file_index('$HOME/tmp/index-file')).
+		os::absolute_file_name('$HOME/tmp', Directory),
+		banpipe_module_path::include_directory(Directory),
+		config::push(result_file_directory,Directory),
+		os::absolute_file_name('$HOME/tmp/index-file', File),
+		config::push(index_file,File),
+		config::push(file_manager,term_file_index(File)).
 
 	succeeds(invoke_task_default) :-
 		task_setup,
