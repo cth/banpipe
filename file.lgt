@@ -21,28 +21,32 @@
 	:- public(read/1).
 	read(Contents) :-
 		parameter(1,F),
-		open(F,read,Stream),
+		os::absolute_file_name(F, P),
+		open(P,read,Stream),
 		catch(read_characters(Stream,Contents),_,true),
 		close(Stream).
 
 	:- public(write/1).
 	write(Contents) :-
 		parameter(1,F),
-		open(F,write,Stream),
+		os::absolute_file_name(F, P),
+		open(P,write,Stream),
 		write_characters(Stream,Contents),
 		close(Stream).
 
 	:- public(append/1).
 	append(Contents) :-
 		parameter(1,F),
-		open(F,append,Stream),
+		os::absolute_file_name(F, P),
+		open(P,append,Stream),
 		write_characters(Stream,Contents),
 		close(Stream).
 
 	:- public(copy_to/1).
 	copy_to(TargetFile) :-
 		parameter(1,File),
-		atomic_list_concat(['cp ',File,' ',TargetFile],ShellCopyCommand),
+		os::absolute_file_name(File, Path),
+		atomic_list_concat(['cp ',Path,' ',TargetFile],ShellCopyCommand),
 		os::shell(ShellCopyCommand).
 
 
@@ -57,8 +61,9 @@
 
 	:- public(touch/0).
 	touch :-
-		parameter(1,F),
-		open(F,write,Stream),
+		parameter(1,File),
+		os::absolute_file_name(File, Path),
+		open(Path,write,Stream),
 		close(Stream).
 
 	:- public(delete/0).
@@ -171,8 +176,9 @@
 	]).
 
 	read_terms(Terms) :-
-		parameter(1,F),
-		open(F,read,Stream),
+		parameter(1,File),
+		os::absolute_file_name(File, Path),
+		open(Path,read,Stream),
 		stream_read_terms(Stream,Terms),
 		close(Stream).
 
@@ -182,8 +188,9 @@
 	]).
 
 	write_terms(Terms) :-
-		parameter(1,F),
-		open(F,write,Stream),
+		parameter(1,File),
+		os::absolute_file_name(File, Path),
+		open(Path,write,Stream),
 		stream_write_terms(Stream,Terms),
 		close(Stream).
 
@@ -203,8 +210,9 @@
 	]).
 
 	append(Terms) :-
-		parameter(1,F),
-		open(F,append,Stream),
+		parameter(1,File),
+		os::absolute_file_name(File, Path),
+		open(Path,append,Stream),
 		stream_write_terms(Stream,Terms),
 		close(Stream).
 

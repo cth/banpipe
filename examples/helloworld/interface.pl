@@ -42,7 +42,8 @@ membr(X,[X|_]).
 membr(X,[_|Xs]) :- membr(X,Xs).
 
 read_from_file(File,Contents) :-
-	open(File,read,Stream),
+	os::absolute_file_name(File, Path),
+	open(Path,read,Stream),
 	read_from_stream(Stream,Contents),
 	close(Stream).
 

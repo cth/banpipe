@@ -26,36 +26,36 @@
 
 	succeeds(write_and_read) :-
 		atom_codes('This is a test\nwith multiple\nlines.\n', Contents),
-		file('/tmp/test-file')::write(Contents),
-		file('/tmp/test-file')::read(Contents).
+		file('$HOME/tmp/test-file')::write(Contents),
+		file('$HOME/tmp/test-file')::read(Contents).
 
 	succeeds(exists_1) :-
 		atom_codes('test 123', Contents),
-		file('/tmp/test-file')::write(Contents),
-		file('/tmp/test-file')::exists.
+		file('$HOME/tmp/test-file')::write(Contents),
+		file('$HOME/tmp/test-file')::exists.
 
 	fails(exists_2) :-
-		file('/tmp/no-such-file')::exists.
+		file('$HOME/tmp/no-such-file')::exists.
 
 	succeeds(dirname) :-
 		file('/path/to/somefile')::dirname('/path/to/').
 
 	succeeds(touch_exists) :-
-		file('/tmp/touchme')::touch,
-		file('/tmp/touchme')::exists.
+		file('$HOME/tmp/touchme')::touch,
+		file('$HOME/tmp/touchme')::exists.
 
 	succeeds(touch_delete) :-
-		file('/tmp/touchme')::touch,
-		file('/tmp/touchme')::delete.
+		file('$HOME/tmp/touchme')::touch,
+		file('$HOME/tmp/touchme')::delete.
 
 	fails(touch_delete_exists) :-
-		file('/tmp/touchme')::touch,
-		file('/tmp/touchme')::delete,
-		file('/tmp/touchme')::exists.
+		file('$HOME/tmp/touchme')::touch,
+		file('$HOME/tmp/touchme')::delete,
+		file('$HOME/tmp/touchme')::exists.
 
 	succeeds(copy_to) :-
-		From = file('/tmp/somefile'),
-		To = '/tmp/otherfile',
+		From = file('$HOME/tmp/somefile'),
+		To = '$HOME/tmp/otherfile',
 		From::write("test"),
 		From::copy_to(To),
 		file(To)::read("test"),
@@ -63,7 +63,7 @@
 		file(To)::delete.
 
 	succeeds(canonical_normal_file) :-
-		file('/tmp//file')::canonical('/tmp/file').
+		file('$HOME/tmp//file')::canonical('$HOME/tmp/file').
 
 	succeeds(canonical_windows_file) :-
 		file('c:\\some\\file')::canonical('c:/some/file').
@@ -78,30 +78,35 @@
 
 	succeeds(write_and_read) :-
 		atom_codes('This is a test\nwith multiple\nlines.\n', Contents),
-		prolog_file('/tmp/test-file')::write(Contents),
-		prolog_file('/tmp/test-file')::read(Contents).
+		os::absolute_file_name('$HOME/tmp/test-file', File),
+		prolog_file(File)::write(Contents),
+		prolog_file(File)::read(Contents).
 
 	succeeds(write_and_read_terms) :-
 		Terms = [a(1),b('2'),c("3")],
-		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
-		prolog_file('/tmp/prolog-test-file')::read_terms(Terms).
+		os::absolute_file_name('$HOME/tmp/prolog-test-file', File),
+		prolog_file(File)::write_terms(Terms),
+		prolog_file(File)::read_terms(Terms).
 
 	succeeds(member) :-
 		Terms = [a(1),b('2'),c("3")],
-		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
-		forall(list::member(T,Terms), prolog_file('/tmp/prolog-test-file')::member(T)).
+		os::absolute_file_name('$HOME/tmp/prolog-test-file', File),
+		prolog_file(File)::write_terms(Terms),
+		forall(list::member(T,Terms), prolog_file(File)::member(T)).
 
 	succeeds(select) :-
 		Terms = [a(1),b('2'),c("3")],
-		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
-		forall(list::select(T,Terms,TermsRest), prolog_file('/tmp/prolog-test-file')::select(T,TermsRest)).
+		os::absolute_file_name('$HOME/tmp/prolog-test-file', File),
+		prolog_file(File)::write_terms(Terms),
+		forall(list::select(T,Terms,TermsRest), prolog_file(File)::select(T,TermsRest)).
 
 	succeeds(append) :-
 		Terms = [a(1),b('2'),c("3")],
 		list::append(Terms,Terms,T2),
-		prolog_file('/tmp/prolog-test-file')::write_terms(Terms),
-		prolog_file('/tmp/prolog-test-file')::append(Terms),
-		prolog_file('/tmp/prolog-test-file')::read_terms(T2).
+		os::absolute_file_name('$HOME/tmp/prolog-test-file', File),
+		prolog_file(File)::write_terms(Terms),
+		prolog_file(File)::append(Terms),
+		prolog_file(File)::read_terms(T2).
 
 :- end_object.
 
@@ -167,12 +172,13 @@
 
 :- object(test_term_file_index, extends(lgtunit)).
 
-	index_file('/tmp/test-file-index').
+	index_file(File) :-
+		os::absolute_file_name('$HOME/tmp/test-file-index', File).
 
 	succeeds(allocate0) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
 		ground(Out1),
 		ground(Out2),
 		Out1 \= Out2.
@@ -180,69 +186,69 @@
 	succeeds(allocate_commit0) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
-		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_commit('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]).
 
 	succeeds(allocate_rollback) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
-		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_rollback('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]).
 
 	fails(allocate_commit_rollback) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		!,
-		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		term_file_index(FI)::result_files_commit('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]),
 		!,
-		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
+		term_file_index(FI)::result_files_rollback('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]).
 
 	fails(allocate_rollback_commit) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		!,
-		term_file_index(FI)::result_files_rollback('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		term_file_index(FI)::result_files_rollback('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]),
 		!,
-		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]).
+		term_file_index(FI)::result_files_commit('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]).
 
 	succeeds(allocate_commmit_results) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[Out1,Out2]),
 		!,
-		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		term_file_index(FI)::result_files_commit('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]),
 		!,
-		term_file_index(FI)::result_files('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],ResultFiles),
+		term_file_index(FI)::result_files('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],ResultFiles),
 		ResultFiles == [Out1,Out2].
 
 	succeeds(allocate_allocate_time) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		!,
-		term_file_index(FI)::result_files_allocate_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
+		term_file_index(FI)::result_files_allocate_time('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
 		date::valid(AYear,AMon,ADay),
 		time::valid(AHour,AMin,ASec).
 
 	fails(allocate_commit_time) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		!,
-		term_file_index(FI)::result_files_commit_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],_).
+		term_file_index(FI)::result_files_commit_time('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],_).
 	
 	succeeds(allocate_commit_alloctime) :-
 		index_file(FI),
 		file(FI)::delete, % make sure the file does not exists
-		term_file_index(FI)::result_files_allocate('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],[_,_]),
+		term_file_index(FI)::result_files_allocate('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],[_,_]),
 		!,
-		term_file_index(FI)::result_files_commit('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)]),
+		term_file_index(FI)::result_files_commit('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)]),
 		!,
-		term_file_index(FI)::result_files_allocate_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
+		term_file_index(FI)::result_files_allocate_time('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],time(AYear,AMon,ADay,AHour,AMin,ASec)),
 		!,
-		term_file_index(FI)::result_files_commit_time('module','task',['/tmp/1','/tmp/2'],[opt1(a),opt2(b)],time(CYear,CMon,CDay,CHour,CMin,CSec)),
+		term_file_index(FI)::result_files_commit_time('module','task',['$HOME/tmp/1','$HOME/tmp/2'],[opt1(a),opt2(b)],time(CYear,CMon,CDay,CHour,CMin,CSec)),
 		date::valid(AYear,AMon,ADay),
 		time::valid(AHour,AMin,ASec),
 		date::valid(CYear,CMon,CDay),
@@ -259,18 +265,20 @@
 	succeeds(test_report_unles) :-
 		catch(report_unless(false)::error(blah),blah,true).
 
-	succeeds(test_report_if_warning) :- 
-		tell('/tmp/warning'),
+	succeeds(test_report_if_warning) :-
+		os::absolute_file_name('$HOME/tmp/warning', File),
+		tell(File),
 		report_if(true)::warning(blah),
 		told,
-		file('/tmp/warning')::read(Warning),
+		file(File)::read(Warning),
 		atom_codes('WARNING: blah\n',Warning).
 
 	succeeds(test_report_unless_warning) :-
-		tell('/tmp/warning'),
+		os::absolute_file_name('$HOME/tmp/warning', File),
+		tell(File),
 		report_if(false)::warning(blah),
 		told,
-		file('/tmp/warning')::read([]).
+		file(File)::read([]).
 
 :- end_object.
 
@@ -278,7 +286,7 @@
 :- object(test_banpipe_module_path, extends(lgtunit)).
 
 	succeeds(get_module_paths) :-
-		TestDirs = ['/tmp/mod1','/tmp/mod2'],
+		TestDirs = ['$HOME/tmp/mod1','$HOME/tmp/mod2'],
 		forall(list::member(Dir,TestDirs),banpipe_module_path::include_directory(Dir)),
 		banpipe_module_path::get_paths(SearchDirectories),
 		forall(list::member(TD,TestDirs),list::member(TD,SearchDirectories)).
@@ -289,15 +297,15 @@
 :- object(test_module, extends(lgtunit)).
 
 	setup :-
-		os::shell('rm -rf /tmp/testmodule').
+		os::shell('rm -rf $HOME/tmp/testmodule').
 
 	succeeds(interface_file) :-
-		os::make_directory('/tmp/testmodule'),
-		file('/tmp/testmodule/interface.pl')::touch,
-		banpipe_module_path::include_directory('/tmp'),
-		module(testmodule)::interface_file('/tmp/testmodule/interface.pl', _),
-		file('/tmp/testmodule/interface.pl')::delete,
-		os::delete_directory('/tmp/testmodule').
+		os::make_directory('$HOME/tmp/testmodule'),
+		file('$HOME/tmp/testmodule/interface.pl')::touch,
+		banpipe_module_path::include_directory('$HOME/tmp'),
+		module(testmodule)::interface_file('$HOME/tmp/testmodule/interface.pl', _),
+		file('$HOME/tmp/testmodule/interface.pl')::delete,
+		os::delete_directory('$HOME/tmp/testmodule').
 
 :- end_object.
 
@@ -310,9 +318,9 @@
 		% (dummy) Task implementation
 		atom_codes('test(In,Opt,Out) :- true.\n', Line2),
 		list::append(Line1, Line2, InterfaceFileContents),
-		os::shell('rm -rf /tmp/testmodule'),
-		os::make_directory('/tmp/testmodule'),
-		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents).
+		os::shell('rm -rf $HOME/tmp/testmodule'),
+		os::make_directory('$HOME/tmp/testmodule'),
+		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents).
 
 	succeeds(task_options) :-
 		module_task(testmodule,test)::options(Options),
@@ -344,8 +352,8 @@
 :- object(test_invoke_task,extends(lgtunit)).
 
 	setup :-
-		(file('/tmp/index-file')::exists ->
-			file('/tmp/index-file')::delete
+		(file('$HOME/tmp/index-file')::exists ->
+			file('$HOME/tmp/index-file')::delete
 			;
 			true).
 
@@ -355,13 +363,13 @@
 		% (dummy) Task implementation
 		atom_codes('test(In,Opt,[Out1,Out2]) :- write(\'hello from prolog\'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n', Line2),
 		list::append(Line1,Line2,InterfaceFileContents),
-		os::shell('rm -rf /tmp/testmodule'),
-		os::make_directory('/tmp/testmodule'),
-		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
-		banpipe_module_path::include_directory('/tmp'),
-		config::push(result_file_directory,'/tmp/'),
-		config::push(index_file,'/tmp/index-file'),
-		config::push(file_manager,term_file_index('/tmp/index-file')).
+		os::shell('rm -rf $HOME/tmp/testmodule'),
+		os::make_directory('$HOME/tmp/testmodule'),
+		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
+		banpipe_module_path::include_directory('$HOME/tmp'),
+		config::push(result_file_directory,'$HOME/tmp/'),
+		config::push(index_file,'$HOME/tmp/index-file'),
+		config::push(file_manager,term_file_index('$HOME/tmp/index-file')).
 
 	succeeds(invoke_task_default) :-
 		task_setup,
@@ -411,7 +419,7 @@
 
 	task_cleanup :-
 		config::setup_defaults,
-		file('/tmp/index-file')::delete.
+		file('$HOME/tmp/index-file')::delete.
 
 :- end_object.
 
@@ -424,8 +432,8 @@
 
 	% Just in case the previous test didn't finish well and forgot cleanup of file
 	setup :-
-		(	file('/tmp/index-file')::exists ->
-			file('/tmp/index-file')::delete
+		(	file('$HOME/tmp/index-file')::exists ->
+			file('$HOME/tmp/index-file')::delete
 		;	true
 		).
 
@@ -437,14 +445,14 @@
 		% (dummy) Task implementation
 		atom_codes('test(_,_,[Out1,Out2]) :- write(\'hello from prolog\'), tell(Out1), write(file1), told, tell(Out2), write(file2), told.\n', Line3),
 		list::append([Line1,Line2,Line3],InterfaceFileContents),
-		os::shell('rm -rf /tmp/testmodule'),
-		os::make_directory('/tmp/testmodule'),
-		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
-		%os::shell('cat /tmp/testmodule/interface.pl'),
-		banpipe_module_path::include_directory('/tmp'),
-		config::push(result_file_directory,'/tmp/'),
-		config::push(index_file,'/tmp/index-file'),
-		config::push(file_manager,term_file_index('/tmp/index-file')).
+		os::shell('rm -rf $HOME/tmp/testmodule'),
+		os::make_directory('$HOME/tmp/testmodule'),
+		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
+		%os::shell('cat $HOME/tmp/testmodule/interface.pl'),
+		banpipe_module_path::include_directory('$HOME/tmp'),
+		config::push(result_file_directory,'$HOME/tmp/'),
+		config::push(index_file,'$HOME/tmp/index-file'),
+		config::push(file_manager,term_file_index('$HOME/tmp/index-file')).
 
 	succeeds(invoke_task_prism) :-
 		task_setup(prism),
@@ -485,7 +493,7 @@
 
 	task_cleanup :-
 		config::setup_defaults,
-		file('/tmp/index-file')::delete.
+		file('$HOME/tmp/index-file')::delete.
 
 :- end_object.
 
@@ -496,10 +504,10 @@
 		atom_codes(':- task(test([_], [filetype(X)], [X])).\n', Line1),
 		atom_codes('test([InFile],_Options,[OutFile]) :- atom_concat(\'cp \',InFile,T1),atom_concat(T1,\' \',T2),atom_concat(T2,OutFile,Cmd),system(Cmd).\n', Line2),
 		list::append(Line1,Line1,InterfaceFileContents),
-		os::shell('rm -rf /tmp/testmodule'),
-		os::make_directory('/tmp/testmodule'),
-		file('/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
-		banpipe_module_path::include_directory('/tmp').
+		os::shell('rm -rf $HOME/tmp/testmodule'),
+		os::make_directory('$HOME/tmp/testmodule'),
+		file('$HOME/tmp/testmodule/interface.pl')::write(InterfaceFileContents),
+		banpipe_module_path::include_directory('$HOME/tmp').
 
 	succeeds(type_check1) :-
 		task(testmodule,test,[type(blah)],[filetype(test(type))])::typecheck([OutputType]),
@@ -638,7 +646,7 @@
 		uri('http://banpipe.org/index.html')::elements('http://','banpipe.org/index.html').
 
 	succeeds(uri_valid_file) :-
-		uri('file:///tmp/blah')::valid.
+		uri('file://$HOME/tmp/blah')::valid.
 
 	succeeds(uri_valid_url) :-
 		uri('ftp://user:pass@server.org/dir/file')::valid.
@@ -652,13 +660,13 @@
 :- object(test_builtin_module_file,extends(lgtunit)).
 
 	succeeds(test_file_get1) :-
-		file('/tmp/test.1')::touch,
-		file::get(['file:///tmp/test.1'],[],['/tmp/test.2']),
-		file('/tmp/test.1')::delete,
-		file('/tmp/test.2')::delete.
+		file('$HOME/tmp/test.1')::touch,
+		file::get(['file://$HOME/tmp/test.1'],[],['$HOME/tmp/test.2']),
+		file('$HOME/tmp/test.1')::delete,
+		file('$HOME/tmp/test.2')::delete.
 
 	succeeds(test_file_get2) :-
-		file::get(['http://banpipe.org/'],[],['/tmp/test.banpipe']),
-		file('/tmp/test.banpipe')::delete.
+		file::get(['http://banpipe.org/'],[],['$HOME/tmp/test.banpipe']),
+		file('$HOME/tmp/test.banpipe')::delete.
 
 :- end_object.
