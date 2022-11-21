@@ -9,6 +9,7 @@ banpipe_required_libraries([
 ]).
 
 banpipe_own_files([
+	banpipe(fix_directives),
 	banpipe(config),
 	banpipe(uri),
 	banpipe(file),

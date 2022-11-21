@@ -97,7 +97,7 @@
 			::default_invoke_command(Exec)),
 		term_extras::term_to_atom(Goal,GoalAtom),
 		::goal_option(GoalOption),
-		atomic_list_concat([Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), consult(\'', BaseFileName, '\'),', GoalAtom,',halt."'],Command),
+		atomic_list_concat([Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), logtalk_load(\'', BaseFileName, '\',[hook(fix_directives)]),', GoalAtom,',halt."'],Command),
 		write(shell_command(Command)), nl,
 		os::shell(Command),
 		os::change_directory(CurrentDir).
@@ -128,8 +128,8 @@
 		comment is 'Invoker which launches a B-Prolog process and runs the goal within that process.'
 	]).
 
-	key_invoke_command(invoke_command(bp)).
-	default_invoke_command(bp).
+	key_invoke_command(invoke_command(bplgt)).
+	default_invoke_command(bplgt).
 	goal_option('-g').
 
 :- end_object.
@@ -160,8 +160,8 @@
 		comment is 'Invoker which launches a SWI-Prolog process and runs the goal within that process.'
 	]).
 
-	key_invoke_command(invoke_command(swipl)).
-	default_invoke_command(swipl).
+	key_invoke_command(invoke_command(swilgt)).
+	default_invoke_command(swilgt).
 	goal_option('-g').
 
 :- end_object.
@@ -176,8 +176,8 @@
 		comment is 'Invoker which launches a LVM process and runs the goal within that process.'
 	]).
 
-	key_invoke_command(invoke_command(lvmpl)).
-	default_invoke_command(lvmpl).
+	key_invoke_command(invoke_command(lvmlgt)).
+	default_invoke_command(lvmlgt).
 	goal_option('-g').
 
 :- end_object.
@@ -192,8 +192,8 @@
 		comment is 'Invoker which launches a YAP process and runs the goal within that process.'
 	]).
 
-	key_invoke_command(invoke_command(yap)).
-	default_invoke_command(yap).
+	key_invoke_command(invoke_command(yaplgt)).
+	default_invoke_command(yaplgt).
 	goal_option('-g').
 
 :- end_object.
@@ -208,8 +208,8 @@
 		comment is 'Invoker which launches a GNU-Prolog process and runs the goal within that process'
 	]).
 
-	key_invoke_command(invoke_command(gprolog)).
-	default_invoke_command(gprolog).
+	key_invoke_command(invoke_command(gplgt)).
+	default_invoke_command(gplgt).
 	goal_option('--entry-goal').
 
 :- end_object.
