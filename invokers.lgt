@@ -167,7 +167,7 @@
 :- end_object.
 
 
-:- object(lvm_invoker, extends(prolog_invoker)).
+:- object(lvmpl_invoker, extends(prolog_invoker)).
 
 	:- info([
 		version is 1:0:0,
