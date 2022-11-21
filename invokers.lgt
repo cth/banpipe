@@ -125,7 +125,7 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-14,
-		comment is 'Invoker which launches a B-Prolog process and runs the goal within that process'
+		comment is 'Invoker which launches a B-Prolog process and runs the goal within that process.'
 	]).
 
 	key_invoke_command(invoke_command(bp)).
@@ -141,7 +141,7 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-14,
-		comment is 'Invoker which launches a PRISM process and runs the goal within that process'
+		comment is 'Invoker which launches a PRISM process and runs the goal within that process.'
 	]).
 
 	key_invoke_command(invoke_command(prism)).
@@ -157,11 +157,27 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-14,
-		comment is 'Invoker which launches a SWI-Prolog process and runs the goal within that process'
+		comment is 'Invoker which launches a SWI-Prolog process and runs the goal within that process.'
 	]).
 
 	key_invoke_command(invoke_command(swipl)).
 	default_invoke_command(swipl).
+	goal_option('-g').
+
+:- end_object.
+
+
+:- object(lvm_invoker, extends(prolog_invoker)).
+
+	:- info([
+		version is 1:0:0,
+		author is 'Paulo Moura',
+		date is 2022-11-21,
+		comment is 'Invoker which launches a LVM process and runs the goal within that process.'
+	]).
+
+	key_invoke_command(invoke_command(lvmpl)).
+	default_invoke_command(lvmpl).
 	goal_option('-g').
 
 :- end_object.
@@ -173,7 +189,7 @@
 		version is 1:0:0,
 		author is 'Christian Theil Have',
 		date is 2012-11-14,
-		comment is 'Invoker which launches a YAP process and runs the goal within that process'
+		comment is 'Invoker which launches a YAP process and runs the goal within that process.'
 	]).
 
 	key_invoke_command(invoke_command(yap)).

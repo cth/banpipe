@@ -394,6 +394,12 @@
 		invoke_task,
 		task_cleanup.
 
+	succeeds(invoke_task_lvm) :-
+		task_setup,
+		config::push(default_invoker,lvm_invoker),
+		invoke_task,
+		task_cleanup.
+
 	succeeds(invoke_task_swipl) :-
 		task_setup,
 		config::push(default_invoker,swipl_invoker),
