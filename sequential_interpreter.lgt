@@ -48,7 +48,7 @@
 		Body = (Module :: TaskSpec),
 		banpipe_parser::parse_task_specification(TaskSpec,Task,Inputs,Options),!,
 		self(Self),
-		meta::map([I,[O,C]]>>(Self::run(I,O,C)),Inputs,OutputsAndChildSpecs),
+		meta::map({Self}/[I,[O,C]]>>(Self::run(I,O,C)),Inputs,OutputsAndChildSpecs),
 		meta::map([[O,_],O]>>true,OutputsAndChildSpecs,InputsResults),
 		meta::map([[_,C],C]>>true,OutputsAndChildSpecs,ChildSpecs),
 		TaskObject = task(Module,Task,InputsResults,Options),
