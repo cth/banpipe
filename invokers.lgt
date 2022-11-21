@@ -97,7 +97,7 @@
 			::default_invoke_command(Exec)),
 		term_extras::term_to_atom(Goal,GoalAtom),
 		::goal_option(GoalOption),
-		atomic_list_concat([Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), logtalk_load(\'$BANPIPE_PATH/fix_directives\'), logtalk_load(\'', BaseFileName, '\',[hook(fix_directives)]),', GoalAtom,',halt."'],Command),
+		atomic_list_concat([Exec,' ', GoalOption, ' "assertz(task(_)), assertz(invoke_with(_)), logtalk_load(os(loader)), logtalk_load(\'$BANPIPE_PATH/fix_directives\'), logtalk_load(\'', BaseFileName, '\',[hook(fix_directives)]),', GoalAtom,',halt."'],Command),
 		write(shell_command(Command)), nl,
 		os::shell(Command),
 		os::change_directory(CurrentDir).
