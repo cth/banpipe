@@ -1,103 +1,100 @@
 :- object(banpipe_module_path).
+
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is 'Manages the module directory search paths.',
 		remarks is [ 
 			'environment_variable $BANPIPE_MODULE_PATH'  - 'Search paths are obtained from the BANPIPE_MODULE_PATH (paths separated by : (unix) or ; (windows)',
 			'explicit paths in scripts' - 'module directories can be added explicitly from scripts, see include_directory/1']
 			]).
-		
+
 	:- private(path_dir/1).
 	:- dynamic(path_dir/1).
 
 	:- public(get_paths/1).
-	:- info(get_paths/1,
-		[ comment is 'Extract module directories from the BANPIPE_MODULE_PATH environment variable.',
-		  argnames is ['Paths']]).
+	:- info(get_paths/1, [
+		comment is 'Extract module directories from the BANPIPE_MODULE_PATH environment variable.',
+		argnames is ['Paths']
+	]).
+
 	get_paths(Paths) :-
-		(shell::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
-			[Separator] = ":",
-			atom_codes(PathAtom,PathCodes),	
-			list_extras::sublist_split(Separator,PathCodes,PathsCodes),
-			meta::map([X,Y]>>(expand_path(X,ExpandPath),atom_codes(Y,ExpandPath)),PathsCodes,EnvPaths)
-			;
-			EnvPaths = []),
+		(	os::environment_variable('BANPIPE_MODULE_PATH',PathAtom) ->
+			atom::split(PathAtom, ':', EnvPaths0),
+			meta::map(os::absolute_file_name,EnvPaths0,EnvPaths)
+		;	EnvPaths = []
+		),
 		findall(Dir,::path_dir(Dir),AdditionalDirs),
-		meta::map([X,Y]>>(atom_codes(X,DirC),expand_path(DirC,ExpandDirC),atom_codes(Y,ExpandDirC)),AdditionalDirs,ExpandAdditionalDirs), 
+		meta::map(os::absolute_file_name,AdditionalDirs,ExpandAdditionalDirs),
 		list::append(ExpandAdditionalDirs,EnvPaths,Paths).
 
-	:- private(expand_path/2).
-	:- info(expand_path/2, [comment is 'Expand relative paths starting with . or not with /']).
-
-	% Windows style absolute path with drive letter
-	expand_path(Path,Path) :-
-		atom_codes(':',Colon),
-		Path = [_DriveLetter,Colon|_],
-		!.
-
-	% Unix style absolute path (starts with /)
-	expand_path(Path,Path) :- 
-		atom_codes('/',Slash),
-		Path = [ Slash | _ ],
-		!.
-
-	% Otherwise, we assume that it is a local relative path
-	expand_path(Path,ExpandPath) :-
-		shell::working_directory(AbsDir),
-		atom_codes(AbsDir,AbsDirCodes),
-		list::append(AbsDirCodes,Path,ExpandPath).
-		
 	:- public(check_set/0).
-	:- info(check_set/0, [comment is 'Check that BANPIPE_MODULE_PATH is set.']).
+	:- info(check_set/0, [
+		comment is 'Check that BANPIPE_MODULE_PATH is set.'
+	]).
+
 	check_set :-
-		report_unless(shell::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
-		
+		report_unless(os::environment_variable('BANPIPE_MODULE_PATH',_))::warning('BANPIPE_MODULE_PATH not set.').
+
 	:- public(include_directory/1).
-	:- info(include_directory/1,
-		[ comment is 'Programmatically appends a directory to the module search path',
-		  argnames is ['Directory']]).
+	:- info(include_directory/1, [
+		comment is 'Programmatically appends a directory to the module search path',
+		argnames is ['Directory']
+	]).
+
 	include_directory(Directory) :-
-		(::path_dir(Directory) -> 
+		(	::path_dir(Directory) ->
 			true
-			;
-			::assertz(path_dir(Directory))).
+		;	::assertz(path_dir(Directory))
+		).
+
 :- end_object.
+
 
 :- object(module(_Name)).
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is 'A proxy object which represent a particular banpipe module.',
 		parnames is ['Name']
 	]).
 
+	:- uses(user, [
+		atomic_list_concat/2
+	]).
+
 	:- public(interface_file/2).
-	
+
 	interface_file(File,prolog) :-
 		parameter(1,ModuleName),
 		banpipe_module_path::get_paths(Paths),
 		list::member(Path,Paths),
-		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.pl'],File),
+		atomic_list_concat([Path, '/', ModuleName, '/', 'interface.pl'],File),
 		file(File)::exists.
-	
+
 	interface_file(File,generic) :-
 		parameter(1,ModuleName),
 		banpipe_module_path::get_paths(Paths),
 		list::member(Path,Paths),
-		meta::foldl(atom_concat,'',[Path, '/', ModuleName, '/', 'interface.banpipe'],File),
+		atomic_list_concat([Path, '/', ModuleName, '/', 'interface.banpipe'],File),
 		file(File)::exists.
 
-	:- public(builtin/0). 
-	:- info(builtin/0,[comment is 'True if module is a builtin module']).
+	:- public(builtin/0).
+	:- info(builtin/0, [
+		comment is 'True if module is a builtin module'
+	]).
+
 	builtin :-
 		parameter(1,Module),
 		implements_protocol(Module,banpipe_builtin_module).
 
-	:- public(module_type/1). 
-	:- info(module_type/1,[comment is 'True if module is a builtin module']).
+	:- public(module_type/1).
+	:- info(module_type/1, [
+		comment is 'True if module is a builtin module'
+	]).
+
 	module_type(builtin) :-
 		self(Self),
 		Self::builtin.
@@ -108,28 +105,35 @@
 	module_type(generic) :-
 		interface_file(_,generic).
 
-		
 	:- public(available/0).
-	:- info(available/0,[comment is 'True if a module with the given name is available.']).
+	:- info(available/0, [
+		comment is 'True if a module with the given name is available.'
+	]).
+
 	available :-
-		::builtin 
-		;
+		::builtin.
+	available :-
 		::interface_file(_,_).
+
 :- end_object.
 
+
 :- object(module_task(_Module,_Task)).
+
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is 'Represents a task in a module',
 		parnames is ['Module', 'Task']
 	]).
 
 	:- public(valid/1).
-	:- info(valid/1,
-		[ comment is 'True if module+task exists, have a declaration+implementation in the interface file and Options matches (is a subset of) declared options.',
-		  argnames is ['Options']]).
+	:- info(valid/1, [
+		comment is 'True if module+task exists, have a declaration+implementation in the interface file and Options matches (is a subset of) declared options.',
+		argnames is ['Options']
+	]).
+
 	valid(Options) :-
 		parameter(1,Module),
 		parameter(2,Task),
@@ -141,11 +145,13 @@
 			true
 			;
 			reporting::error(interface(model_called_with_undeclared_options(Module,Options)))).
-			
+
 	:- public(expand_options/2).
- 	:- info(expand_options/2,
-		[ comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
-		  argnams is [ 'Options', 'SortedExpandedOptions' ]]).
+	:- info(expand_options/2, [
+		comment is 'Options are expanded to SortedExpandedOptions: A sorted list which include Options+declared default options, except if an option in Options use same functor. ',
+		argnams is [ 'Options', 'SortedExpandedOptions' ]
+	]).
+
 	expand_options(Options,SortedExpandedOptions) :-
 		::options(DefaultOptions),
 		::expand_options(Options,DefaultOptions,SortedExpandedOptions).
@@ -175,7 +181,7 @@
 		parameter(2,Task),
 		TaskGoal =.. [ Task, _, _, _ ],
 		Module::predicate_property(TaskGoal,(public)).
-	
+
 	% has_implementation/0 for external prolog-based banpipe modules
 	has_implementation :-
 		parameter(1,Module),
@@ -195,22 +201,24 @@
 	:- public(declaration/1).
 	:- info(declaration/1,
 		[ comment is 'Declaration is the task declation, e.g, taskname(input_types,options,output_types).',
-		argnames is ['Declaration']]).
+		argnames is ['Declaration']
+	]).
+
 	declaration(Declaration) :-
 		parameter(1,Module),
 		module(Module)::builtin,
 		!,
 		parameter(2,Task),
 		Module::task(Declaration),
-		Declaration =.. [ Task | _ ].
-		
+		functor(Declaration, Task, _).
+
 	declaration(Declaration) :-
 		parameter(1,Module),
 		parameter(2,Task),
 		module(Module)::interface_file(InterfaceFile,prolog),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
-		TaskMatcher =.. [ ':-', task(Declaration) ],
-		Declaration =.. [ Task | _ ].
+		TaskMatcher = (:- task(Declaration)),
+		functor(Declaration, Task, _).
 
 	declaration(Declaration) :- 
 		parameter(1,Module),
@@ -218,43 +226,51 @@
 		module(Module)::interface_file(InterfaceFile,generic),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
 		TaskMatcher = task(Declaration), 
-		Declaration =.. [ Task | _ ].
-		
+		functor(Declaration, Task, _).
+
 	:- public(options/1).
-	:- info(options/1, 
-		[ comment is 'Options is the list of declared options for task.',
-		  argnames is ['Options']]).
+	:- info(options/1, [
+		comment is 'Options is the list of declared options for task.',
+		argnames is ['Options']
+	]).
+
 	options(Options) :-
 		::declaration(Decl),
 		Decl =.. [ _ , _, OptionsDecl, _ ],
-		(list::member(version(_),OptionsDecl) ->
+		(	list::member(version(_),OptionsDecl) ->
 			Options = OptionsDecl
-			;
-			Options = [version(na)|OptionsDecl]).
-	
+		;	Options = [version(na)|OptionsDecl]
+		).
+
 	:- public(input_types/1).
-	:- info(input_types/1,
-		[ comment is 'InputTypes is a sequence of file types accepted as input to the task.',
-		  argnames is ['InputTypes']]).
+	:- info(input_types/1, [
+		comment is 'InputTypes is a sequence of file types accepted as input to the task.',
+		argnames is ['InputTypes']
+	]).
+
 	input_types(InputTypes) :-
 		::declaration(Decl),
 		Decl =.. [ _ , InputTypes, _, _ ].
 
 	:- public(output_types/1).
-	:- info(output_types/1,
-		[ comment is 'OutputTypes is a sequence of file types produced by the task.',
-		  argnames is ['OutputTypes']]).
+	:- info(output_types/1, [
+		comment is 'OutputTypes is a sequence of file types produced by the task.',
+		argnames is ['OutputTypes']
+	]).
+
 	output_types(OutputTypes) :-
 		::declaration(Decl),
 		Decl =.. [ _ , _, _, OutputTypes ].
+
 :- end_object.
+
 
 :- object(task(Module,Task,_InputFiles,_Options), extends(module_task(Module,Task))).
 
 	:- info([
-		version is 1.0,
+		version is 1:0:0,
 		author is 'Christian Theil Have',
-		date is 2012/11/09,
+		date is 2012-11-09,
 		comment is '.',
 		parnames is ['Module', 'Task', 'InputFiles', 'Options']
 	]).
@@ -262,8 +278,9 @@
 	:- public(run/1).
 	:- info(run/1,[
 		comment is 'Runs the task(Module,Task,InputFiles,Options) using an invoker (see invoker/1) if the task is not available on file(s). OutputFiles is a list of names of resulting files.',
-		argnames is ['OutputFiles']]).
-	
+		argnames is ['OutputFiles']
+	]).
+
 	run(OutputFilesList) :-
 		self(Self),
 		parameter(1,Module),
@@ -296,7 +313,7 @@
 			% Strip the list if it is not declared in the argument
 			[InputFilesCanonicalAdapt] = InputFilesCanonical),
 		Goal =.. [ Task, InputFilesCanonicalAdapt, ExpandedOptions, OutputFiles ],
-		writeln(Goal),
+		write(Goal), nl,
 		(FileManager::result_files(Module,Task,InputFilesCanonical,ExpandedOptions,OutputFilesList) ->
 			true % The task has allready been run 
 			;
@@ -313,8 +330,9 @@
 	:- public(typecheck/1).
 	:- info(typecheck/1,[
 		comments is 'Check that supplied types of the input types are valid and unify OutputTypes to the resulting output types.',
-		argnames is ['OutputTypes']]).
-	
+		argnames is ['OutputTypes']
+	]).
+
 	% FIXME: Typecheck needs adaptation to non-list types
 	typecheck(OutputTypes) :-
 		parameter(2,Task),
@@ -326,9 +344,11 @@
 		term::subsumes(InputTypes,SuppliedInputTypes).
 
 	:- public(invoker/1).
-	:- info(invoker/1,
-		[ comment is 'Determine InvokerObject to use: module may declare invoke_with/1; otherwise use banpipe_config default_invoker',
-		  argnames is ['InvokerObject']]).
+	:- info(invoker/1, [
+		comment is 'Determine InvokerObject to use: module may declare invoke_with/1; otherwise use banpipe_config default_invoker',
+		argnames is ['InvokerObject']
+	]).
+
 	invoker(builtin) :-
 		parameter(1,Module),
 		module(Module)::builtin.
@@ -336,18 +356,19 @@
 	invoker(generic_invoker) :-
 		parameter(1,Module),
 		module(Module)::interface_file(_,generic).
-		
+
 	invoker(InvokerName) :-
 		parameter(1,Module),
 		module(Module)::interface_file(InterfaceFile,prolog),
 		prolog_file(InterfaceFile)::member(TaskMatcher),
-		TaskMatcher =.. [ ':-', invoke_with(PrologName) ],
+		TaskMatcher = (:- invoke_with(PrologName)),
 		atom_concat(PrologName,'_invoker',InvokerName),
 		!.
 
 	invoker(Invoker) :-
 		config::get(default_invoker,Invoker).
-		
+
 	% TODO: Eventually, I might move guard invokation to run/1 (rather than in script interpreter)
 	% to allow unifying variables from the default option settings
+
 :- end_object.

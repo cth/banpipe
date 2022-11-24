@@ -38,7 +38,7 @@ Next, you need to download the source code for BANpipe. You can download the lat
 
 Alternative you can clone the git repository, i.e., 
 
-`git clone https://github.com/cth/banpipe.git`
+	git clone https://github.com/cth/banpipe.git
 
 Place the source code in any directory that you see fit, e.g., `/home/myaccount/banpipe`.
 
@@ -46,26 +46,30 @@ After downloading banpipe, you will need to setup BANpipe as a Logtalk library:
 You can edit the file `settings.lgt` in the BANpipe directory to reflect your installation path
 and then move the `settings.lgt` to `$LOGTALKUSER`.
 
+The environment variable `BANPIPE_PATH` must be set to the `banpipe` directory:
+
+	export BANPIPE_PATH=/home/myacccount/banpipe
+
 You also need to add any directory which contains BANpipe modules to the 
 `$BANPIPE_MODULE_PATH` variable. For instance, to add the example modules,
 
-`export BANPIPE_MODULE_PATH=/home/myacccount/banpipe/examples`
+	export BANPIPE_MODULE_PATH=/home/myacccount/banpipe/examples
 
 The `$BANPIPE_MODULE_PATH` environment variable works like the normal PATH variable and you can add multiple directories separated by ':'
 
 Now, you should be able to start Logtalk (e.g., using `swilgt`) and call,
 
-`{banpipe(init)}.`
+	{banpipe(loader)}.
 
 which will load the BANpipe library. 
 
 You can now load BANpipe scripts, e.g. the helloworld.pl examples, by calling the goal,
 
-`banpipe::load('/home/myaccount/examples/helloworld.pl').`
+	banpipe::load('/home/myaccount/examples/helloworld.pl').
 
 and subsequently run the script using 
 
-`banpipe::run(helloworld(english),Outfile)`
+	banpipe::run(helloworld(english),Outfile).
 
 `Outfile` will be unified to name of the output file.
 
@@ -73,14 +77,14 @@ and subsequently run the script using
 
 Once installation of BANpipe is completed, you can load BANpipe using the command
 
-`{banpipe(init)}.`
+	{banpipe(loader)}.
 
 
 ### Loading a BANpipe script
 
 A BANpipe script is loaded using the command 
 
-`banpipe::load(Filename)`
+	banpipe::load(Filename).
 
 where `Filename` is a relative or absolute file name in the filesystem. 
 You need to supply the full filename including possible extensions, e.g. `.pl`
@@ -90,14 +94,14 @@ You need to supply the full filename including possible extensions, e.g. `.pl`
 
 To run a goal in a BANpipe script the command,
 
-`banpipe::run(Goal)`
+	banpipe::run(Goal).
 
 is used. This will run the scripts sequentially in a bottom-up, left-to-right fashion, i.e., dependencies are 
 computed first left-most dependencies in a task are computed before right-most dependencies.
 
 To get the filename corresponding to the goal, call instead,
 
-`banpipe::run(Goal,File)`
+	banpipe::run(Goal,File).
 
 This will unify `File` to the generated file corresponding to `Goal`.
 
@@ -107,7 +111,7 @@ When banpipe::run(Goal) is called, scripts are run in a sequential fashion.
 It is possible also to run scripts with automatic parallelization, so that all independent tasks
 will be run simultaneously. This is achieved by calling,
 
-`banpipe::prun(Goal).`
+	banpipe::prun(Goal).
 
 Runnings scripts with parallization is only available when running BANpipe with Logtalk on a Prolog
 system which has support for threads, e.g., SWI-Prolog.
@@ -118,11 +122,11 @@ Scripts are not type checked when calling `banpipe::run`or `banpipe::prun`. Is p
 run a script that is not well-typed. However, type checking a script in advance may help to avoid 
 errors. To typecheck a script use the goal,
 
-`banpipe::typecheck(Goal)`
+	banpipe::typecheck(Goal).
 
 or similarly
 
-`banpipe::typecheck(Goal,Type)`
+	banpipe::typecheck(Goal,Type).
 
 to get the `Type` corresponding to `Goal`. `banpipe::typecheck/{1,2}` fails with a report of the type error,
 if the script is not well-typed. 
@@ -133,7 +137,7 @@ A call graph shows the interdependencies between tasks and may be used as a way 
 scripts. Even though it is a graph, it is displayed as a tree where nodes which are shared 
 in the graph are shown as multiple branches of the tree. A call graph is obtained by calling,
 
-`banpipe::callgraph(Goal)`
+	banpipe::callgraph(Goal).
 
 For instance, for the hello world example, the following call graph is produced:
 
